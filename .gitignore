@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.env
+
+# Build artifacts (rebuild from catalog with scripts/build_db.py)
+data/build/catalog.db.tmp
+
+# Local/editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Temp
+/tmp/

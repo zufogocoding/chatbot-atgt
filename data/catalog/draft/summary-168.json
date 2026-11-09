@@ -1,0 +1,30 @@
+{
+  "document": "168/2024/NĐ-CP",
+  "articles": [
+    6,
+    7,
+    13,
+    14,
+    18,
+    32
+  ],
+  "violations": 266,
+  "by_article": {
+    "6": 74,
+    "7": 65,
+    "13": 23,
+    "14": 13,
+    "18": 24,
+    "32": 67
+  },
+  "by_vehicle": {
+    "xe_may": 105,
+    "o_to": 157,
+    "both": 4
+  },
+  "with_additional_penalty": 71,
+  "with_remedial_measures": 59,
+  "with_license_points": 109,
+  "penalty_rules": 57,
+  "status": "draft"
+}

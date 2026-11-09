@@ -1,0 +1,36 @@
+{
+  "document": "168/2024/NĐ-CP",
+  "consolidated_with": "238/2026/NĐ-CP",
+  "consolidated_as_of": "2026-11-09",
+  "amendment_effective_from": "2026-08-15",
+  "articles": [
+    6,
+    7,
+    13,
+    14,
+    18,
+    32
+  ],
+  "violations": 267,
+  "by_article": {
+    "6": 75,
+    "7": 65,
+    "13": 23,
+    "14": 13,
+    "18": 24,
+    "32": 67
+  },
+  "by_vehicle": {
+    "xe_may": 105,
+    "o_to": 158,
+    "both": 4
+  },
+  "with_additional_penalty": 67,
+  "with_remedial_measures": 68,
+  "with_license_points": 109,
+  "penalty_rules": 57,
+  "patched_records": 20,
+  "added_records": 1,
+  "patched_rules": 7,
+  "status": "draft"
+}

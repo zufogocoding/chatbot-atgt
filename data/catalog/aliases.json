@@ -1,0 +1,947 @@
+{
+  "version": "2026-11-09",
+  "description": "Curated citizen phrasings mapped to consolidated violation records. Used for exact-match intent resolution before semantic retrieval.",
+  "vehicle_types": [
+    "o_to",
+    "xe_may"
+  ],
+  "aliases": [
+    {
+      "id": "vuot-den-do",
+      "canonical": "Không chấp hành hiệu lệnh của đèn tín hiệu giao thông",
+      "citizen_phrases": [
+        "vượt đèn đỏ",
+        "chạy đèn đỏ",
+        "đèn đỏ vẫn đi",
+        "không dừng đèn đỏ",
+        "vượt đèn giao thông",
+        "vượt đèn",
+        "đèn đỏ",
+        "đèn giao thông",
+        "đèn tín hiệu giao thông",
+        "vuot den do",
+        "chay den do",
+        "den do"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k9-b"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k7-c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-doi-mu-bao-hiem",
+      "canonical": "Không đội mũ bảo hiểm hoặc đội mũ không cài quai đúng quy cách",
+      "citizen_phrases": [
+        "không đội mũ bảo hiểm",
+        "quên đội mũ",
+        "quên mũ bảo hiểm",
+        "không cài quai mũ",
+        "đội mũ không cài quai",
+        "chở người không đội mũ",
+        "khong doi mu bao hiem",
+        "quen mu bao hiem"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k2-h",
+            "qualifier": "người điều khiển xe"
+          },
+          {
+            "record_id": "nd168-d7-k2-i",
+            "qualifier": "người ngồi sau không đội mũ"
+          }
+        ]
+      },
+      "notes": "Mức phạt 400.000–600.000 đồng cho cả người lái và người ngồi sau; không bị trừ điểm giấy phép lái xe."
+    },
+    {
+      "id": "nong-do-con",
+      "canonical": "Điều khiển xe trên đường mà trong máu hoặc hơi thở có nồng độ cồn",
+      "citizen_phrases": [
+        "nồng độ cồn",
+        "uống rượu bia",
+        "say xỉn",
+        "thổi kèn",
+        "ma men",
+        "vi phạm nồng độ cồn",
+        "không chấp hành kiểm tra nồng độ cồn",
+        "nong do con",
+        "uong ruou bia"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k6-c",
+            "qualifier": "chưa vượt quá 50 mg/100 ml máu hoặc 0,25 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d6-k9-a",
+            "qualifier": "vượt quá 50–80 mg/100 ml máu hoặc 0,25–0,4 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d6-k11-a",
+            "qualifier": "vượt quá 80 mg/100 ml máu hoặc 0,4 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d6-k11-b",
+            "qualifier": "không chấp hành yêu cầu kiểm tra nồng độ cồn"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k6-a",
+            "qualifier": "chưa vượt quá 50 mg/100 ml máu hoặc 0,25 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d7-k8-b",
+            "qualifier": "vượt quá 50–80 mg/100 ml máu hoặc 0,25–0,4 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d7-k9-d",
+            "qualifier": "vượt quá 80 mg/100 ml máu hoặc 0,4 mg/l khí thở"
+          },
+          {
+            "record_id": "nd168-d7-k9-đ",
+            "qualifier": "không chấp hành yêu cầu kiểm tra nồng độ cồn"
+          }
+        ]
+      },
+      "notes": "Cần hỏi thêm loại xe và mức đo nồng độ cồn để chọn đúng khung phạt."
+    },
+    {
+      "id": "qua-toc-do",
+      "canonical": "Điều khiển xe chạy quá tốc độ quy định",
+      "citizen_phrases": [
+        "chạy quá tốc độ",
+        "phóng nhanh",
+        "vượt tốc độ",
+        "quá tốc độ",
+        "chạy nhanh quá",
+        "qua toc do",
+        "chay qua toc do"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k3-a",
+            "qualifier": "quá 5 km/h đến dưới 10 km/h"
+          },
+          {
+            "record_id": "nd168-d6-k5-đ",
+            "qualifier": "quá 10–20 km/h"
+          },
+          {
+            "record_id": "nd168-d6-k6-a",
+            "qualifier": "quá 20–35 km/h"
+          },
+          {
+            "record_id": "nd168-d6-k7-a",
+            "qualifier": "quá 35 km/h"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k2-b",
+            "qualifier": "quá 5 km/h đến dưới 10 km/h"
+          },
+          {
+            "record_id": "nd168-d7-k4-a",
+            "qualifier": "quá 10–20 km/h"
+          },
+          {
+            "record_id": "nd168-d7-k8-a",
+            "qualifier": "quá 20 km/h"
+          }
+        ]
+      },
+      "notes": "Cần hỏi thêm mức vượt tốc độ để chọn đúng khung phạt."
+    },
+    {
+      "id": "khong-co-bang-lai",
+      "canonical": "Không có giấy phép lái xe hoặc sử dụng giấy phép lái xe không hợp lệ",
+      "citizen_phrases": [
+        "không có bằng lái",
+        "chưa có bằng lái",
+        "không có giấy phép lái xe",
+        "chưa có giấy phép lái xe",
+        "bằng lái giả",
+        "bằng lái bị tẩy xóa",
+        "khong co bang lai",
+        "chua co bang lai"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d18-k9-b",
+            "qualifier": "xe ô tô"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d18-k5-a",
+            "qualifier": "xe mô tô đến 125 cm3 hoặc đến 11 kW"
+          },
+          {
+            "record_id": "nd168-d18-k7-b",
+            "qualifier": "xe mô tô trên 125 cm3 hoặc trên 11 kW"
+          }
+        ]
+      },
+      "notes": "Các hình thức thu hồi giấy phép chỉ áp dụng khi giấy phép không do cơ quan có thẩm quyền cấp hoặc không hợp lệ; không áp dụng khi người lái hoàn toàn không có giấy phép."
+    },
+    {
+      "id": "bang-lai-het-han",
+      "canonical": "Sử dụng giấy phép lái xe đã hết hạn",
+      "citizen_phrases": [
+        "bằng lái hết hạn",
+        "giấy phép lái xe hết hạn",
+        "bằng lái quá hạn",
+        "hết hạn bằng lái",
+        "bang lai het han"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d18-k8-a",
+            "qualifier": "hết hạn dưới 01 năm"
+          },
+          {
+            "record_id": "nd168-d18-k9-a",
+            "qualifier": "hết hạn từ 01 năm trở lên hoặc không đúng loại xe"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d18-k5-a",
+            "qualifier": "xe mô tô đến 125 cm3 hoặc đến 11 kW"
+          },
+          {
+            "record_id": "nd168-d18-k7-b",
+            "qualifier": "xe mô tô trên 125 cm3 hoặc trên 11 kW"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-co-bao-hiem",
+      "canonical": "Không có chứng nhận bảo hiểm bắt buộc trách nhiệm dân sự còn hiệu lực",
+      "citizen_phrases": [
+        "không có bảo hiểm xe",
+        "không mua bảo hiểm",
+        "bảo hiểm hết hạn",
+        "hết hạn bảo hiểm",
+        "khong co bao hiem",
+        "bao hiem het han"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d18-k4-c"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d18-k2-b"
+          }
+        ]
+      },
+      "notes": "Chỉ áp dụng với xe không có bảo hiểm còn hiệu lực. Trường hợp kinh doanh vận tải không mang theo giấy tờ có mức phạt khác."
+    },
+    {
+      "id": "khong-co-dang-ky-xe",
+      "canonical": "Điều khiển xe không có chứng nhận đăng ký xe hoặc đăng ký xe hết hiệu lực",
+      "citizen_phrases": [
+        "không có đăng ký xe",
+        "mất giấy đăng ký xe",
+        "xe không giấy tờ",
+        "không có cà vẹt",
+        "mất cà vẹt",
+        "khong co dang ky xe",
+        "mat ca vet"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k4-a"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k2-a"
+          }
+        ]
+      },
+      "notes": "Có thể bị tịch thu phương tiện nếu không chứng minh được nguồn gốc xuất xứ."
+    },
+    {
+      "id": "khong-xi-nhan",
+      "canonical": "Chuyển làn hoặc chuyển hướng không có tín hiệu báo trước",
+      "citizen_phrases": [
+        "không xi nhan",
+        "không bật xi nhan",
+        "quên xi nhan",
+        "chuyển làn không xi nhan",
+        "rẽ không xi nhan",
+        "không có tín hiệu báo trước",
+        "khong xi nhan",
+        "quen xi nhan"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k2-a",
+            "qualifier": "khi chuyển làn đường"
+          },
+          {
+            "record_id": "nd168-d6-k3-c",
+            "qualifier": "khi chuyển hướng, rẽ"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k1-e",
+            "qualifier": "khi chuyển làn đường"
+          },
+          {
+            "record_id": "nd168-d7-k3-a",
+            "qualifier": "khi chuyển hướng, rẽ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "di-nguoc-chieu",
+      "canonical": "Đi ngược chiều của đường một chiều hoặc đường có biển cấm đi ngược chiều",
+      "citizen_phrases": [
+        "đi ngược chiều",
+        "chạy ngược chiều",
+        "đi vào đường một chiều",
+        "đi ngược đường",
+        "di nguoc chieu",
+        "chay nguoc chieu"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k9-d",
+            "qualifier": "đường một chiều hoặc đường có biển cấm đi ngược chiều"
+          },
+          {
+            "record_id": "nd168-d6-k11-đ",
+            "qualifier": "trên đường cao tốc"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k7-a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "di-vao-duong-cam",
+      "canonical": "Đi vào khu vực cấm hoặc đường có biển báo cấm đi vào",
+      "citizen_phrases": [
+        "đi vào đường cấm",
+        "đi vào khu vực cấm",
+        "đi đường cấm",
+        "vi phạm biển cấm đi vào",
+        "di vao duong cam"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k5-i"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k6-b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "duong-cao-toc",
+      "canonical": "Vi phạm quy định khi tham gia giao thông trên đường cao tốc",
+      "citizen_phrases": [
+        "đi vào đường cao tốc",
+        "xe máy lên cao tốc",
+        "dừng xe trên cao tốc",
+        "đỗ xe trên cao tốc",
+        "đi ngược chiều trên cao tốc",
+        "duong cao toc"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k7-c",
+            "qualifier": "dừng, đỗ xe không đúng nơi quy định"
+          },
+          {
+            "record_id": "nd168-d6-k11-đ",
+            "qualifier": "đi ngược chiều, lùi xe, quay đầu xe trên cao tốc"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k7-b",
+            "qualifier": "điều khiển xe mô tô đi vào đường cao tốc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vuot-sai-quy-dinh",
+      "canonical": "Vượt xe trong trường hợp không được vượt hoặc vượt không đúng quy định",
+      "citizen_phrases": [
+        "vượt ẩu",
+        "vượt sai quy định",
+        "vượt phải",
+        "vượt xe sai quy định",
+        "vuot au",
+        "vuot sai quy dinh"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k5-a",
+            "qualifier": "vượt trong trường hợp không được vượt"
+          },
+          {
+            "record_id": "nd168-d6-k4-d",
+            "qualifier": "không nhường đường cho xe xin vượt"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k4-c",
+            "qualifier": "vượt trong trường hợp không được vượt"
+          },
+          {
+            "record_id": "nd168-d7-k3-đ",
+            "qualifier": "vượt bên phải trái phép"
+          },
+          {
+            "record_id": "nd168-d7-k1-b",
+            "qualifier": "vượt không có tín hiệu"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lang-lach-danh-vong",
+      "canonical": "Điều khiển xe lạng lách, đánh võng trên đường bộ",
+      "citizen_phrases": [
+        "lạng lách đánh võng",
+        "lạng lách",
+        "đánh võng",
+        "chạy hình chữ S",
+        "lang lach danh vong"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k12"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k9-a"
+          }
+        ]
+      },
+      "notes": "Tái phạm có thể bị tịch thu phương tiện và tước giấy phép lái xe 22–24 tháng."
+    },
+    {
+      "id": "su-dung-dien-thoai",
+      "canonical": "Dùng tay cầm và sử dụng điện thoại khi điều khiển xe",
+      "citizen_phrases": [
+        "sử dụng điện thoại khi lái xe",
+        "nghe điện thoại khi lái xe",
+        "vừa lái xe vừa dùng điện thoại",
+        "dùng điện thoại",
+        "su dung dien thoai"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k5-h"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k4-đ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-that-day-an-toan",
+      "canonical": "Không thắt dây đai an toàn khi điều khiển xe ô tô",
+      "citizen_phrases": [
+        "không thắt dây an toàn",
+        "không cài dây bảo hiểm",
+        "quên thắt dây an toàn",
+        "khong that day an toan"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k3-k"
+          }
+        ]
+      },
+      "notes": "Mức 800.000–1.000.000 đồng áp dụng cho người điều khiển. Người ngồi trên xe không thắt dây có mức phạt riêng tại Điều 12."
+    },
+    {
+      "id": "dung-do-xe-sai-quy-dinh",
+      "canonical": "Dừng xe, đỗ xe không đúng quy định",
+      "citizen_phrases": [
+        "đỗ xe sai quy định",
+        "dừng xe sai quy định",
+        "đỗ xe vỉa hè",
+        "đỗ xe lòng đường",
+        "dừng đỗ sai quy định",
+        "do xe sai quy dinh"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k2-d",
+            "qualifier": "dừng, đỗ ngoài đô thị không sát mép đường"
+          },
+          {
+            "record_id": "nd168-d6-k3-đ",
+            "qualifier": "dừng, đỗ tại nơi giao nhau, điểm đón trả khách, trước cổng cơ quan"
+          },
+          {
+            "record_id": "nd168-d6-k3-e",
+            "qualifier": "đỗ xe không sát lề đường, trên miệng cống, trên vỉa hè trái phép"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k2-a",
+            "qualifier": "dừng, đỗ trên phần đường xe chạy ngoài đô thị"
+          },
+          {
+            "record_id": "nd168-d7-k2-d",
+            "qualifier": "dừng, đỗ gây cản trở giao thông; đỗ trên vỉa hè trái phép"
+          },
+          {
+            "record_id": "nd168-d7-k2-e",
+            "qualifier": "dừng, đỗ tại điểm đón trả khách, vạch người đi bộ, nơi có biển cấm"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quay-dau-sai-quy-dinh",
+      "canonical": "Quay đầu xe tại nơi không được quay đầu",
+      "citizen_phrases": [
+        "quay đầu xe sai quy định",
+        "quay đầu ở nơi cấm",
+        "quay đầu xe",
+        "quay dau sai quy dinh"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k4-k",
+            "qualifier": "tại nơi có biển cấm quay đầu"
+          },
+          {
+            "record_id": "nd168-d6-k4-i",
+            "qualifier": "trên vạch người đi bộ, cầu, gầm cầu vượt"
+          },
+          {
+            "record_id": "nd168-d6-k4-đ",
+            "qualifier": "trong hầm đường bộ"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k2-k",
+            "qualifier": "tại nơi không được quay đầu"
+          },
+          {
+            "record_id": "nd168-d7-k4-d",
+            "qualifier": "trong hầm đường bộ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-bat-den",
+      "canonical": "Không sử dụng đèn chiếu sáng khi trời tối hoặc điều kiện tầm nhìn hạn chế",
+      "citizen_phrases": [
+        "không bật đèn",
+        "không mở đèn",
+        "quên bật đèn",
+        "không có đèn chiếu sáng",
+        "khong bat den"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k3-g",
+            "qualifier": "trời tối hoặc sương mù, mưa"
+          },
+          {
+            "record_id": "nd168-d6-k3-n",
+            "qualifier": "trong hầm đường bộ"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k1-g",
+            "qualifier": "trời tối hoặc sương mù, mưa"
+          },
+          {
+            "record_id": "nd168-d7-k3-h",
+            "qualifier": "trong hầm đường bộ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "thiet-bi-xe-hong-thieu",
+      "canonical": "Điều khiển xe thiếu hoặc có thiết bị không bảo đảm an toàn",
+      "citizen_phrases": [
+        "xe không có gương",
+        "không có gương chiếu hậu",
+        "xe không có còi",
+        "không có đèn",
+        "đèn xe hỏng",
+        "phanh hỏng",
+        "thiet bi xe hong"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k2-a",
+            "qualifier": "thiếu đèn, gương, dây đai, thiết bị chữa cháy..."
+          },
+          {
+            "record_id": "nd168-d13-k2-b",
+            "qualifier": "không có còi hoặc còi không tác dụng"
+          },
+          {
+            "record_id": "nd168-d13-k2-c",
+            "qualifier": "thiếu bộ phận giảm thanh, giảm khói"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k1-a",
+            "qualifier": "thiếu còi, đèn soi biển số, gương trái..."
+          },
+          {
+            "record_id": "nd168-d14-k1-b",
+            "qualifier": "không có đèn tín hiệu"
+          },
+          {
+            "record_id": "nd168-d14-k1-c",
+            "qualifier": "không có đèn chiếu sáng gần, xa"
+          },
+          {
+            "record_id": "nd168-d14-k1-d",
+            "qualifier": "không có hệ thống hãm"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-bien-so",
+      "canonical": "Không gắn biển số hoặc gắn biển số không đúng quy định",
+      "citizen_phrases": [
+        "không có biển số",
+        "không gắn biển số",
+        "biển số giả",
+        "biển số bị che",
+        "che biển số",
+        "gắn biển số sai",
+        "khong co bien so"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k7-b",
+            "qualifier": "không gắn biển số"
+          },
+          {
+            "record_id": "nd168-d13-k8-a",
+            "qualifier": "biển số không đúng với đăng ký xe hoặc không do cơ quan có thẩm quyền cấp"
+          },
+          {
+            "record_id": "nd168-d13-k8-b",
+            "qualifier": "biển số không rõ, bị che, bẻ cong, thay đổi nhận diện"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k3-a",
+            "qualifier": "không gắn biển số hoặc biển số không đúng đăng ký"
+          },
+          {
+            "record_id": "nd168-d14-k3-b",
+            "qualifier": "biển số không rõ, bị che, bẻ cong, thay đổi nhận diện"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-chap-hanh-hieu-lenh-csgt",
+      "canonical": "Không chấp hành hiệu lệnh, hướng dẫn của người điều khiển giao thông",
+      "citizen_phrases": [
+        "không chấp hành hiệu lệnh công an",
+        "không dừng xe theo hiệu lệnh",
+        "bỏ chạy khi bị yêu cầu dừng",
+        "không chấp hành hiệu lệnh csgt",
+        "khong chap hanh hieu lenh"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k9-c"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k7-d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "net-po-ru-ga",
+      "canonical": "Sử dụng còi, rú ga (nẹt pô) liên tục trong khu đông dân cư",
+      "citizen_phrases": [
+        "nẹt pô",
+        "rú ga",
+        "nẹt bô",
+        "bấm còi liên tục",
+        "net po",
+        "ru ga"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k3-b",
+            "qualifier": "xe ô tô"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k9-k",
+            "qualifier": "xe mô tô, xe gắn máy"
+          }
+        ]
+      }
+    },
+    {
+      "id": "xe-qua-nien-han",
+      "canonical": "Điều khiển xe quá niên hạn sử dụng tham gia giao thông",
+      "citizen_phrases": [
+        "xe quá niên hạn",
+        "xe hết niên hạn",
+        "xe cũ quá hạn sử dụng",
+        "xe qua nien han"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k9-a"
+          }
+        ]
+      },
+      "notes": "Hình thức xử phạt chính là tịch thu phương tiện, không có khung phạt tiền."
+    },
+    {
+      "id": "khong-sang-ten-chu-xe",
+      "canonical": "Chủ xe không làm thủ tục sang tên/đổi chủ khi mua bán, cho tặng xe",
+      "citizen_phrases": [
+        "không sang tên",
+        "chưa sang tên",
+        "xe không sang tên",
+        "mua xe không sang tên",
+        "không sang tên xe",
+        "không làm thủ tục sang tên",
+        "không chính chủ",
+        "xe không chính chủ",
+        "đứng tên không chính chủ",
+        "xe đứng tên người khác",
+        "khong sang ten",
+        "chua sang ten",
+        "khong chinh chu",
+        "xe khong chinh chu"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k3-a"
+          }
+        ],
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k7-h"
+          }
+        ]
+      },
+      "notes": "Áp dụng khi thay đổi chủ xe theo quy định nhưng chưa làm thủ tục cấp chứng nhận đăng ký xe, biển số xe."
+    },
+    {
+      "id": "giao-xe-cho-nguoi-khong-du-dieu-kien",
+      "canonical": "Chủ xe giao xe hoặc để cho người không đủ điều kiện điều khiển",
+      "citizen_phrases": [
+        "giao xe cho người không có bằng lái",
+        "cho người không có bằng lái mượn xe",
+        "cho mượn xe người không có bằng",
+        "giao xe cho người chưa đủ tuổi",
+        "giao xe cho người bị tước bằng",
+        "cho người mất bằng lái mượn xe",
+        "giao xe cho nguoi khong co bang lai",
+        "cho muon xe khong co bang"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k10"
+          }
+        ],
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k14-i"
+          }
+        ]
+      },
+      "notes": "Chủ phương tiện (cá nhân/tổ chức) bị phạt khi giao xe hoặc để người không đủ điều kiện điều khiển. Trường hợp chủ xe trực tiếp lái xe vi phạm sẽ áp dụng mức phạt/điểm của người điều khiển."
+    },
+    {
+      "id": "tu-y-cai-tao-do-xe",
+      "canonical": "Chủ xe tự ý thay đổi, cải tạo đặc tính/kết cấu xe",
+      "citizen_phrases": [
+        "độ xe",
+        "cải tạo xe",
+        "độ xe trái phép",
+        "tự ý cải tạo xe",
+        "thay đổi khung xe",
+        "thay đổi máy xe",
+        "thay đổi kết cấu xe",
+        "độ pô",
+        "nâng hạ thùng xe",
+        "do xe",
+        "cai tao xe"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k8-b",
+            "qualifier": "tự ý thay đổi khung, máy, hình dáng, kích thước, đặc tính xe mô tô/xe gắn máy"
+          }
+        ],
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k16-c",
+            "qualifier": "tự ý thay đổi tổng thành khung/máy, hệ thống phanh/truyền động, cải tạo kết cấu/hình dáng/kích thước xe ô tô"
+          }
+        ]
+      },
+      "notes": "Mức phạt và biện pháp khắc phục khác nhau giữa xe máy và ô tô; cần xác định loại xe và hành vi cụ thể."
+    },
+    {
+      "id": "tu-y-thay-doi-mau-son-xe",
+      "canonical": "Chủ xe tự ý thay đổi màu sơn hoặc nhãn hiệu xe không đúng đăng ký",
+      "citizen_phrases": [
+        "đổi màu sơn xe",
+        "sơn xe khác màu",
+        "thay đổi màu sơn xe",
+        "đổi màu xe không đăng ký",
+        "thay đổi nhãn hiệu xe",
+        "doi mau son xe",
+        "son xe khac mau"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k1-a"
+          }
+        ],
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k7-i"
+          }
+        ]
+      },
+      "notes": "Chủ xe phải làm thủ tục khai báo/đăng ký khi thay đổi màu sơn hoặc nhãn hiệu theo quy định."
+    },
+    {
+      "id": "lap-thiet-bi-thay-doi-bien-so",
+      "canonical": "Chủ xe lắp đặt, sử dụng thiết bị thay đổi biển số",
+      "citizen_phrases": [
+        "lắp thiết bị thay đổi biển số",
+        "lắp thiết bị lật biển số",
+        "dùng thiết bị che biển số",
+        "biển số lật",
+        "thiết bị đổi biển số",
+        "lap thiet bi thay doi bien so"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k8-g"
+          }
+        ],
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k12-c"
+          }
+        ]
+      },
+      "notes": "Ngoài phạt tiền, có thể bị tịch thu biển số và thiết bị thay đổi biển số."
+    },
+    {
+      "id": "xe-qua-nien-han-su-dung-chu-xe",
+      "canonical": "Chủ xe đưa phương tiện quá niên hạn sử dụng tham gia giao thông",
+      "citizen_phrases": [
+        "chủ xe cho xe quá niên hạn chạy",
+        "đưa xe quá niên hạn tham gia giao thông",
+        "xe quá hạn sử dụng chủ xe",
+        "chu xe dua xe qua nien han"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k17-c"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d32-k17-c"
+          }
+        ]
+      },
+      "notes": "Bị tịch thu phương tiện theo Điều 32 khoản 17 điểm c."
+    }
+  ]
+}

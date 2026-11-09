@@ -1,0 +1,256 @@
+{
+  "document": "238/2026/NĐ-CP",
+  "title": "Nghị định sửa đổi, bổ sung một số điều của Nghị định 168/2024/NĐ-CP",
+  "issued": "2026-06-26",
+  "effective_from": "2026-08-15",
+  "source_url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/7/238-ndcp.signed.pdf",
+  "note": "Amendments touching the MVP scope (Điều 6, 7, 13, 14, 18 and the owner provisions in Điều 32) are encoded here. Other articles remain out of scope.",
+  "added": [
+    {
+      "id": "nd168-d6-k1a",
+      "vehicle_type": "o_to",
+      "behavior_group": "quy_tac_giao_thong",
+      "behavior_text": "Phạt cảnh cáo đối với người điều khiển xe ô tô thực hiện hành vi chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe mà không sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định (trừ xe ô tô kinh doanh vận tải hành khách).",
+      "fine_min": 0,
+      "fine_max": 0,
+      "fine_text": "Phạt cảnh cáo",
+      "record_kind": "warning",
+      "legal_basis": {
+        "document": "168/2024/NĐ-CP (sửa đổi, bổ sung bởi 238/2026/NĐ-CP)",
+        "article": 6,
+        "clause": "1a",
+        "point": null,
+        "path": "6.1a"
+      },
+      "source_quote": "238/2026/NĐ-CP Điều 2 khoản 1: \"1a. Phạt cảnh cáo đối với người điều khiển xe ô tô thực hiện hành vi chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe mà không sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định (trừ xe ô tô kinh doanh vận tải hành khách).\""
+    }
+  ],
+  "patches": [
+    {
+      "id": "nd168-d6-k2-a",
+      "op": "replace",
+      "old": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề”, trừ các hành vi vi phạm quy định tại điểm g khoản 5 Điều này;",
+      "new": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề” hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên, trừ các hành vi vi phạm quy định tại điểm g khoản 5 Điều này;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 2",
+      "source_quote": "Bổ sung cụm từ \"hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên\" vào sau cụm từ \"chỉ được phép chuyển sang một làn đường liền kề\" tại điểm a khoản 2, điểm g khoản 5 Điều 6; điểm e khoản 1 Điều 7..."
+    },
+    {
+      "id": "nd168-d6-k3-h",
+      "op": "replace",
+      "old": "không nối chắc chắn, an toàn giữa xe kéo và xe được kéo khi kéo nhau;",
+      "new": "không nối chắc chắn, an toàn giữa xe kéo và xe được kéo khi kéo nhau, trừ hành vi vi phạm quy định tại điểm b khoản 3a Điều 29 của Nghị định này;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 1",
+      "source_quote": "Bổ sung cụm từ \", trừ hành vi vi phạm quy định tại điểm b khoản 3a Điều 29 của Nghị định này\" vào sau cụm từ \"xe được kéo khi kéo nhau\" tại điểm h khoản 3 Điều 6."
+    },
+    {
+      "id": "nd168-d6-k3-m",
+      "op": "set_text",
+      "text": "Chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe ô tô ngồi cùng hàng ghế với người lái xe (trừ xe ô tô chỉ có một hàng ghế);",
+      "source": "238/2026/NĐ-CP Điều 2 khoản 2",
+      "source_quote": "Sửa đổi, bổ sung điểm m khoản 3 Điều 6: \"m) Chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe ô tô ngồi cùng hàng ghế với người lái xe (trừ xe ô tô chỉ có một hàng ghế);\"."
+    },
+    {
+      "id": "nd168-d6-k5-g",
+      "op": "replace",
+      "old": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề” khi chạy trên đường cao tốc;",
+      "new": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề” hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên khi chạy trên đường cao tốc;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 2",
+      "source_quote": "Bổ sung cụm từ \"hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên\" vào sau cụm từ \"chỉ được phép chuyển sang một làn đường liền kề\" tại điểm a khoản 2, điểm g khoản 5 Điều 6..."
+    },
+    {
+      "id": "nd168-d6-k5-i",
+      "op": "replace",
+      "old": "đối với loại phương tiện đang điều khiển, trừ các hành vi vi phạm quy định tại điểm d khoản 9",
+      "new": "đối với loại phương tiện đang điều khiển hoặc có quy định cấm của cấp có thẩm quyền đối với loại phương tiện đang điều khiển, trừ các hành vi vi phạm quy định tại điểm d khoản 9",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 3",
+      "source_quote": "Bổ sung cụm từ \"hoặc có quy định cấm của cấp có thẩm quyền đối với loại phương tiện đang điều khiển\" vào sau cụm từ \"đối với loại phương tiện đang điều khiển\" tại điểm i khoản 5 Điều 6, điểm b khoản 6 Điều 7..."
+    },
+    {
+      "id": "nd168-d6-k5-p",
+      "op": "replace",
+      "old": "Chở người trên thùng xe trái quy định; chở người trên nóc xe; để người đu bám ở cửa xe, bên ngoài thành xe khi xe đang chạy;",
+      "new": "Chở người trên thùng xe trái quy định; để người nằm, ngồi, đu bám bên ngoài xe khi xe đang chạy;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 10",
+      "source_quote": "Thay thế cụm từ \"chở người trên nóc xe; để người đu bám ở cửa xe, bên ngoài thành xe khi xe đang chạy\" bằng cụm từ \"để người nằm, ngồi, đu bám bên ngoài xe khi xe đang chạy\" tại điểm p khoản 5 Điều 6."
+    },
+    {
+      "id": "nd168-d6-k7-c",
+      "op": "replace",
+      "old": "đỗ xe ở làn dừng xe khẩn cấp trên đường cao tốc;",
+      "new": "đỗ xe ở làn dừng xe khẩn cấp hoặc dải dừng xe khẩn cấp trên đường cao tốc;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 4",
+      "source_quote": "Bổ sung cụm từ \"hoặc dải dừng xe khẩn cấp\" vào sau cụm từ \"làn dừng xe khẩn cấp\" tại điểm c khoản 7 Điều 6, điểm b khoản 6 Điều 8."
+    },
+    {
+      "id": "nd168-d7-k1-e",
+      "op": "replace",
+      "old": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề”;",
+      "new": "“mỗi lần chuyển làn đường chỉ được phép chuyển sang một làn đường liền kề” hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên;",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 2",
+      "source_quote": "Bổ sung cụm từ \"hoặc chuyển làn đường không bảo đảm khoảng cách an toàn với xe phía trước, xe phía sau, xe hai bên\" vào sau cụm từ \"chỉ được phép chuyển sang một làn đường liền kề\" tại ... điểm e khoản 1 Điều 7..."
+    },
+    {
+      "id": "nd168-d7-k6-b",
+      "op": "replace",
+      "old": "đối với loại phương tiện đang điều khiển, trừ các hành vi vi phạm quy định tại điểm a, điểm b khoản 7",
+      "new": "đối với loại phương tiện đang điều khiển hoặc có quy định cấm của cấp có thẩm quyền đối với loại phương tiện đang điều khiển, trừ các hành vi vi phạm quy định tại điểm a, điểm b khoản 7",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 3",
+      "source_quote": "Bổ sung cụm từ \"hoặc có quy định cấm của cấp có thẩm quyền đối với loại phương tiện đang điều khiển\" vào sau cụm từ \"đối với loại phương tiện đang điều khiển\" tại ... điểm b khoản 6 Điều 7..."
+    },
+    {
+      "id": "nd168-d13-k3-d",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại ... điểm d khoản 3, điểm b khoản 4 Điều 13..."
+    },
+    {
+      "id": "nd168-d13-k4-b",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại ... điểm d khoản 3, điểm b khoản 4 Điều 13..."
+    },
+    {
+      "id": "nd168-d18-k3-c",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại ... điểm c khoản 3 Điều 18 ..."
+    },
+    {
+      "id": "nd168-d18-k4-a",
+      "op": "set_text",
+      "text": "Người từ đủ 16 tuổi đến dưới 18 tuổi điều khiển xe mô tô và các loại xe tương tự xe mô tô;",
+      "source": "238/2026/NĐ-CP Điều 6",
+      "source_quote": "Sửa đổi bổ sung điểm a khoản 4 Điều 18: \"a) Người từ đủ 16 tuổi đến dưới 18 tuổi điều khiển xe mô tô và các loại xe tương tự xe mô tô;\"."
+    },
+    {
+      "id": "nd168-d13-k8-b",
+      "op": "set_text",
+      "text": "Điều khiển xe không gắn đủ biển số hoặc gắn biển số không đúng vị trí, không đúng quy cách theo quy định; gắn biển số không rõ chữ, số hoặc sơn, dán lên chữ, số của biển số xe; gắn biển số bị bẻ cong, che lấp, làm thay đổi chữ, số, màu sắc (của chữ, số, nền biển số xe), hình dạng, kích thước của biển số xe; sử dụng chất liệu, vật liệu, thiết bị làm thay đổi khả năng nhận diện thông tin biển số xe của phương tiện, thiết bị kỹ thuật nghiệp vụ (kể cả rơ moóc và sơ mi rơ moóc).",
+      "source": "238/2026/NĐ-CP Điều 3",
+      "source_quote": "Sửa đổi, bổ sung điểm b khoản 8 Điều 13: \"b) Điều khiển xe không gắn đủ biển số hoặc gắn biển số không đúng vị trí, không đúng quy cách theo quy định; ...\"."
+    },
+    {
+      "id": "nd168-d14-k3-b",
+      "op": "set_text",
+      "text": "Điều khiển xe gắn biển số không đúng vị trí, không đúng quy cách theo quy định; gắn biển số không rõ chữ, số hoặc sơn, dán lên chữ, số của biển số xe; gắn biển số bị bẻ cong, che lấp, làm thay đổi chữ, số, màu sắc (của chữ, số, nền biển số xe), hình dạng, kích thước của biển số xe; sử dụng chất liệu, vật liệu, thiết bị làm thay đổi khả năng nhận diện thông tin biển số xe của phương tiện, thiết bị kỹ thuật nghiệp vụ.",
+      "source": "238/2026/NĐ-CP Điều 4",
+      "source_quote": "Sửa đổi, bổ sung điểm b khoản 3 Điều 14: \"b) Điều khiển xe gắn biển số không đúng vị trí, không đúng quy cách theo quy định; ...\"."
+    },
+    {
+      "id": "nd168-d32-k1-b",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định khí thải",
+      "new": "chứng nhận kiểm định khí thải",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại điểm b khoản 1 Điều 32."
+    },
+    {
+      "id": "nd168-d32-k7-b",
+      "op": "replace",
+      "old": "; giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 12",
+      "source_quote": "Bỏ cụm từ \"giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường\" tại điểm b khoản 7 Điều 32.",
+      "new": ""
+    },
+    {
+      "id": "nd168-d32-k7-d",
+      "op": "replace",
+      "old": ", giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 12",
+      "source_quote": "Bỏ cụm từ \"giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường\" tại điểm d khoản 7 Điều 32.",
+      "new": ""
+    },
+    {
+      "id": "nd168-d32-k11-d",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại điểm d khoản 11 Điều 32."
+    },
+    {
+      "id": "nd168-d32-k14-h",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11",
+      "source_quote": "Thay thế cụm từ \"giấy chứng nhận kiểm định\" bằng cụm từ \"chứng nhận kiểm định\" tại điểm h khoản 14 Điều 32."
+    }
+  ],
+  "rule_patches": [
+    {
+      "id": "nd168-d14-k6-a",
+      "text": "Thực hiện hành vi quy định tại khoản 1; điểm d, điểm đ khoản 2 Điều này buộc thay thế thiết bị đủ tiêu chuẩn an toàn kỹ thuật hoặc khôi phục tính năng kỹ thuật của thiết bị theo quy định;",
+      "add_refs": [
+        {
+          "clause": 1,
+          "point": null
+        },
+        {
+          "clause": 2,
+          "point": "d"
+        }
+      ],
+      "source": "238/2026/NĐ-CP Điều 19 khoản 5",
+      "source_quote": "Bổ sung cụm từ \"khoản 1; điểm d,\" vào trước cụm từ \"điểm đ\" tại điểm a khoản 6 Điều 14."
+    },
+    {
+      "id": "nd168-d32-k18-c",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    },
+    {
+      "id": "nd168-d32-k18-d",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    },
+    {
+      "id": "nd168-d32-k18-đ",
+      "op": "replace",
+      "old": "điểm e, điểm g khoản 7; ",
+      "new": "",
+      "remove_refs": [
+        {
+          "clause": 7,
+          "point": "e"
+        },
+        {
+          "clause": 7,
+          "point": "g"
+        }
+      ],
+      "source": "238/2026/NĐ-CP Điều 19 khoản 12"
+    },
+    {
+      "id": "nd168-d32-k19-đ",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    },
+    {
+      "id": "nd168-d32-k19-g",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    },
+    {
+      "id": "nd168-d32-k20",
+      "op": "replace",
+      "old": "giấy chứng nhận kiểm định",
+      "new": "chứng nhận kiểm định",
+      "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    }
+  ]
+}
