@@ -36,8 +36,12 @@ python3 scripts/evaluate_dataset.py --failures
 | Hỏi lại khi thiếu thông tin | 16/16 |
 | Từ chối ngoài phạm vi hoặc thiếu nguồn | 0/10 |
 | Thủ tục, tìm đúng đoạn trong 5 kết quả BM25 đầu | 46/46 |
+| Thủ tục, số liệu trong key point xuất hiện trong câu trả lời | 46/46 |
+| Thủ tục, độ phủ từ khóa trung bình | 87,4% |
+| Thủ tục, ca dưới 60% từ khóa | 0/46 |
+| Thủ tục, trích dẫn hợp lệ | 46/46 |
 
-Nhánh tra mức phạt chấm theo CLI hiện có. Các câu mà CLI chưa trả lời được vẫn nằm trong mẫu số. Chỉ số hỏi lại đo loại phản hồi, còn `expected_reason` ghi chi tiết thông tin thiếu để dùng khi đánh giá router. Nhánh thủ tục đo truy xuất đoạn nguồn trên corpus 23 đoạn. Chất lượng nội dung trả lời, độ chính xác trích dẫn do RAG sinh và mục tiêu đầy đủ của MVP cần được đo sau khi tích hợp.
+Nhánh tra mức phạt chấm theo CLI hiện có. Các câu mà CLI chưa trả lời được vẫn nằm trong mẫu số. Chỉ số hỏi lại đo loại phản hồi, còn `expected_reason` ghi chi tiết thông tin thiếu để dùng khi đánh giá router. Nhánh thủ tục đo truy xuất đoạn nguồn trên corpus 23 đoạn. Độ phủ từ khóa là heuristic từ vựng trên `expected_key_points`, dùng để bắt câu trả lời thiếu số liệu hoặc ý chính; nó không thay thế đánh giá ngữ nghĩa của người đọc.
 
 ## Chấm FastAPI qua HTTP
 
@@ -53,6 +57,10 @@ Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, 
 |---|---:|
 | Đúng bản ghi, khung tiền và căn cứ mức phạt | 171/171 |
 | Đúng đoạn và căn cứ thủ tục | 46/46 |
+| Thủ tục, số liệu trong key point xuất hiện trong câu trả lời | 46/46 |
+| Thủ tục, độ phủ từ khóa trung bình | 87,4% |
+| Thủ tục, ca dưới 60% từ khóa | 0/46 |
+| Thủ tục, trích dẫn hợp lệ | 46/46 |
 | Hỏi lại đúng loại phản hồi | 16/16 |
 | Từ chối đúng loại phản hồi | 10/10 |
 | Câu trả lời thiếu nguồn | 0 |

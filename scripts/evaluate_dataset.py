@@ -9,6 +9,7 @@ from hashlib import sha256
 from io import StringIO
 import json
 from math import ceil
+import re
 from pathlib import Path
 import sqlite3
 from time import perf_counter
@@ -22,6 +23,31 @@ import query_catalog as lookup
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
+STOPWORDS = set(
+    """va la cua cho trong khi thi tu den ve ra vao mot cac nhung neu bi duoc
+    khong nguoi ta toi ban co the se da dang nay do boi vi voi tren duoi tai
+    theo hoac ma nhu de phai roi con cung mot cach""".split()
+)
+
+
+def content_tokens(text: str) -> set[str]:
+    return {
+        word for word in re.findall(r"[a-z0-9]+", normalize_text(text))
+        if len(word) > 1 and word not in STOPWORDS
+    }
+
+
+def numeric_tokens(text: str) -> set[str]:
+    return set(re.findall(r"\d+(?:[.,]\d+)?", normalize_text(text)))
+
+
+def keypoint_coverage(expected: str, answer: str) -> float:
+    expected_tokens = content_tokens(expected)
+    if not expected_tokens:
+        return 1.0
+    return len(expected_tokens & content_tokens(answer)) / len(expected_tokens)
+
+
 CATEGORY_LIMITS = {
     "xe_may": (60, 80),
     "o_to": (60, 80),
@@ -203,6 +229,18 @@ def evaluate_api(url: str, cases: list[dict], failures: bool) -> None:
                         for ref in case["expected_legal_basis"]}
             actual = {(source["document"], source["locator"], source["url"]) for source in answer["sources"]}
             matches = matches and expected <= actual and set(case["expected_procedure_ids"]) <= set(answer["procedure_ids"])
+            key_points = case.get("expected_key_points") or ""
+            coverage = keypoint_coverage(key_points, answer["answer"])
+            stats["procedure_keypoint_sum"] += coverage
+            stats["procedure_keypoint_cases"] += 1
+            stats["procedure_low_coverage"] += coverage < 0.6
+            stats["procedure_missing_number"] += bool(
+                numeric_tokens(key_points) - numeric_tokens(answer["answer"])
+            )
+            markers = [int(marker) for marker in re.findall(r"\[(\d+)\]", answer["answer"])]
+            stats["procedure_citation_integrity"] += bool(
+                markers and set(markers) == set(range(1, len(answer["sources"]) + 1))
+            )
         stats[f"{kind}_correct"] += matches
         if failures and not matches:
             print(f"{case['id']} {question} → {answer['answer_type']}: {answer['reason'] or answer['procedure_ids']}")
@@ -217,6 +255,12 @@ def evaluate_api(url: str, cases: list[dict], failures: bool) -> None:
     ]:
         hits, total = stats[key], stats[denominator]
         print(f"{label}: {hits}/{total} ({hits / total:.1%})")
+    coverage_cases = stats["procedure_keypoint_cases"]
+    coverage = stats["procedure_keypoint_sum"] / coverage_cases if coverage_cases else 0
+    print(f"Thủ tục — số liệu khớp: {coverage_cases - stats['procedure_missing_number']}/{coverage_cases}")
+    print(f"Thủ tục — độ phủ từ khóa trung bình: {coverage:.1%}")
+    print(f"Thủ tục — ca dưới 60% từ khóa: {stats['procedure_low_coverage']}/{coverage_cases}")
+    print(f"Thủ tục — trích dẫn hợp lệ: {stats['procedure_citation_integrity']}/{coverage_cases}")
     print(f"Câu trả lời thiếu nguồn: {stats['without_sources']}")
     print(f"Độ trễ HTTP p95: {sorted(latencies)[ceil(0.95 * len(latencies)) - 1]:.1f} ms")
 
