@@ -18,7 +18,7 @@ Thư mục này là **nguồn sự thật** cho phần tra cứu mức phạt c�
 | Có biện pháp khắc phục hậu quả | 68 |
 | Có trừ điểm GPLX | 109 |
 | Quy tắc hình phạt/trừ điểm | 57 |
-| Alias tiếng dân | 35 nhóm, 238 cách nói (189 biến thể sau chuẩn hóa) |
+| Alias tiếng dân | 44 nhóm, 285 cách nói (229 biến thể sau chuẩn hóa) |
 | Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 271/271. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
 
 Phân bố theo Điều:
@@ -204,7 +204,7 @@ warnings: 0 (hoặc chỉ warning về record chưa có alias)
 built data/build/catalog.db
   violations: 271
   penalty rules: 57
-  alias groups: 35 (189 phrases)
+  alias groups: 44 (229 phrases)
 ```
 
 ### Tra thử bằng CLI

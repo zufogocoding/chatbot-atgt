@@ -49,10 +49,10 @@ Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vư
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
 | Bản ghi vi phạm | 271 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
-| Alias tiếng dân | 35 nhóm, 238 cách nói (189 biến thể sau chuẩn hóa) |
+| Alias tiếng dân | 44 nhóm, 285 cách nói (229 biến thể sau chuẩn hóa) |
 | Kiểm chứng | 271/271 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
-| Bộ đánh giá | 243 câu có nhãn kỳ vọng, có script chấm baseline |
+| Bộ đánh giá | 254 câu có nhãn kỳ vọng, có script chấm baseline |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
 Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe. Chưa gồm: Điều 32 khoản 5–6 (phạt trên mỗi người vượt quá, có trần), các điểm 238/2026 thêm mới 9a/11.e/13.e (xe đầu kéo/vận tải nội bộ, tham chiếu Điều 20/21), Điều 17 và các điều vận tải 20–24.

@@ -85,6 +85,17 @@ def test_passenger_is_a_separate_subject():
         ("Xe máy không có gương chiếu hậu", "nd168-d14-k1-a"),
         ("Xe máy thiếu gương chiếu hậu bên trái", "nd168-d14-k1-a"),
         ("Ô tô chuyển làn không xi nhan", "nd168-d6-k2-a"),
+        ("Ô tô không có kính chắn gió", "nd168-d13-k1"),
+        ("Ô tô lắp thêm đèn", "nd168-d13-k3-a"),
+        ("Ô tô lốp không đúng kích cỡ", "nd168-d13-k3-c"),
+        ("Ô tô phanh không ăn", "nd168-d13-k5-b"),
+        ("Xe máy phanh không ăn", "nd168-d14-k1-d"),
+        ("Ô tô còi quá to", "nd168-d13-k5-d"),
+        ("Xe máy còi quá to", "nd168-d14-k2-đ"),
+        ("Ô tô không có bộ giảm thanh", "nd168-d13-k2-c"),
+        ("Xe máy không có bộ giảm thanh", "nd168-d14-k2-d"),
+        ("Ô tô dán logo cơ quan nhà nước", "nd168-d13-k4-c"),
+        ("Xe máy lắp đèn chiếu sáng phía sau", "nd168-d14-k1-đ"),
     ],
 )
 def test_common_phrasings(question, record_id):

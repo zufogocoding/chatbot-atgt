@@ -652,7 +652,6 @@
         "xe không có còi",
         "không có đèn",
         "đèn xe hỏng",
-        "phanh hỏng",
         "thiet bi xe hong"
       ],
       "requires_qualifier": true,
@@ -1053,6 +1052,193 @@
         ]
       },
       "notes": "Chủ thể bị phạt là người được chở."
+    },
+    {
+      "id": "o-to-khong-kinh-chan-gio",
+      "canonical": "Điều khiển ô tô không có kính chắn gió hoặc kính vỡ không có tác dụng",
+      "citizen_phrases": [
+        "không có kính chắn gió",
+        "kính chắn gió bị vỡ",
+        "kính lái vỡ",
+        "mất kính chắn gió",
+        "kinh chan gio vo"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "o-to-lap-them-den",
+      "canonical": "Điều khiển ô tô lắp thêm đèn không đúng quy định",
+      "citizen_phrases": [
+        "lắp thêm đèn",
+        "gắn thêm đèn",
+        "lắp đèn led trái phép",
+        "độ đèn xe",
+        "lap them den"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k3-a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lop-banh-khong-dat-chuan",
+      "canonical": "Điều khiển xe không đủ bánh lốp hoặc bánh lốp không đúng kích cỡ, tiêu chuẩn",
+      "citizen_phrases": [
+        "không đủ bánh lốp",
+        "lốp không đúng kích cỡ",
+        "bánh lốp không đạt chuẩn",
+        "thay lốp sai kích cỡ",
+        "lop khong dung kich co"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k3-c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "phanh-khong-an",
+      "canonical": "Điều khiển xe có hệ thống hãm nhưng không có tác dụng",
+      "citizen_phrases": [
+        "phanh không ăn",
+        "thắng không ăn",
+        "mất phanh",
+        "hỏng phanh",
+        "phanh hỏng",
+        "phanh khong an"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k5-b"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k1-d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "coi-qua-to",
+      "canonical": "Sử dụng còi vượt quá âm lượng hoặc không đúng quy chuẩn",
+      "citizen_phrases": [
+        "còi quá to",
+        "bấm còi quá to",
+        "còi vượt âm lượng",
+        "còi không đúng chuẩn",
+        "thay còi to",
+        "coi qua to"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k5-d"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k2-đ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-co-giam-thanh",
+      "canonical": "Điều khiển xe không có bộ phận giảm thanh, giảm khói hoặc không bảo đảm quy chuẩn",
+      "citizen_phrases": [
+        "không có bộ giảm thanh",
+        "mất bộ giảm thanh",
+        "tháo bộ giảm thanh",
+        "pô xe kêu to",
+        "ống xả kêu to",
+        "khong co bo giam thanh"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k2-c"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k2-d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "het-han-kiem-dinh",
+      "canonical": "Điều khiển ô tô có giấy chứng nhận hoặc tem kiểm định đã hết hiệu lực",
+      "citizen_phrases": [
+        "hết hạn kiểm định",
+        "quá hạn đăng kiểm",
+        "tem kiểm định hết hạn",
+        "đăng kiểm quá hạn",
+        "het han kiem dinh"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k5-a",
+            "qualifier": "đã hết hiệu lực dưới 01 tháng"
+          },
+          {
+            "record_id": "nd168-d13-k6-b",
+            "qualifier": "không có giấy chứng nhận hoặc tem kiểm định"
+          }
+        ]
+      },
+      "notes": "Cần phân biệt xe còn giấy/tem nhưng quá hạn dưới 01 tháng với xe không có giấy/tem kiểm định."
+    },
+    {
+      "id": "dan-logo-co-quan",
+      "canonical": "Dán, lắp phù hiệu hoặc biểu trưng giống cơ quan nhà nước",
+      "citizen_phrases": [
+        "dán logo cơ quan nhà nước",
+        "gắn phù hiệu giả",
+        "dán biểu trưng cơ quan",
+        "giả logo cơ quan",
+        "dan logo co quan"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d13-k4-c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "xe-may-lap-den-sau",
+      "canonical": "Điều khiển xe máy lắp đèn chiếu sáng về phía sau",
+      "citizen_phrases": [
+        "lắp đèn chiếu sáng phía sau",
+        "gắn đèn sau xe máy",
+        "độ đèn sau xe",
+        "lắp thêm đèn phía sau",
+        "lap den chieu sang phia sau"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d14-k1-đ"
+          }
+        ]
+      }
     }
   ]
 }

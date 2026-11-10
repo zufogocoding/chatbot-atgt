@@ -1,11 +1,11 @@
 # Golden set và baseline
 
-[golden.jsonl](golden.jsonl) chứa 243 câu hỏi biên soạn cho snapshot 09/11/2026. Các nhãn được lưu cố định để phát hiện thay đổi khi chạy lại, với khung tiền lấy từ kết quả đối chiếu theo điều, khoản, điểm.
+[golden.jsonl](golden.jsonl) chứa 254 câu hỏi biên soạn cho snapshot 09/11/2026. Các nhãn được lưu cố định để phát hiện thay đổi khi chạy lại, với khung tiền lấy từ kết quả đối chiếu theo điều, khoản, điểm.
 
 | Nhóm | Số câu |
 |---|---:|
-| Tra mức phạt xe máy | 75 |
-| Tra mức phạt ô tô | 71 |
+| Tra mức phạt xe máy | 79 |
+| Tra mức phạt ô tô | 78 |
 | Thủ tục nộp phạt và khiếu nại | 46 |
 | Thiếu thông tin và ngoài phạm vi | 26 |
 | Không dấu và teencode | 25 |
@@ -29,10 +29,10 @@ python3 scripts/evaluate_dataset.py --failures
 
 | Chỉ số | Kết quả |
 |---|---:|
-| Tra mức phạt, tìm đúng bản ghi trong 5 ứng viên đầu | 73/171 |
-| Tra mức phạt, trả đúng bản ghi | 30/171 |
-| Tra mức phạt, đúng cả min/max | 25/171 |
-| Tra mức phạt, đúng căn cứ | 25/171 |
+| Tra mức phạt, tìm đúng bản ghi trong 5 ứng viên đầu | 86/182 |
+| Tra mức phạt, trả đúng bản ghi | 42/182 |
+| Tra mức phạt, đúng cả min/max | 37/182 |
+| Tra mức phạt, đúng căn cứ | 37/182 |
 | Hỏi lại khi thiếu thông tin | 16/16 |
 | Từ chối ngoài phạm vi hoặc thiếu nguồn | 0/10 |
 | Thủ tục, tìm đúng đoạn trong 5 kết quả BM25 đầu | 46/46 |
@@ -55,7 +55,7 @@ Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, 
 
 | Chỉ số qua HTTP cục bộ | Kết quả |
 |---|---:|
-| Đúng bản ghi, khung tiền và căn cứ mức phạt | 171/171 |
+| Đúng bản ghi, khung tiền và căn cứ mức phạt | 182/182 |
 | Đúng đoạn và căn cứ thủ tục | 46/46 |
 | Thủ tục, số liệu trong key point xuất hiện trong câu trả lời | 46/46 |
 | Thủ tục, độ phủ từ khóa trung bình | 87,4% |
@@ -66,4 +66,4 @@ Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, 
 | Câu trả lời thiếu nguồn | 0 |
 | Độ trễ HTTP p95 trong lần chạy kiểm thử | 1,5 ms |
 
-Ba câu về dùng tay cầm điện thoại khi lái ô tô được sửa nhãn thành Điều 6 khoản 5 điểm h theo catalog và Công báo. Bảy ca mới bổ sung phủ Điều 12 (người được chở), cách nói số lượng hành khách và trường hợp thiếu loại đường khi hỏi ngược chiều.
+Ba câu về dùng tay cầm điện thoại khi lái ô tô được sửa nhãn thành Điều 6 khoản 5 điểm h theo catalog và Công báo. Bảy ca bổ sung phủ Điều 12 (người được chở), cách nói số lượng hành khách và trường hợp thiếu loại đường khi hỏi ngược chiều. Mười một ca tiếp theo phủ nhóm thiết bị/điều kiện xe: kính chắn gió, đèn lắp thêm, lốp, phanh, còi, giảm thanh, logo cơ quan và đèn sau.
