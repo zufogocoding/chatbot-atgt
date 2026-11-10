@@ -7,16 +7,16 @@ Chatbot tiếng Việt giúp người dân tra cứu mức phạt vi phạm giao
 
 ## Cách chạy trên Windows
 
-Cài **Git**, **Python 3.11+** và **Node.js 20.9+**. Branch `Test` có sẵn file `data/build/catalog.db`, nên có thể chạy chatbot ngay sau khi cài thư viện.
+Cài **Git**, **Python 3.11+** và **Node.js 20.9+**. Repo có sẵn file `data/build/catalog.db`, nên có thể chạy chatbot ngay sau khi cài thư viện.
 
-### 1. Tải branch Test
+### 1. Tải source
 
 ```powershell
-git clone --branch Test --single-branch https://github.com/zufogocoding/chatbot-atgt.git
+git clone https://github.com/zufogocoding/chatbot-atgt.git
 cd chatbot-atgt
 ```
 
-Nếu đã clone repo, chạy `git fetch origin`, `git switch Test` rồi `git pull --ff-only` từ thư mục dự án.
+Nếu đã clone repo, chạy `git fetch origin` rồi `git pull --ff-only` từ thư mục dự án.
 
 ### 2. Chạy FastAPI trong terminal thứ nhất
 
@@ -48,14 +48,14 @@ Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vư
 |---|---|
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
-| Bản ghi vi phạm | 267 (Điều 6, 7, 13, 14, 18, 32) — gồm vi phạm người điều khiển và chủ phương tiện |
-| Alias tiếng dân | 31 nhóm, 205 cách nói |
-| Kiểm chứng | 267/267 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
+| Bản ghi vi phạm | 271 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
+| Alias tiếng dân | 35 nhóm, 238 cách nói (189 biến thể sau chuẩn hóa) |
+| Kiểm chứng | 271/271 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
-| Bộ đánh giá | 236 câu có nhãn kỳ vọng, có script chấm baseline |
+| Bộ đánh giá | 243 câu có nhãn kỳ vọng, có script chấm baseline |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
-Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe. Chưa gồm: Điều 32 khoản 5–6 (phạt trên mỗi người vượt quá, có trần), các điểm 238/2026 thêm mới 9a/11.e/13.e, Điều 12, 17.
+Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe. Chưa gồm: Điều 32 khoản 5–6 (phạt trên mỗi người vượt quá, có trần), các điểm 238/2026 thêm mới 9a/11.e/13.e (xe đầu kéo/vận tải nội bộ, tham chiếu Điều 20/21), Điều 17 và các điều vận tải 20–24.
 
 Dữ liệu thủ tục nằm trong [`data/procedures/`](data/procedures/) và được lập chỉ mục BM25 trong [`data/build/catalog.db`](data/build/catalog.db). SQLite chứa bảng `procedures`, `procedure_sources` và `procedure_citations` để tra đoạn thủ tục và căn cứ. Kết quả và cách chạy golden set nằm trong [`data/eval/README.md`](data/eval/README.md).
 
@@ -91,6 +91,7 @@ python3 scripts/query_catalog.py search "xe máy vượt đèn đỏ"
 python3 scripts/query_catalog.py answer "ô tô quá tốc độ"
 python3 scripts/query_catalog.py answer "vượt đèn đỏ"          # hỏi lại loại xe
 python3 scripts/query_catalog.py answer "xe máy không chính chủ" # chủ phương tiện (Điều 32)
+python3 scripts/query_catalog.py answer "người ngồi sau xe máy không đội mũ" # người được chở (Điều 12)
 python3 scripts/query_catalog.py record nd168-d7-k7-c
 python3 scripts/query_catalog.py procedure "thời hiệu khiếu nại quyết định xử phạt" --limit 1
 python3 scripts/query_catalog.py stats

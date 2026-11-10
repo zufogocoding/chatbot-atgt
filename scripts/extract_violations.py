@@ -4,9 +4,12 @@
 Scope of this first pass:
   - Điều 6  : ô tô - quy tắc giao thông
   - Điều 7  : xe máy - quy tắc giao thông
+  - Điều 12 : hành vi của người được chở trên xe máy/ô tô (mũ bảo hiểm,
+              dây đai an toàn, bám kéo, che ô)
   - Điều 13 : ô tô - điều kiện phương tiện
   - Điều 14 : xe máy - điều kiện phương tiện
   - Điều 18 : điều kiện của người điều khiển xe cơ giới (cả hai loại xe)
+  - Điều 32 : chủ phương tiện
 
 The output is a *draft* catalog. Every record carries a source quote and a
 legal path so a human can verify it against the original document.
@@ -42,6 +45,10 @@ SOURCE_URL = "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/01/168-nd-cp.sig
 ARTICLE_META = {
     6: {"vehicle_type": "o_to", "behavior_group": "quy_tac_giao_thong"},
     7: {"vehicle_type": "xe_may", "behavior_group": "quy_tac_giao_thong"},
+    # Điều 12 mostly covers public-order violations, not vehicle operation.
+    # Only the clauses about passengers on motorbikes/cars are in scope; see
+    # ARTICLE_12_INCLUDE below.
+    12: {"vehicle_type": "both", "behavior_group": "quy_tac_giao_thong"},
     13: {"vehicle_type": "o_to", "behavior_group": "dieu_kien_phuong_tien"},
     14: {"vehicle_type": "xe_may", "behavior_group": "dieu_kien_phuong_tien"},
     # Điều 18 covers driver conditions for both cars and motorbikes. The
@@ -52,6 +59,14 @@ ARTICLE_META = {
     # name (e.g. clause 5/6 refer back to Điều 20 - cars).
     32: {"vehicle_type": "both", "behavior_group": "chu_phuong_tien"},
 }
+
+# Article 12 clauses worth cataloguing for a motorbike/car lookup tool:
+#   2.d   : passenger on a motorbike uses an umbrella
+#   4     : passenger in a car does not wear a seatbelt
+#   5.a/b : passenger on a motorbike clings/stands or does not wear a helmet
+# The rest of Article 12 is public-order regulation (sidewalk trading, drones,
+# road obstructions...) and is outside this project's scope.
+ARTICLE_12_INCLUDE = {(2, "d"), (4, None), (5, "a"), (5, "b")}
 
 # Article 32 clauses that are intentionally out of scope for this pass:
 #   5, 6  : per-extra-passenger fines with caps, tied to Điều 20 (cars).
@@ -79,6 +94,31 @@ ARTICLE_32_VEHICLE = {
     16: "o_to",
     17: "both",
 }
+
+SUBJECT_BY_ARTICLE = {
+    12: "nguoi_duoc_cho",
+    32: "chu_phuong_tien",
+}
+
+
+def provision_in_scope(article: int, clause: int, point: str | None) -> bool:
+    """Whether a clause/point belongs to this project's catalog scope."""
+    if article == 12:
+        if point is None:
+            # Keep the clause intro (fine amount + subject) for clauses whose
+            # points are included; drop unrelated clauses entirely.
+            return clause in {2, 4, 5}
+        return (clause, point) in ARTICLE_12_INCLUDE
+    if article == 32:
+        if clause in ARTICLE_32_SKIP_CLAUSES:
+            return False
+        if (clause, point) in ARTICLE_32_SKIP_POINTS:
+            return False
+    return True
+
+
+def subject_for(article: int) -> str:
+    return SUBJECT_BY_ARTICLE.get(article, "nguoi_dieu_khien")
 
 FINE_RE = re.compile(
     r"Phạt tiền từ\s+([\d\.]+)\s+đồng\s+đến\s+([\d\.]+)\s+đồng", re.IGNORECASE
@@ -295,14 +335,7 @@ def parse_penalty(text: str) -> dict[str, Any] | None:
 
 
 def ref_in_scope(article: int, ref: dict[str, Any]) -> bool:
-    if article != 32:
-        return True
-    clause = ref["clause"]
-    if clause in ARTICLE_32_SKIP_CLAUSES:
-        return False
-    if (clause, ref.get("point")) in ARTICLE_32_SKIP_POINTS:
-        return False
-    return True
+    return provision_in_scope(article, ref["clause"], ref.get("point"))
 
 
 def parse_penalty_rules(provisions: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -310,7 +343,7 @@ def parse_penalty_rules(provisions: list[dict[str, Any]]) -> list[dict[str, Any]
     grouped: dict[tuple[int, int], list[dict[str, Any]]] = defaultdict(list)
     for p in provisions:
         if p["article"] in ARTICLE_META:
-            if p["article"] == 32 and p["clause"] in ARTICLE_32_SKIP_CLAUSES:
+            if not provision_in_scope(p["article"], p["clause"], p["point"]):
                 continue
             grouped[(p["article"], p["clause"])].append(p)
 
@@ -362,11 +395,8 @@ def extract_violations(
     for p in provisions:
         if p["article"] not in ARTICLE_META:
             continue
-        if p["article"] == 32:
-            if p["clause"] in ARTICLE_32_SKIP_CLAUSES:
-                continue
-            if (p["clause"], p["point"]) in ARTICLE_32_SKIP_POINTS:
-                continue
+        if not provision_in_scope(p["article"], p["clause"], p["point"]):
+            continue
         grouped[(p["article"], p["clause"])].append(p)
 
     for (article, clause), items in grouped.items():
@@ -421,7 +451,7 @@ def extract_violations(
                     "o_to" if path == "32.17.b"
                     else infer_vehicle_type(article, clause, f"{text} {behavior}")
                 ),
-                "subject": "chu_phuong_tien" if article == 32 else "nguoi_dieu_khien",
+                "subject": subject_for(article),
                 "behavior_group": ARTICLE_META[article]["behavior_group"],
                 "behavior_text": behavior,
                 "clause_text": text,

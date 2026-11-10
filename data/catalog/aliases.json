@@ -16,8 +16,16 @@
         "chạy đèn đỏ gây tai nạn"
       ],
       "records": {
-        "o_to": [{"record_id": "nd168-d6-k10-b"}],
-        "xe_may": [{"record_id": "nd168-d7-k10-b"}]
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k10-b"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k10-b"
+          }
+        ]
       }
     },
     {
@@ -956,6 +964,95 @@
         ]
       },
       "notes": "Bị tịch thu phương tiện theo Điều 32 khoản 17 điểm c."
+    },
+    {
+      "id": "nguoi-duoc-cho-khong-doi-mu",
+      "canonical": "Người được chở trên xe mô tô, xe gắn máy không đội mũ bảo hiểm hoặc cài quai không đúng quy cách",
+      "citizen_phrases": [
+        "người ngồi sau không đội mũ bảo hiểm",
+        "người ngồi sau không đội mũ",
+        "người được chở không đội mũ",
+        "hành khách xe máy không đội mũ",
+        "khách ngồi sau không đội mũ",
+        "người đi cùng không đội mũ bảo hiểm",
+        "nguoi ngoi sau khong doi mu",
+        "nguoi duoc cho khong doi mu",
+        "hanh khach xe may khong doi mu"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d12-k5-b"
+          }
+        ]
+      },
+      "notes": "Chủ thể bị phạt là người được chở, không phải người lái. Nếu người lái chở người không đội mũ thì áp dụng Điều 7 khoản 2 điểm i."
+    },
+    {
+      "id": "hanh-khach-khong-that-day-an-toan",
+      "canonical": "Người được chở trên xe ô tô không thắt dây đai an toàn",
+      "citizen_phrases": [
+        "hành khách không thắt dây an toàn",
+        "người ngồi sau ô tô không thắt dây",
+        "người được chở trên ô tô không thắt dây",
+        "hành khách không cài dây bảo hiểm",
+        "người ngồi ghế phụ không thắt dây",
+        "khách ngồi sau không cài dây an toàn",
+        "hanh khach khong that day an toan",
+        "nguoi ngoi sau o to khong that day"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d12-k4"
+          }
+        ]
+      },
+      "notes": "Chủ thể bị phạt là người được chở. Người lái chở người không thắt dây bị xử phạt theo Điều 6 khoản 3 điểm l."
+    },
+    {
+      "id": "nguoi-duoc-cho-bam-keo",
+      "canonical": "Người được chở trên xe mô tô, xe gắn máy bám, kéo, đẩy xe khác hoặc có hành vi nguy hiểm",
+      "citizen_phrases": [
+        "người ngồi sau bám kéo",
+        "người được chở bám kéo xe khác",
+        "hành khách đứng trên yên xe",
+        "ngồi trên tay lái xe máy",
+        "người ngồi sau mang vác vật cồng kềnh",
+        "người được chở đứng trên yên",
+        "nguoi ngoi sau bam keo",
+        "nguoi duoc cho dung tren yen"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d12-k5-a"
+          }
+        ]
+      },
+      "notes": "Chủ thể bị phạt là người được chở."
+    },
+    {
+      "id": "nguoi-duoc-cho-che-o-du",
+      "canonical": "Người được chở trên xe mô tô, xe gắn máy sử dụng ô (dù)",
+      "citizen_phrases": [
+        "người ngồi sau che ô",
+        "người ngồi sau che dù",
+        "người được chở che ô",
+        "che dù trên xe máy",
+        "sử dụng ô dù trên xe máy",
+        "che ô khi ngồi sau xe máy",
+        "nguoi ngoi sau che o",
+        "che du tren xe may"
+      ],
+      "records": {
+        "xe_may": [
+          {
+            "record_id": "nd168-d12-k2-d"
+          }
+        ]
+      },
+      "notes": "Chủ thể bị phạt là người được chở."
     }
   ]
 }

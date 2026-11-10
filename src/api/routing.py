@@ -63,6 +63,10 @@ def normalize_question(question: str) -> tuple[str, str]:
     return surface, normalize_text(surface)
 
 
+PASSENGER_CUE = r"\b(?:nguoi ngoi sau|nguoi duoc cho|hanh khach|nguoi di cung)\b"
+DRIVER_CUE = r"\b(?:nguoi lai|tai xe|cam lai|dieu khien|toi lai|lai xe|toi cho|cho nguoi|cho ban|cho be|cho tre|cho khach)\b"
+
+
 def includes(pattern: str, text: str) -> bool:
     return re.search(pattern, text) is not None
 
@@ -251,6 +255,10 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
     if not on_highway and includes(r"\bnguoc chieu\b", text):
         if includes(r"\b(?:duong mot chieu|bien cam|trong pho)\b", text):
             return vehicle_path(vehicle, "7.7.a", "6.9.d")
+        return Clarification(
+            "road_type",
+            "Bạn đi ngược chiều trong đô thị/đường một chiều hay trên đường cao tốc?",
+        )
     if lane_violation:
         return vehicle_path(vehicle, "7.1.e", "6.2.a")
     for pattern, bike, car in DIRECT_PATHS:
@@ -259,21 +267,39 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
     if includes(LICENSE, text) and includes(r"\b(?:khong co|chua co|quen|khong mang|het han|qua han)\b", text):
         return license_path(surface, text, vehicle)
     if vehicle == "xe_may":
+        if includes(PASSENGER_CUE, text) and includes(
+            r"\b(?:che|su dung|dung)\b.{0,12}\b(?:o|du)\b", text
+        ):
+            return "12.2.d"
+        if includes(PASSENGER_CUE, text) and includes(
+            r"\b(?:bam|keo|day)\b.{0,25}\bxe khac\b|\bdung tren yen\b|\bngoi tren tay lai\b"
+            r"|\bmang vac vat cong kenh\b|\bgia deo hang\b",
+            text,
+        ):
+            return "12.5.a"
         if includes(r"\b(?:khong doi|khong cai|quen doi|quen cai|doi mu)\b.{0,30}\b(?:mu bao hiem|quai mu|quai)\b", text):
-            if includes(r"\b(?:ngoi sau|cho (?:nguoi|ban))\b", text) and includes(r"\b(?:ngoi sau|nguoi lon|\d+ tuoi|cho ban)\b", text):
+            passenger = includes(PASSENGER_CUE, text)
+            driver_responsibility = includes(DRIVER_CUE, text)
+            if passenger and not driver_responsibility:
+                # Điều 12.5.b fines the passenger, not the person driving.
+                return "12.5.b"
+            if passenger or includes(r"\b(?:ngoi sau|cho (?:nguoi|ban))\b", text):
                 return "7.2.i"
             if includes(r"\b(?:toi lai|lai xe|lai xemay|cam lai|dieu khien|nguoi lai)\b", text):
                 return "7.2.h"
             return Clarification("helmet_role", "Người lái hay người ngồi sau không đội mũ hoặc không cài quai đúng cách?")
         if includes(r"\b(?:boc dau|chay.{0,20}bang mot banh)\b", text):
             return "7.11.b"
-        if includes(r"\b(?:thieu|mat|khong co|khong co tac dung)\b.{0,25}\bguong\b.{0,22}\btrai\b|\bguong ben trai\b.{0,30}\bkhong co tac dung\b", text):
+        if (
+            includes(r"\b(?:thieu|mat|khong co|khong co tac dung)\b.{0,25}\bguong(?: chieu hau)?\b", text)
+            and not includes(r"\bguong ben phai\b", text)
+        ) or includes(r"\bguong ben trai\b.{0,30}\bkhong co tac dung\b", text):
             return "14.1.a"
         if includes(r"\b(?:chua tron 18|1[67] tuoi)\b", text) and includes(r"\bmo to\b", text):
             return "18.4.a"
-        if includes(r"\b(?:cho ba nguoi|bon nguoi tren mot xe)\b", text):
+        if includes(r"\b(?:cho (?:ba|3) nguoi|(?:bon|4) nguoi tren mot xe)\b", text):
             return "7.3.b"
-        if includes(r"\bcho hai nguoi lon\b|\bcho hai (?:nguoi|ban)\b.{0,30}\bkhong thuoc (?:dien )?ngoai le\b", text):
+        if includes(r"\bcho (?:hai|2) nguoi lon\b|\bcho (?:hai|2) (?:nguoi|ban)\b.{0,30}\bkhong thuoc (?:dien )?ngoai le\b", text):
             return "7.2.g"
         if includes(r"\btai nghe\b", text) and ("tro thinh" not in text or "khong phai thiet bi tro thinh" in text):
             return "7.4.đ"
@@ -284,9 +310,14 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
         includes(r"\b(?:hanh khach|ghe phu|nguoi ngoi)\b", text)
         and includes(r"\b(?:khong (?:that|cai) day|ghe co day.{0,18}khong cai)\b", text)
     ):
-        if includes(r"\b(?:hanh khach|nguoi ngoi|ghe phu)\b", text):
+        passenger = includes(PASSENGER_CUE, text) or includes(r"\b(?:ghe phu|nguoi ngoi)\b", text)
+        driver = includes(DRIVER_CUE, text)
+        if passenger and not driver:
+            # Điều 12.4 fines the passenger who does not wear a seatbelt.
+            return "12.4"
+        if passenger:
             return "6.3.l"
-        if includes(r"\b(?:nguoi lai|cam lai|dieu khien|tai xe)\b", text):
+        if driver:
             return "6.3.k"
         return Clarification("seatbelt_role", "Bạn hỏi về dây an toàn của người lái hay của người ngồi trên xe?")
     if vehicle == "o_to" and includes(r"\b(?:mo cua|de cua)\b", text) and includes(r"\bkhong (?:bao dam )?an toan\b", text):

@@ -45,6 +45,10 @@ def test_health_and_openapi():
         ("Đi xe máy đo nồng độ cồn 0,251 mg/l khí thở", "nd168-d7-k8-b", 6_000_000, 8_000_000),
         ("Ô tô cầm điện thoại khi lái xe", "nd168-d6-k5-h", 4_000_000, 6_000_000),
         ("Ô tô chuyển làn ngoài cao tốc không giữ khoảng cách an toàn", "nd168-d6-k2-a", 600_000, 800_000),
+        ("Người ngồi sau xe máy không đội mũ bảo hiểm", "nd168-d12-k5-b", 400_000, 600_000),
+        ("Hành khách trên ô tô không thắt dây an toàn", "nd168-d12-k4", 350_000, 400_000),
+        ("Người ngồi sau che dù khi đi xe máy", "nd168-d12-k2-d", 200_000, 250_000),
+        ("Người ngồi sau xe máy bám kéo xe khác", "nd168-d12-k5-a", 400_000, 600_000),
     ],
 )
 def test_penalty_boundaries_and_sources(question, record_id, minimum, maximum):
@@ -60,6 +64,33 @@ def test_organization_fine():
     reply = ask("Công ty mua ô tô mà chưa sang tên")
     assert reply["penalty"]["organization_fine"] == {"min": 8_000_000, "max": 12_000_000}
     assert reply["answer"].startswith("Mức phạt tổ chức")
+
+
+def test_passenger_is_a_separate_subject():
+    passenger = ask("Người ngồi sau xe máy không đội mũ bảo hiểm")
+    assert passenger["penalty"]["subject"] == "nguoi_duoc_cho"
+    assert passenger["penalty"]["behavior"].startswith("Không đội")
+    driver = ask("Xe máy chở người không đội mũ bảo hiểm")
+    assert driver["penalty"]["record_id"] == "nd168-d7-k2-i"
+    assert driver["penalty"]["subject"] == "nguoi_dieu_khien"
+
+
+@pytest.mark.parametrize(
+    "question, record_id",
+    [
+        ("Xe máy chở ba người phía sau", "nd168-d7-k3-b"),
+        ("Xe máy chở 3 người phía sau", "nd168-d7-k3-b"),
+        ("Xe máy chở hai người lớn", "nd168-d7-k2-g"),
+        ("Xe máy chở 2 người lớn", "nd168-d7-k2-g"),
+        ("Xe máy không có gương chiếu hậu", "nd168-d14-k1-a"),
+        ("Xe máy thiếu gương chiếu hậu bên trái", "nd168-d14-k1-a"),
+        ("Ô tô chuyển làn không xi nhan", "nd168-d6-k2-a"),
+    ],
+)
+def test_common_phrasings(question, record_id):
+    reply = ask(question)
+    assert reply["answer_type"] == "penalty"
+    assert reply["penalty"]["record_id"] == record_id
 
 
 @pytest.mark.parametrize(

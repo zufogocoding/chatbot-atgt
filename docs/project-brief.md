@@ -1,6 +1,6 @@
 # Chatbot tra cứu xử phạt vi phạm giao thông
 
-**Trạng thái:** Có catalog hợp nhất 267 bản ghi, corpus thủ tục, golden set 236 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
+**Trạng thái:** Có catalog hợp nhất 271 bản ghi, corpus thủ tục, golden set 243 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
 
 **Cập nhật:** 10/11/2026
 
@@ -129,13 +129,13 @@ Nguồn sự thật là các file JSONL/JSON trong `data/`; SQLite chỉ là b�
 | `data/parsed/168-provisions.jsonl` | 1.242 điều/khoản/điểm đã parse từ Công báo 168/2024 |
 | `data/parsed/238-2026-nd-cp.txt` | Toàn văn Nghị định 238/2026 |
 | `data/amendments/238-2026.json` | 20 bản vá nội dung, 1 bản ghi mới và 7 bản vá quy tắc |
-| `data/catalog/consolidated/violations.jsonl` | **267 bản ghi vi phạm** đã hợp nhất 168 + 238 |
+| `data/catalog/consolidated/violations.jsonl` | **271 bản ghi vi phạm** đã hợp nhất 168 + 238 |
 | `data/catalog/consolidated/penalty-rules.jsonl` | 57 quy tắc hình phạt bổ sung/trừ điểm |
-| `data/catalog/aliases.json` | 31 nhóm alias, 205 cách nói của người dân |
+| `data/catalog/aliases.json` | 35 nhóm alias, 238 cách nói của người dân (189 biến thể sau chuẩn hóa) |
 | `data/overrides/penalty-conditions.json` | Điều kiện áp dụng cho hình phạt có điều kiện |
 | `data/build/catalog.db` | SQLite sinh tự động: violations, penalty_rules, alias_*, FTS5 |
 | `data/procedures/` | 23 đoạn thủ tục và danh mục nguồn |
-| `data/eval/golden.jsonl` | 236 câu có nhãn và căn cứ kỳ vọng |
+| `data/eval/golden.jsonl` | 243 câu có nhãn và căn cứ kỳ vọng |
 
 ### 6.2. Schema một bản ghi vi phạm
 
@@ -369,18 +369,18 @@ chatbot-atgt/
 **Đã xong:**
 
 - Thu thập 168/2024, 238/2026, Luật 36/2024 hợp nhất.
-- Parse 1.242 điều/khoản/điểm; trích xuất 267 bản ghi cho Điều 6, 7, 13, 14, 18, 32.
+- Parse 1.242 điều/khoản/điểm; trích xuất 271 bản ghi cho Điều 6, 7, 12 (người được chở), 13, 14, 18, 32.
 - Hợp nhất 238/2026; validation 0 lỗi, còn cảnh báo các record chưa có alias.
-- 31 nhóm alias / 205 cách nói, phủ 94 bản ghi, gồm nhóm vượt đèn đỏ gây tai nạn.
+- 35 nhóm alias / 238 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn và bốn nhóm riêng cho người được chở.
 - Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển và mức phạt tổ chức.
-- Đối chiếu khung tiền, loại xử phạt và căn cứ của 267 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
-- Thu thập 23 đoạn thủ tục và chạy golden set 236 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
+- Đối chiếu khung tiền, loại xử phạt và căn cứ của 271 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
+- Thu thập 23 đoạn thủ tục và chạy golden set 243 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
 - Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
 - Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn thủ tục, nguồn và lựa chọn bổ sung loại xe.
 
 **Việc tiếp theo:**
 
-1. Hai người đối chiếu độc lập 255 bản ghi có phạt tiền trước khi chuyển `verified` và lưu vào `data/catalog/verified/`.
-2. Bổ sung phần còn thiếu của Điều 32 (khoản 5–6 phạt theo số người vượt quá có trần; điểm 238/2026 thêm mới 9a/11.e/13.e), sau đó cân nhắc Điều 12, 17, 20–24.
-3. Cải thiện chọn khung phạt, định tuyến và từ chối ngoài phạm vi. Chạy lại golden set khi thay đổi hệ thống.
-4. Tích hợp corpus thủ tục vào RAG và đánh giá chất lượng câu trả lời có trích dẫn.
+1. Hai người đối chiếu độc lập 259 bản ghi có phạt tiền trước khi chuyển `verified` và lưu vào `data/catalog/verified/`.
+2. Bổ sung phần còn thiếu của Điều 32 (khoản 5–6 phạt theo số người vượt quá có trần; điểm 238/2026 thêm mới 9a/11.e/13.e), sau đó cân nhắc Điều 17 và 20–24.
+3. Cải thiện baseline CLI: recall@5 hiện 73/171, trả lời được 30/171; API đã đạt 171/171 trên golden set. Mở rộng định tuyến cho cách nói tự nhiên và câu hỏi phức tạp.
+4. Đánh giá chất lượng câu trả lời thủ tục có trích dẫn (không chỉ recall@5) và bổ sung corpus nếu thiếu.

@@ -36,6 +36,7 @@ VALID_PENALTY_TYPES = {
 }
 VALID_LICENSE_POINTS = {0, 2, 3, 4, 6, 8, 10, 12}
 VALID_VEHICLE_TYPES = {"xe_may", "o_to", "both"}
+VALID_SUBJECTS = {"nguoi_dieu_khien", "chu_phuong_tien", "nguoi_duoc_cho"}
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -91,6 +92,12 @@ def main() -> int:
 
         if rec.get("vehicle_type") not in VALID_VEHICLE_TYPES:
             errors.append(f"{rid}: invalid vehicle_type {rec.get('vehicle_type')!r}")
+        if rec.get("subject") not in VALID_SUBJECTS:
+            errors.append(f"{rid}: invalid subject {rec.get('subject')!r}")
+        if lb["article"] == 12 and rec.get("subject") != "nguoi_duoc_cho":
+            errors.append(f"{rid}: Article 12 record must be a passenger")
+        if lb["article"] == 32 and rec.get("subject") != "chu_phuong_tien":
+            errors.append(f"{rid}: Article 32 record must be a vehicle owner")
 
         # 1. Fine range
         fmin, fmax = rec.get("fine_min"), rec.get("fine_max")
@@ -238,6 +245,18 @@ def main() -> int:
             ],
         },
         "nd168-d6-k1a": {"fine_min": 0, "fine_max": 0, "record_kind": "warning"},
+        "nd168-d12-k5-b": {
+            "fine_min": 400_000,
+            "fine_max": 600_000,
+            "vehicle_type": "xe_may",
+            "subject": "nguoi_duoc_cho",
+        },
+        "nd168-d12-k4": {
+            "fine_min": 350_000,
+            "fine_max": 400_000,
+            "vehicle_type": "o_to",
+            "subject": "nguoi_duoc_cho",
+        },
         "nd168-d32-k3-a": {
             "fine_min": 800_000,
             "fine_max": 1_000_000,

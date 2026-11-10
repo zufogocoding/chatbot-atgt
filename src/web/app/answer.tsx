@@ -3,6 +3,11 @@ import { Fragment } from "react";
 import { type ChatReply, type Fine, type Penalty, type Source, type Vehicle, vehicleLabels } from "../lib/contracts";
 
 const number = new Intl.NumberFormat("vi-VN");
+const subjectLabels: Record<string, string> = {
+  chu_phuong_tien: "Chủ phương tiện",
+  nguoi_dieu_khien: "Người điều khiển",
+  nguoi_duoc_cho: "Người được chở",
+};
 
 export function formatDate(value: string) {
   const [year, month, day] = value.split("-");
@@ -85,7 +90,7 @@ function PenaltyDetails({ penalty }: { penalty: Penalty }) {
     <>
       <div className="answer-tags">
         <span>{vehicleLabels[penalty.vehicle_type]}</span>
-        <span>{penalty.subject === "chu_phuong_tien" ? "Chủ phương tiện" : "Người điều khiển"}</span>
+        <span>{subjectLabels[penalty.subject] ?? "Người điều khiển"}</span>
         {penalty.verification_status === "draft" && <span className="draft-tag">Dữ liệu dự thảo</span>}
       </div>
       <p className="behavior">{penalty.behavior}</p>

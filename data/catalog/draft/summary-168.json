@@ -3,23 +3,25 @@
   "articles": [
     6,
     7,
+    12,
     13,
     14,
     18,
     32
   ],
-  "violations": 266,
+  "violations": 270,
   "by_article": {
     "6": 74,
     "7": 65,
+    "12": 4,
     "13": 23,
     "14": 13,
     "18": 24,
     "32": 67
   },
   "by_vehicle": {
-    "xe_may": 105,
-    "o_to": 158,
+    "xe_may": 108,
+    "o_to": 159,
     "both": 3
   },
   "with_additional_penalty": 71,

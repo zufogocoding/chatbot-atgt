@@ -321,6 +321,7 @@ def cmd_search(con: sqlite3.Connection, args: argparse.Namespace) -> int:
 SUBJECT_LABELS = {
     "chu_phuong_tien": "Chủ phương tiện",
     "nguoi_dieu_khien": "Người điều khiển",
+    "nguoi_duoc_cho": "Người được chở",
 }
 
 

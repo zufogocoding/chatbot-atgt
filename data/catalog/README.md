@@ -9,17 +9,17 @@ Thư mục này là **nguồn sự thật** cho phần tra cứu mức phạt c�
 | Văn bản gốc | Nghị định 168/2024/NĐ-CP |
 | Văn bản sửa đổi | Nghị định 238/2026/NĐ-CP, hiệu lực 15/08/2026 |
 | Ngày hợp nhất | 09/11/2026 |
-| Số bản ghi | **267** |
-| Điều đã trích xuất | 6, 7, 13, 14, 18, 32 |
-| Bản ghi có phạt tiền | 255 |
+| Số bản ghi | **271** |
+| Điều đã trích xuất | 6, 7, 12, 13, 14, 18, 32 |
+| Bản ghi có phạt tiền | 259 |
 | Bản ghi chỉ có hình phạt bổ sung | 10 (tịch thu phương tiện) |
 | Bản ghi cảnh cáo | 2 |
 | Có hình phạt bổ sung | 67 |
 | Có biện pháp khắc phục hậu quả | 68 |
 | Có trừ điểm GPLX | 109 |
 | Quy tắc hình phạt/trừ điểm | 57 |
-| Alias tiếng dân | 31 nhóm, 205 cách nói (165 biến thể sau chuẩn hóa) |
-| Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 267/267. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
+| Alias tiếng dân | 35 nhóm, 238 cách nói (189 biến thể sau chuẩn hóa) |
+| Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 271/271. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
 
 Phân bố theo Điều:
 
@@ -27,6 +27,7 @@ Phân bố theo Điều:
 |---|---|---:|---:|---:|
 | 6 | Ô tô – quy tắc giao thông | – | 75 | – |
 | 7 | Xe máy – quy tắc giao thông | 65 | – | – |
+| 12 | Người được chở trên xe máy/ô tô | 3 | 1 | – |
 | 13 | Ô tô – điều kiện phương tiện | – | 23 | – |
 | 14 | Xe máy – điều kiện phương tiện | 13 | – | – |
 | 18 | Điều kiện người điều khiển | 12 | 11 | 1 |
@@ -115,7 +116,7 @@ data/
 | Trường | Ghi chú |
 |---|---|
 | `vehicle_type` | `xe_may`, `o_to`, hoặc `both` |
-| `subject` | `nguoi_dieu_khien` hoặc `chu_phuong_tien` (Điều 32) |
+| `subject` | `nguoi_dieu_khien`, `nguoi_duoc_cho` (Điều 12) hoặc `chu_phuong_tien` (Điều 32) |
 | `record_kind` | `fine` (có khung tiền), `warning` (cảnh cáo, tiền = 0), `additional_only` (không phạt tiền, chỉ tịch thu) |
 | `fine_min`, `fine_max` | Đơn vị đồng, mức phạt cá nhân. `null` với `additional_only` |
 | `fine_by_subject.to_chuc` | Mức phạt tổ chức (thường gặp ở Điều 32) |
@@ -194,16 +195,16 @@ python3 scripts/build_db.py
 Kết quả mong đợi:
 
 ```
-records: 267
+records: 271
 penalty rules: 57
-fine records checked: 255
-source quotes checked: 267
+fine records checked: 259
+source quotes checked: 271
 errors: 0
 warnings: 0 (hoặc chỉ warning về record chưa có alias)
 built data/build/catalog.db
-  violations: 267
+  violations: 271
   penalty rules: 57
-  alias groups: 31 (165 phrases)
+  alias groups: 35 (189 phrases)
 ```
 
 ### Tra thử bằng CLI
@@ -238,10 +239,10 @@ Nguyên tắc của `answer`:
 ### Xuất phiếu review thủ công
 
 ```bash
-# Toàn bộ 267 bản ghi
+# Toàn bộ 271 bản ghi
 python3 scripts/export_review.py
 
-# Chỉ 255 bản ghi có phạt tiền
+# Chỉ 259 bản ghi có phạt tiền
 python3 scripts/export_review.py --fine-only
 
 # Phiếu riêng cho từng người rà soát
@@ -257,7 +258,7 @@ File CSV dùng UTF-8 (mở trực tiếp bằng Excel/LibreOffice):
 
 Hai người đối chiếu độc lập với Công báo 168 và 238 theo đề cương. Mỗi người dùng một bản phiếu riêng. Chỉ chuyển bản ghi sang `verified` sau khi hai lượt đều xác nhận số tiền, căn cứ và nội dung. Tạo phiếu mới bằng `--out` để giữ kết quả đã điền.
 
-[`fine-audit-2026-11-10.csv`](review/fine-audit-2026-11-10.csv) lưu kết quả đối chiếu tự động riêng cho 267 bản ghi, gồm mức tiền cá nhân, tổ chức và đoạn luật dùng để đối chiếu. Chạy lại với `python3 scripts/audit_fines.py`. Dùng `--out` để xuất CSV mới.
+[`fine-audit-2026-11-10.csv`](review/fine-audit-2026-11-10.csv) lưu kết quả đối chiếu tự động riêng cho 271 bản ghi, gồm mức tiền cá nhân, tổ chức và đoạn luật dùng để đối chiếu. Chạy lại với `python3 scripts/audit_fines.py`. Dùng `--out` để xuất CSV mới.
 
 ### Khi có văn bản mới
 
@@ -305,7 +306,7 @@ Catalog giữ trạng thái **draft** đến khi hoàn tất hai lượt đối 
 
 - Thủ tục nộp phạt và khiếu nại nằm trong [`data/procedures/`](../procedures/). Nhánh trả lời bằng RAG đang chờ tích hợp.
 - **Điều 32 (chủ phương tiện) đã trích xuất phần lõi**: sang tên/thay đổi chủ xe, đăng ký/biển số, cải tạo xe, giao xe cho người không đủ điều kiện, đưa xe không biển số/đăng ký tham gia giao thông, tịch thu phương tiện (một số trường hợp). **Chưa gồm**: khoản 5, 6 (phạt theo số người vượt quá, có trần tối đa — mô hình phạt khác), các điểm 238/2026 bổ sung như 9a, 11.e, 13.e, và một số hành vi tham chiếu Điều 20/21/22/34 chưa có trong catalog.
-- **Chưa trích xuất Điều 12, 17, 20–24.** Chở hàng, chở người kinh doanh vận tải, vi phạm người đi bộ/hành khách... chưa có.
+- **Điều 12 mới trích xuất nhóm người được chở**: mũ bảo hiểm, dây đai an toàn, bám kéo, che ô/dù. Các hành vi công cộng khác của Điều 12 (bán hàng vỉa hè, vật cản, drone...) nằm ngoài phạm vi. **Chưa trích xuất Điều 17 và 20–24** (môi trường, vận tải hành khách/hàng hóa).
 - **Một số điểm luật gộp nhiều hành vi thay thế** (ví dụ Điều 18 khoản 5 điểm a). Record giữ nguyên văn cả điểm; hình phạt bổ sung có `condition` để tránh khẳng định sai. Khi làm UI nên tách hoặc hỏi lại hành vi cụ thể.
 - **Chưa xử lý quy định chuyển tiếp** của 238/2026 và các mức phạt thay đổi theo thời điểm. Catalog là ảnh chụp tại 09/11/2026.
 - [Golden set và kết quả baseline](../eval/README.md) tách độ khớp của dữ liệu khỏi chất lượng chọn bản ghi và câu trả lời.
