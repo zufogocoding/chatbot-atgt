@@ -9,6 +9,7 @@ Thư mục này chứa phiếu xuất từ catalog và các bản ghi phục v�
 | `nguoi-ra-soat-1.csv` | Phiếu trống cho người rà soát 1 (259 bản ghi có phạt tiền) |
 | `nguoi-ra-soat-2.csv` | Phiếu trống cho người rà soát 2 (259 bản ghi có phạt tiền) |
 | `fine-audit-2026-11-10.csv` | Kết quả đối chiếu tự động mức tiền với đoạn luật |
+| `spotcheck-2026-11-10.csv` | Mẫu 30 bản ghi rủi ro cao cho một người spot-check, **không phải phiếu xác minh hai người** |
 | `ai-precheck-2026-11-10.csv` | Bản AI điền thử, **không phải phiếu của người rà soát** |
 | `ai-precheck-2026-11-10.catalog-diff.csv` | Các ô dữ liệu catalog bị bản AI sửa |
 
@@ -21,6 +22,21 @@ Thư mục này chứa phiếu xuất từ catalog và các bản ghi phục v�
 5. Hai phiếu phải có tên người rà soát khác nhau.
 
 `scripts/merge_reviews.py` kiểm tra lại các cột catalog so với catalog hiện tại. Nếu phiếu bị sửa cột dữ liệu, script từ chối gộp và yêu cầu xuất lại phiếu.
+
+## Mẫu spot-check 30 bản ghi rủi ro cao
+
+`spotcheck-2026-11-10.csv` được sinh bằng `python3 scripts/export_spotcheck.py`. Đây là mẫu **một người** rà soát nhanh, không thay thế quy trình hai người và không thể gộp thành snapshot `verified`.
+
+Mẫu chọn tự động, chia đều qua các nhóm rủi ro:
+
+- 4 bản ghi người được chở (Điều 12);
+- bản ghi sửa đổi bởi 238/2026/NĐ-CP;
+- bản ghi có phạt tổ chức;
+- bản ghi có điều kiện trừ điểm GPLX;
+- bản ghi có hình phạt bổ sung;
+- bản ghi có biện pháp khắc phục.
+
+Cột `risk_reason` ghi lý do bản ghi nằm trong mẫu. Người rà soát điền các cột còn lại như phiếu thường (`expected_fine_min`, `expected_fine_max`, `fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`). Kết quả chỉ dùng để báo cáo độ tin cậy và phát hiện lỗi hệ thống, không dùng để đổi `verification_status`.
 
 ## Bản AI precheck ngày 10/11/2026
 

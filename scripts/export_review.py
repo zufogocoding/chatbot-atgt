@@ -65,6 +65,40 @@ def clause_key(clause: Any) -> tuple[int, str]:
     return (int(match.group(1)), match.group(2))
 
 
+def review_row(rec: dict[str, Any]) -> dict[str, Any]:
+    basis = rec["legal_basis"]
+    return {
+        "id": rec["id"],
+        "record_kind": rec["record_kind"],
+        "vehicle_type": rec["vehicle_type"],
+        "article": basis["article"],
+        "clause": basis["clause"],
+        "point": basis.get("point") or "",
+        "legal_path": legal_path(rec),
+        "behavior_text": rec["behavior_text"],
+        "fine_text": rec.get("fine_text") or "",
+        "fine_min": rec.get("fine_min") if rec.get("fine_min") is not None else "",
+        "fine_max": rec.get("fine_max") if rec.get("fine_max") is not None else "",
+        "license_points": rec.get("license_points", 0),
+        "additional_penalties": "; ".join(
+            format_penalty(p) for p in rec.get("additional_penalties", [])
+        ),
+        "remedial_measures": "; ".join(
+            format_penalty(p) for p in rec.get("remedial_measures", [])
+        ),
+        "source_quote": rec.get("source_quote", ""),
+        "verification_status": rec.get("verification", {}).get("status", ""),
+        "expected_fine_min": "",
+        "expected_fine_max": "",
+        "fine_ok": "",
+        "citation_ok": "",
+        "text_ok": "",
+        "reviewer": "",
+        "reviewed_at": "",
+        "note": "",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
@@ -92,39 +126,7 @@ def main() -> int:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         for rec in records:
-            basis = rec["legal_basis"]
-            writer.writerow(
-                {
-                    "id": rec["id"],
-                    "record_kind": rec["record_kind"],
-                    "vehicle_type": rec["vehicle_type"],
-                    "article": basis["article"],
-                    "clause": basis["clause"],
-                    "point": basis.get("point") or "",
-                    "legal_path": legal_path(rec),
-                    "behavior_text": rec["behavior_text"],
-                    "fine_text": rec.get("fine_text") or "",
-                    "fine_min": rec.get("fine_min") if rec.get("fine_min") is not None else "",
-                    "fine_max": rec.get("fine_max") if rec.get("fine_max") is not None else "",
-                    "license_points": rec.get("license_points", 0),
-                    "additional_penalties": "; ".join(
-                        format_penalty(p) for p in rec.get("additional_penalties", [])
-                    ),
-                    "remedial_measures": "; ".join(
-                        format_penalty(p) for p in rec.get("remedial_measures", [])
-                    ),
-                    "source_quote": rec.get("source_quote", ""),
-                    "verification_status": rec.get("verification", {}).get("status", ""),
-                    "expected_fine_min": "",
-                    "expected_fine_max": "",
-                    "fine_ok": "",
-                    "citation_ok": "",
-                    "text_ok": "",
-                    "reviewer": "",
-                    "reviewed_at": "",
-                    "note": "",
-                }
-            )
+            writer.writerow(review_row(rec))
 
     display_path = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
     print(f"wrote {display_path} ({len(records)} rows)")

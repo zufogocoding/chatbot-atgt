@@ -374,6 +374,7 @@ chatbot-atgt/
 - 49 nhóm alias / 317 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn, bốn nhóm cho người được chở, chín nhóm thiết bị/điều kiện xe, nhường đường cho xe ưu tiên, còi ban đêm, biển báo/vạch kẻ đường, ô tô đi trên vỉa hè và chạy dưới tốc độ tối thiểu.
 - Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển và mức phạt tổ chức.
 - Đối chiếu khung tiền, loại xử phạt và căn cứ của 271 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
+- Xuất mẫu spot-check 30 bản ghi rủi ro cao (người được chở, sửa đổi 238/2026, phạt tổ chức, điều kiện trừ điểm, hình phạt bổ sung, khắc phục hậu quả) bằng `scripts/export_spotcheck.py`; phiếu nằm trong `data/catalog/review/spotcheck-2026-11-10.csv`. Đây là mẫu một người, không thay thế quy trình hai người.
 - Thu thập 23 đoạn thủ tục và chạy golden set 254 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
 - Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
 - API trả `penalty.source_quote` (đoạn luật áp dụng), `penalty.guidance` (hạn nộp, nơi nộp, thời hiệu khiếu nại kèm trích dẫn), `options` (phương án hỏi lại) và `related` (bản ghi tương ứng cho loại xe còn lại khi xác định duy nhất). Client có thể gửi `record_id` để tra thẳng phương án đã chọn.
