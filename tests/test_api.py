@@ -1,6 +1,9 @@
 import asyncio
+from contextlib import closing
+from datetime import datetime, timedelta
 from pathlib import Path
 import re
+import sqlite3
 from tempfile import TemporaryDirectory
 
 import httpx
@@ -33,6 +36,38 @@ def test_health_and_openapi():
     assert response.json()["violations"] > 0
     assert response.json()["procedures"] > 0
     assert "/chat" in call("GET", "/openapi.json").json()["paths"]
+
+
+def test_question_log_records_resolved_answer_and_masks_identifiers(monkeypatch, tmp_path):
+    path = tmp_path / "logs" / "questions.db"
+    monkeypatch.setenv("ATGT_QUESTION_LOG_PATH", str(path))
+    application = create_app()
+
+    response = call("POST", "/chat", {
+        "question": "Xe máy vượt đèn đỏ (59-X1 123.45, 0912 345 678, vi-du@example.com, 012345678901)",
+        "record_id": "nd168-d7-k7-c",
+    }, application)
+    assert response.status_code == 200
+
+    response = call("POST", "/chat", {
+        "question": "Vượt đèn đỏ phạt bao nhiêu?",
+    }, application)
+    assert response.status_code == 200
+
+    with closing(sqlite3.connect(path)) as connection:
+        rows = connection.execute("SELECT * FROM question_log ORDER BY rowid").fetchall()
+    assert [row[:-1] for row in rows] == [
+        ("Xe máy vượt đèn đỏ ([đã ẩn], [đã ẩn], [đã ẩn], [đã ẩn])", "penalty", "nd168-d7-k7-c", None),
+        ("Vượt đèn đỏ phạt bao nhiêu?", "clarify", None, "vehicle_type"),
+    ]
+    assert all(datetime.fromisoformat(row[-1]).utcoffset() == timedelta(0) for row in rows)
+
+
+def test_question_log_unavailable_does_not_break_chat(monkeypatch, tmp_path):
+    monkeypatch.setenv("ATGT_QUESTION_LOG_PATH", str(tmp_path))
+    response = call("POST", "/chat", {"question": "Xe máy vượt đèn đỏ"}, create_app())
+    assert response.status_code == 200
+    assert response.json()["answer_type"] == "penalty"
 
 
 @pytest.mark.parametrize(

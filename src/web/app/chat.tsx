@@ -313,6 +313,7 @@ export default function Chat() {
                 <label className="sr-only" htmlFor="question">Câu hỏi</label>
                 <textarea
                   id="question"
+                  aria-describedby="question-privacy"
                   ref={input}
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
@@ -336,6 +337,9 @@ export default function Chat() {
                   </button>
                 </div>
               </form>
+              <p className="composer-note" id="question-privacy">
+                Câu hỏi có thể được lưu để cải thiện tra cứu. Vui lòng không nhập thông tin cá nhân.
+              </p>
             </div>
           </div>
         </div>

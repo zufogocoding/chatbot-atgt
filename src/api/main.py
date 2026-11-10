@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 
 from scripts.query_catalog import DEFAULT_DB
 
+from .question_log import append_question_log
 from .schemas import ChatRequest, ChatResponse, HealthResponse
 from .service import chat, connect_catalog, health
 
@@ -18,6 +19,7 @@ logger = logging.getLogger("uvicorn.error")
 
 def create_app(db_path: Path | None = None) -> FastAPI:
     catalog_path = db_path or Path(os.environ.get("CATALOG_DB_PATH") or DEFAULT_DB)
+    log_path = os.environ.get("ATGT_QUESTION_LOG_PATH")
     app = FastAPI(title="Chatbot tra cứu xử phạt giao thông", version="0.1.0")
 
     @app.get("/health", response_model=HealthResponse)
@@ -41,6 +43,11 @@ def create_app(db_path: Path | None = None) -> FastAPI:
             "chat intent=%s answer_type=%s latency_ms=%.1f",
             result.intent, result.answer_type, (perf_counter() - start) * 1000,
         )
+        if log_path:
+            try:
+                append_question_log(Path(log_path), request.question, result)
+            except (OSError, sqlite3.Error) as error:
+                logger.warning("question log write failed: %s", type(error).__name__)
         return result
 
     return app

@@ -43,6 +43,28 @@ npm.cmd run dev
 
 Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vượt đèn đỏ bị phạt bao nhiêu?” hoặc “Nộp phạt ở đâu, thời hạn bao lâu?”. Nếu giao diện báo **Mất kết nối**, kiểm tra lại terminal FastAPI và trang `/health` ở cổng 8000.
 
+## Chạy demo trong mạng nội bộ
+
+Sau khi cài thư viện như trên, chạy FastAPI từ thư mục gốc trong terminal thứ nhất.
+
+```powershell
+$env:ATGT_QUESTION_LOG_PATH = Join-Path (Get-Location) 'tmp\demo\question-log.db'
+.\.venv\Scripts\python.exe -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+```
+
+Trong terminal thứ hai, thay địa chỉ ví dụ bằng địa chỉ IPv4 nội bộ của máy chủ.
+
+```powershell
+cd src/web
+npm.cmd run build
+$demoIp = '192.168.1.10'
+.\node_modules\.bin\next.cmd start --hostname $demoIp --port 3000
+```
+
+Truy cập `http://<IP-LAN>:3000` từ mạng nội bộ. API dùng chung địa chỉ với web qua `/api/health` và `/api/chat`.
+
+Khi đặt `ATGT_QUESTION_LOG_PATH`, API ghi mỗi lượt chat có kết quả vào bảng SQLite `question_log`, gồm `question`, `answer_type`, `record_id`, `reason` và `timestamp` (UTC). `record_id` là mã bản ghi mức phạt trong câu trả lời, để trống nếu chưa có bản ghi. API không thu thập IP, tài khoản hay thông tin thiết bị trong bảng này. Log che email, chuỗi số định danh và biển số theo mẫu phổ biến. Tên và địa chỉ viết tự do vẫn có thể xuất hiện nếu người dùng nhập vào câu hỏi. Thư mục `tmp/` đã được Git bỏ qua.
+
 ## Trạng thái hiện tại
 
 | Hạng mục | Giá trị |

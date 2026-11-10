@@ -283,6 +283,7 @@ svg { flex: none; }
 }
 .composer textarea::placeholder { color: #68768e; }
 .composer-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.composer-note { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
 .vehicle-select { display: flex; align-items: center; gap: 7px; padding: 0 5px; color: var(--muted); font-size: 11px; }
 .vehicle-select select {
   z-index: 1;

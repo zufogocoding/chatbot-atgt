@@ -13,17 +13,20 @@ export async function POST(request: Request) {
   if (!body || typeof body !== "object") {
     return NextResponse.json({ detail: "Bạn hãy nhập một câu hỏi để tra cứu." }, { status: 422 });
   }
-  const { question, vehicle_type } = body as Record<string, unknown>;
+  const { question, vehicle_type, record_id } = body as Record<string, unknown>;
   if (typeof question !== "string" || !question.trim() || question.trim().length > MAX_QUESTION_LENGTH) {
     return NextResponse.json({ detail: "Câu hỏi cần có từ 1 đến 1.000 ký tự." }, { status: 422 });
   }
   if (vehicle_type !== undefined && vehicle_type !== "xe_may" && vehicle_type !== "o_to") {
     return NextResponse.json({ detail: "Bạn hãy chọn xe máy hoặc ô tô." }, { status: 422 });
   }
+  if (record_id != null && (typeof record_id !== "string" || record_id.trim().length > 64)) {
+    return NextResponse.json({ detail: "Mã bản ghi không hợp lệ." }, { status: 422 });
+  }
 
   return forwardCatalog("/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: question.trim(), vehicle_type }),
+    body: JSON.stringify({ question: question.trim(), vehicle_type, record_id }),
   });
 }
