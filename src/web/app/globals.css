@@ -336,6 +336,12 @@ svg { flex: none; }
 .penalty-list { margin-top: 14px; font-size: 12px; }
 .penalty-list h3 { font-size: 12px; }
 .penalty-list ul { margin: 6px 0 0; padding-left: 19px; color: #4a5973; line-height: 1.7; }
+.legal-quote { margin-top: 14px; padding: 10px 12px; background: #fbfcff; border: 1px solid #e7edf7; border-radius: 8px; font-size: 12px; }
+.legal-quote summary { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #294c9f; font-weight: 600; }
+.legal-quote summary svg { color: #355ec7; }
+.legal-quote p { margin-top: 8px; color: #4a5973; line-height: 1.7; overflow-wrap: anywhere; }
+.related-penalties { margin-top: 14px; }
+.related-penalties h3 { margin-bottom: 6px; font-size: 12px; }
 .answer-prose { display: grid; gap: 13px; }
 .answer-prose h3 { margin-bottom: 5px; font-size: 13px; line-height: 1.5; }
 .answer-prose p { color: #41516a; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -385,7 +391,20 @@ svg { flex: none; }
 }
 .clarification-actions button:hover:not(:disabled), .request-error button:hover:not(:disabled) { background: #dfeaff; }
 .clarification-actions button:disabled, .request-error button:disabled { opacity: .55; }
-.clarification-options { margin: 10px 0 0; padding-left: 19px; color: #41516a; font-size: 12px; line-height: 1.7; }
+.clarification-options { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.clarification-options button {
+  width: 100%;
+  padding: 7px 9px;
+  color: #2448ae;
+  background: #edf3ff;
+  border: 1px solid #dae5ff;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+.clarification-options button:hover:not(:disabled) { background: #dfeaff; }
+.clarification-options button:disabled { opacity: .55; }
 .thinking, .request-error { display: flex; align-items: flex-start; gap: 9px; padding: 14px; background: #fff; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; line-height: 1.55; }
 .thinking { align-items: center; color: #4c5d79; }
 .spinner { width: 16px; height: 16px; border: 2px solid #dbe6ff; border-top-color: var(--blue); border-radius: 50%; animation: spin .75s linear infinite; }

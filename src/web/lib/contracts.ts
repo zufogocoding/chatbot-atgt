@@ -3,6 +3,7 @@ export type Vehicle = "xe_may" | "o_to";
 export type ChatRequest = {
   question: string;
   vehicle_type?: Vehicle;
+  record_id?: string;
 };
 
 export type Fine = { min: number | null; max: number | null };
@@ -21,6 +22,7 @@ export type Penalty = {
   additional_penalties: string[];
   remedial_measures: string[];
   verification_status: string;
+  source_quote: string;
 };
 
 export type Source = {
@@ -38,6 +40,7 @@ export type ChatReply = {
   reason: string | null;
   penalty: Penalty | null;
   options: { record_id: string; label: string }[];
+  related: { record_id: string; label: string }[];
   sources: Source[];
 };
 

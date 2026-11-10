@@ -66,6 +66,56 @@ def test_organization_fine():
     assert reply["answer"].startswith("Mức phạt tổ chức")
 
 
+def test_penalty_includes_legal_quote():
+    reply = ask("Xe máy vượt đèn đỏ")
+    assert reply["penalty"]["record_id"] == "nd168-d7-k7-c"
+    assert "Không chấp hành hiệu lệnh" in reply["penalty"]["source_quote"]
+    assert "4.000.000" in reply["penalty"]["source_quote"]
+
+
+def test_related_vehicle_and_option_selection():
+    reply = ask("Xe máy vượt đèn đỏ")
+    related = {item["record_id"]: item for item in reply["related"]}
+    assert "nd168-d6-k9-b" in related
+    assert "ô tô" in related["nd168-d6-k9-b"]["label"]
+
+    selected = call("POST", "/chat", {
+        "question": "Xem mức phạt cho ô tô",
+        "record_id": "nd168-d6-k9-b",
+    }).json()
+    assert selected["answer_type"] == "penalty"
+    assert selected["penalty"]["record_id"] == "nd168-d6-k9-b"
+    assert selected["penalty"]["vehicle_type"] == "o_to"
+    assert selected["related"][0]["record_id"] == "nd168-d7-k7-c"
+
+
+def test_related_vehicle_matches_qualifier_and_skips_broad_groups():
+    alcohol = ask("Đi xe máy đo nồng độ cồn 0,25 mg/l khí thở")
+    assert alcohol["penalty"]["record_id"] == "nd168-d7-k6-a"
+    assert [item["record_id"] for item in alcohol["related"]] == ["nd168-d6-k6-c"]
+    assert "chưa vượt quá" in alcohol["related"][0]["label"]
+
+    # "Thiếu gương" is part of a broad equipment alias that maps to several
+    # different car behaviors, so no single comparison is safe to offer.
+    equipment = ask("Xe máy không có gương chiếu hậu")
+    assert equipment["penalty"]["record_id"] == "nd168-d14-k1-a"
+    assert equipment["related"] == []
+
+
+def test_option_selection_requires_valid_record_and_vehicle():
+    missing = call("POST", "/chat", {
+        "question": "Xem", "record_id": "nd168-does-not-exist",
+    }).json()
+    assert missing["answer_type"] == "refuse"
+    assert missing["reason"] == "record_not_found"
+
+    wrong_vehicle = call("POST", "/chat", {
+        "question": "Xem", "record_id": "nd168-d7-k7-c", "vehicle_type": "o_to",
+    }).json()
+    assert wrong_vehicle["answer_type"] == "clarify"
+    assert wrong_vehicle["reason"] == "vehicle_type"
+
+
 def test_passenger_is_a_separate_subject():
     passenger = ask("Người ngồi sau xe máy không đội mũ bảo hiểm")
     assert passenger["penalty"]["subject"] == "nguoi_duoc_cho"

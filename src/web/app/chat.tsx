@@ -122,7 +122,7 @@ export default function Chat() {
         failureMessage = typeof data?.detail === "string" ? data.detail : "Chưa thể gửi câu hỏi. Bạn thử lại nhé.";
         throw new Error();
       }
-      if (!data || typeof data.answer !== "string" || !Array.isArray(data.sources) || !Array.isArray(data.options)) {
+      if (!data || typeof data.answer !== "string" || !Array.isArray(data.sources) || !Array.isArray(data.options) || !Array.isArray(data.related)) {
         failureMessage = "Hệ thống trả về dữ liệu chưa đầy đủ. Bạn thử gửi lại câu hỏi nhé.";
         throw new Error();
       }
@@ -282,6 +282,7 @@ export default function Chat() {
                           reply={turn.reply}
                           pending={busy}
                           onChooseVehicle={(value) => void ask({ ...turn.request, vehicle_type: value })}
+                          onChooseOption={(option) => void ask({ question: option.label, record_id: option.record_id })}
                           onEdit={() => editQuestion(turn.request.question, turn.request.vehicle_type)}
                         />
                       ) : turn.error ? (

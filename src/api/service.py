@@ -20,6 +20,7 @@ REQUIRED_TABLES = {
     "catalog_meta", "violations", "violations_fts", "alias_phrases", "alias_groups",
     "alias_records", "procedures", "procedures_fts", "procedure_sources", "procedure_citations",
 }
+VEHICLE_LABELS = {"xe_may": "xe máy", "o_to": "ô tô"}
 
 
 def connect_catalog(path: Path) -> sqlite3.Connection:
@@ -76,7 +77,50 @@ def penalty_sources(record: dict) -> list[Source]:
     return sources
 
 
-def penalty_response(record: dict, as_of: str, text: str) -> ChatResponse:
+def related_choices(con: sqlite3.Connection, record: dict) -> list[Choice]:
+    """Find the same behavior for the other vehicle type, when an alias links both."""
+    if record["vehicle_type"] == "both":
+        return []
+    rows = con.execute(
+        """
+        SELECT ar2.record_id, ar2.vehicle_type, ar2.qualifier,
+               ar1.qualifier AS source_qualifier
+        FROM alias_records ar1
+        JOIN alias_records ar2 ON ar1.alias_id = ar2.alias_id
+        WHERE ar1.record_id = ?
+          AND ar2.record_id != ?
+          AND ar2.vehicle_type IN ('xe_may', 'o_to')
+          AND ar2.vehicle_type != ?
+        ORDER BY ar2.vehicle_type, ar2.record_id
+        """,
+        (record["id"], record["id"], record["vehicle_type"]),
+    ).fetchall()
+    if rows and rows[0]["source_qualifier"]:
+        same_level = [row for row in rows if row["qualifier"] == rows[0]["source_qualifier"]]
+        if same_level:
+            rows = same_level
+    if len({row["record_id"] for row in rows}) != 1:
+        # A broad alias group (for example vehicle equipment) can contain
+        # several different behaviors. Do not guess which one the user means.
+        return []
+    choices: list[Choice] = []
+    seen: set[str] = set()
+    for row in rows:
+        if row["record_id"] in seen:
+            continue
+        seen.add(row["record_id"])
+        label = f"Xem mức phạt cho {VEHICLE_LABELS[row['vehicle_type']]}"
+        if row["qualifier"]:
+            label += f" — {row['qualifier']}"
+        choices.append(Choice(record_id=row["record_id"], label=label))
+        if len(choices) == 3:
+            break
+    return choices
+
+
+def penalty_response(
+    record: dict, as_of: str, text: str, related: list[Choice] | None = None,
+) -> ChatResponse:
     sources = penalty_sources(record)
     if not sources:
         return refuse(as_of, "insufficient_source", "Mình chưa có căn cứ nguồn cho trường hợp này.", "penalty_lookup")
@@ -93,6 +137,7 @@ def penalty_response(record: dict, as_of: str, text: str) -> ChatResponse:
         additional_penalties=[format_penalty(value) for value in record["additional_penalties"]],
         remedial_measures=[format_penalty(value) for value in record["remedial_measures"]],
         verification_status=record["verification_status"],
+        source_quote=record["source_quote"],
     )
     if penalty.record_kind == "warning":
         lines = ["Hình thức xử phạt: cảnh cáo."]
@@ -116,7 +161,7 @@ def penalty_response(record: dict, as_of: str, text: str) -> ChatResponse:
         lines.append(f"Văn bản sửa đổi: {sources[1].document} [2].")
     return ChatResponse(
         intent="penalty_lookup", answer_type="penalty", answer="\n".join(lines),
-        as_of=as_of, penalty=penalty, sources=sources,
+        as_of=as_of, penalty=penalty, related=related or [], sources=sources,
     )
 
 
@@ -246,7 +291,7 @@ def lookup_penalty(
         ).fetchone()
         record = get_record(con, row["id"]) if row else None
         if record:
-            return penalty_response(record, as_of, text)
+            return penalty_response(record, as_of, text, related_choices(con, record))
         return refuse(as_of, "insufficient_source", "Mình chưa có khung phạt phù hợp trong catalog.", "penalty_lookup")
 
     for alias in find_aliases(con, text):
@@ -263,7 +308,7 @@ def lookup_penalty(
         if len(matches) == 1 and not alias["requires_qualifier"]:
             record = get_record(con, matches[0]["record_id"])
             if record:
-                return penalty_response(record, as_of, text)
+                return penalty_response(record, as_of, text, related_choices(con, record))
         options = [Choice(record_id=row["record_id"], label=row["qualifier"])
                    for row in matches[:3] if row["qualifier"]]
         return clarify(as_of, Clarification("conduct", "Bạn mô tả rõ hơn trường hợp vi phạm để mình chọn đúng khung phạt?"), options)
@@ -278,6 +323,20 @@ def lookup_penalty(
 def chat(con: sqlite3.Connection, request: ChatRequest) -> ChatResponse:
     as_of = snapshot(con)
     surface, text = normalize_question(request.question)
+    if request.record_id:
+        record = get_record(con, request.record_id)
+        if record is None:
+            return refuse(
+                as_of, "record_not_found",
+                "Không tìm thấy bản ghi phù hợp trong catalog. Bạn thử mô tả lại hành vi.",
+                "penalty_lookup",
+            )
+        if request.vehicle_type and record["vehicle_type"] not in (request.vehicle_type, "both"):
+            return clarify(
+                as_of,
+                Clarification("vehicle_type", "Bản ghi này thuộc loại xe khác. Bạn muốn tra cho xe máy hay ô tô?"),
+            )
+        return penalty_response(record, as_of, text, related_choices(con, record))
     mentioned = mentioned_vehicles(text)
     if includes(OUTSIDE_REQUEST, text):
         return refuse(as_of, "out_of_scope", "Mình hỗ trợ tra mức phạt xe máy, ô tô và hướng dẫn nộp phạt, khiếu nại giao thông.")

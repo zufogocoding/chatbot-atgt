@@ -117,6 +117,12 @@ function PenaltyDetails({ penalty }: { penalty: Penalty }) {
           <ul>{values.map((value, index) => <li key={index}>{value}</li>)}</ul>
         </section>
       ))}
+      {penalty.source_quote && (
+        <details className="legal-quote">
+          <summary><BookOpen size={15} aria-hidden="true" /> Đoạn luật áp dụng</summary>
+          {penalty.source_quote.split(" || ").map((part, index) => <p key={index}>{part}</p>)}
+        </details>
+      )}
     </>
   );
 }
@@ -131,11 +137,13 @@ const answerLabels = {
 export default function Answer({
   reply,
   onChooseVehicle,
+  onChooseOption,
   onEdit,
   pending,
 }: {
   reply: ChatReply;
   onChooseVehicle: (vehicle: Vehicle) => void;
+  onChooseOption: (option: { record_id: string; label: string }) => void;
   onEdit: () => void;
   pending: boolean;
 }) {
@@ -160,11 +168,29 @@ export default function Answer({
           })}
         </div>
       )}
+      {reply.related.length > 0 && (
+        <section className="related-penalties">
+          <h3>So sánh loại xe khác</h3>
+          <div className="clarification-actions">
+            {reply.related.map((option) => (
+              <button key={option.record_id} type="button" disabled={pending} onClick={() => onChooseOption(option)}>
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
       {reply.answer_type === "clarify" && (
         <>
           {reply.options.length > 0 && (
             <ul className="clarification-options">
-              {reply.options.map((option) => <li key={option.record_id}>{option.label}</li>)}
+              {reply.options.map((option) => (
+                <li key={option.record_id}>
+                  <button type="button" disabled={pending} onClick={() => onChooseOption(option)}>
+                    {option.label}
+                  </button>
+                </li>
+              ))}
             </ul>
           )}
           <div className="clarification-actions">

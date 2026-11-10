@@ -13,6 +13,9 @@ class ChatRequest(BaseModel):
 
     question: str = Field(min_length=1, max_length=1000)
     vehicle_type: Vehicle | None = None
+    # Set when the client selects a clarification option. The record is
+    # authoritative, so no further intent parsing is needed.
+    record_id: str | None = Field(default=None, max_length=64)
 
 
 class Source(BaseModel):
@@ -41,6 +44,7 @@ class Penalty(BaseModel):
     additional_penalties: list[str]
     remedial_measures: list[str]
     verification_status: str
+    source_quote: str
 
 
 class Choice(BaseModel):
@@ -57,6 +61,7 @@ class ChatResponse(BaseModel):
     reason: str | None = None
     penalty: Penalty | None = None
     options: list[Choice] = Field(default_factory=list)
+    related: list[Choice] = Field(default_factory=list)
     sources: list[Source] = Field(default_factory=list)
     procedure_ids: list[str] = Field(default_factory=list)
 
