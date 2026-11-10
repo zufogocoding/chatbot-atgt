@@ -16,6 +16,12 @@ Thư mục này chứa phiếu xuất từ catalog và các bản ghi phục v�
 | `ai-precheck-2026-11-10.csv` | Bản AI điền thử, **không phải phiếu của người rà soát** |
 | `ai-precheck-2026-11-10.catalog-diff.csv` | Các ô dữ liệu catalog bị bản AI sửa |
 
+## Phạm vi chốt để rà soát
+
+Catalog được chốt phạm vi tại commit `5de91b1` (11/11/2026): **276 bản ghi**, trong đó **264 bản ghi có phạt tiền**. Hai phiếu `nguoi-ra-soat-1.csv` và `nguoi-ra-soat-2.csv` được sinh từ đúng snapshot này. Trong thời gian rà soát không bổ sung hay sửa bản ghi; nếu buộc phải sửa, xuất lại cả hai phiếu và rà soát lại từ đầu.
+
+Phạm vi gồm Điều 6, 7, 12, 13, 14, 18 và 32. Điểm b khoản 9a Điều 32 (thiết bị ghi nhận hình ảnh người lái xe) hoãn đến 01/01/2028 nên không nằm trong phiếu.
+
 ## Quy tắc điền phiếu
 
 1. Mỗi người mở một phiếu riêng, không xem phiếu của người kia trước khi điền xong.
