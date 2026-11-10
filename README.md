@@ -4,6 +4,7 @@ Chatbot tiếng Việt giúp người dân tra cứu mức phạt vi phạm giao
 
 - [Phạm vi, kiến trúc và kế hoạch đánh giá](docs/project-brief.md)
 - [Schema catalog, quy trình dựng lại và giới hạn](data/catalog/README.md)
+- [Bàn giao kiểm chứng catalog cho hai người rà soát](docs/ban-giao.md)
 
 ## Cách chạy trên Windows
 
