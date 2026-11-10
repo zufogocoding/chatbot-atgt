@@ -31,6 +31,15 @@ Tệp `ai-precheck-2026-11-10.csv` do AI điền, không đáp ứng quy trình 
 - Bản AI đổi `verification_status` của cả 259 dòng thành `reviewed`, dù chưa có người xác nhận.
 - Bản AI sửa 31 ô `remedial_measures` và 25 ô `additional_penalties`; danh sách đầy đủ ở `ai-precheck-2026-11-10.catalog-diff.csv`.
 
+### Kết quả duyệt 56 ô
+
+- **37 ô** có điều kiện đúng theo luật đã được áp dụng qua `data/overrides/penalty-conditions.json`: điều kiện thùng xe của `32.18.c`/`32.19.đ`, điều kiện có phù hiệu của `32.18.đ`, và điều kiện gây hư hại cầu, đường của `32.19.e`.
+- **14 ô** chỉ đề xuất thêm từ “giấy” vào “chứng nhận kiểm định” đã bị bác, vì Nghị định 238/2026 Điều 11 khoản 11 thay thế cụm từ này tại `32.18.c`, `32.18.d`, `32.19.đ`, `32.19.g` và `32.20`.
+- **1 ô** đề xuất thêm tước phù hiệu cho `32.7.g` đã bị bác, vì 238/2026 Điều 11 khoản 12 bỏ “điểm e, điểm g khoản 7” khỏi `32.18.đ`.
+- **4 ô** ghi chú về cách hiểu `32.18.a` (“tịch thu biển số; tịch thu biển số, thiết bị thay đổi biển số”) được giữ thành ghi chú trong `data/catalog/README.md`, không đưa vào dữ liệu hình phạt.
+
+Trong 37 ô được áp dụng, một số ô còn kèm đề xuất thêm “giấy” hoặc mở rộng nhãn câu chữ; các phần đó không được áp dụng, chỉ phần điều kiện được giữ. Hai chỉnh sửa câu chữ được giữ thêm: “Buộc khôi phục lại tình trạng ban đầu…” (thay vì “Buộc tình trạng ban đầu…”) và nhãn “chứng nhận kiểm định và tem kiểm định” (thay vì “giấy chứng nhận/tem kiểm định”) cho khớp Nghị định 238/2026.
+
 Kết quả đối chiếu nội dung:
 
 - 259/259 mức tiền `expected_fine_min/max` khớp catalog.

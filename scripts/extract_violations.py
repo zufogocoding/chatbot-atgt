@@ -306,9 +306,12 @@ def parse_penalty(text: str) -> dict[str, Any] | None:
             "description": extract_description(text, "buộc "),
         }
     if "phải khôi phục" in text.lower():
+        description = extract_description(text, "phải khôi phục lại ")
+        if description:
+            description = f"khôi phục lại {description}"
         return {
             "type": "bien_phap_khac_phuc",
-            "description": extract_description(text, "phải khôi phục lại "),
+            "description": description,
         }
     if "tịch thu biển số" in text.lower():
         return {"type": "tich_thu_bien_so"}

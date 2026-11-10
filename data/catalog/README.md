@@ -151,6 +151,14 @@ hoặc:
 
 **Quy tắc hiển thị:** không được viết "bị tịch thu xe" như hình phạt chắc chắn. Phải viết "có thể bị tịch thu nếu...". Các điều kiện này nằm trong `data/overrides/penalty-conditions.json` và được áp dụng tự động khi trích xuất.
 
+**Điều kiện bổ sung đã áp dụng (rá soát 10/11/2026):**
+
+- `32.18.c` và `32.19.đ`: chỉ áp dụng khi phương tiện có thùng xe, khối lượng hàng hóa cho phép chuyên chở không đúng quy định hiện hành.
+- `32.18.đ`: tước quyền sử dụng phù hiệu chỉ áp dụng nếu xe có phù hiệu.
+- `32.19.e`: biện pháp khôi phục tình trạng ban đầu chỉ áp dụng nếu hành vi gây hư hại cầu, đường.
+
+**Điều 32 khoản 18 điểm a:** câu chữ "bị tịch thu biển số; tịch thu biển số, thiết bị thay đổi biển số" không tách rõ vế thứ hai theo từng hành vi. Catalog giữ `tich_thu_bien_so` cho `32.8.g`, `32.8.h`, `32.12.c`, `32.13.d` và chưa gán `tich_thu_thiet_bi`; cần đối chiếu thêm nếu có văn bản giải thích.
+
 ## 4. Schema alias
 
 `aliases.json` gom cách nói thông thường của người dân về cùng một nhóm hành vi:

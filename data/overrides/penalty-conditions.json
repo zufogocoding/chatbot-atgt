@@ -1,12 +1,16 @@
 {
-  "note": "Human-curated conditions for sanctions whose rule text applies to a whole point but only to some alternative behaviors inside that point. Keyed by penalty-rule id.",
-  "updated": "2026-11-09",
+  "note": "Human-curated conditions for sanctions that apply only when the rule text or a linked clause sets a condition (alternative behaviors, vehicle configuration, or damage). Keyed by penalty-rule id.",
+  "updated": "2026-11-10",
   "conditions": {
     "nd168-d13-k10-b": "không chứng minh được nguồn gốc xuất xứ của xe (không có giấy tờ, chứng nhận nguồn gốc hoặc chứng nhận quyền sở hữu hợp pháp)",
     "nd168-d14-k5-b": "không chứng minh được nguồn gốc xuất xứ của xe (không có giấy tờ, chứng nhận nguồn gốc hoặc chứng nhận quyền sở hữu hợp pháp)",
     "nd168-d18-k10": "Giấy phép lái xe bị tẩy xóa",
     "nd168-d18-k11": "Giấy phép lái xe không do cơ quan có thẩm quyền cấp hoặc không hợp lệ",
     "nd168-d18-k12": "Sử dụng giấy phép lái xe không hợp lệ",
-    "nd168-d32-k18-b": "không chứng minh được nguồn gốc xuất xứ của xe (không có giấy tờ, chứng nhận nguồn gốc hoặc chứng nhận quyền sở hữu hợp pháp)"
+    "nd168-d32-k18-b": "không chứng minh được nguồn gốc xuất xứ của xe (không có giấy tờ, chứng nhận nguồn gốc hoặc chứng nhận quyền sở hữu hợp pháp)",
+    "nd168-d32-k18-c": "phương tiện có thùng xe, khối lượng hàng hóa cho phép chuyên chở không đúng theo quy định hiện hành",
+    "nd168-d32-k18-đ": "có phù hiệu",
+    "nd168-d32-k19-đ": "phương tiện có thùng xe, khối lượng hàng hóa cho phép chuyên chở không đúng theo quy định hiện hành",
+    "nd168-d32-k19-e": "gây hư hại cầu, đường"
   }
 }

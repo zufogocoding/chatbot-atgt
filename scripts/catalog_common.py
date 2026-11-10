@@ -69,7 +69,7 @@ def format_penalty(penalty: dict[str, Any]) -> str:
     elif kind == "tich_thu_bien_so":
         text = "Tịch thu biển số"
     elif kind == "tuoc_giay_kiem_dinh":
-        text = "Tước quyền sử dụng giấy chứng nhận/tem kiểm định {}–{} tháng".format(
+        text = "Tước quyền sử dụng chứng nhận kiểm định và tem kiểm định {}–{} tháng".format(
             penalty.get("min_months"), penalty.get("max_months")
         )
     elif kind == "tuoc_phu_hieu":
