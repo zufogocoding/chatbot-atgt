@@ -49,13 +49,21 @@ CATALOG_COLUMNS = (
     "fine_text",
     "fine_min",
     "fine_max",
+    "fine_unit",
+    "fine_cap",
+    "fine_org_min",
+    "fine_org_max",
+    "fine_org_cap",
     "license_points",
     "additional_penalties",
     "remedial_measures",
     "source_quote",
     "verification_status",
 )
-NUMERIC_COLUMNS = {"article", "fine_min", "fine_max", "license_points"}
+NUMERIC_COLUMNS = {
+    "article", "fine_min", "fine_max", "fine_cap",
+    "fine_org_min", "fine_org_max", "fine_org_cap", "license_points",
+}
 
 
 def load_catalog(path: Path) -> list[dict[str, Any]]:
@@ -131,6 +139,16 @@ def expected_cell(record: dict[str, Any], field: str) -> Any:
         return record.get("fine_min")
     if field == "fine_max":
         return record.get("fine_max")
+    if field == "fine_unit":
+        return record.get("fine_unit") or ""
+    if field == "fine_cap":
+        return record.get("fine_cap")
+    if field == "fine_org_min":
+        return (record.get("fine_by_subject", {}).get("to_chuc") or {}).get("min")
+    if field == "fine_org_max":
+        return (record.get("fine_by_subject", {}).get("to_chuc") or {}).get("max")
+    if field == "fine_org_cap":
+        return (record.get("fine_by_subject", {}).get("to_chuc") or {}).get("cap")
     if field == "license_points":
         return record.get("license_points", 0)
     if field == "additional_penalties":
@@ -224,8 +242,62 @@ def check_row(
                 errors.append(
                     f"{path}: {rid}: {field}={actual} but catalog has {expected}"
                 )
-    elif (row.get("expected_fine_min") or "").strip() or (row.get("expected_fine_max") or "").strip():
-        errors.append(f"{path}: {rid}: expected_fine_* must be blank for a non-fine record")
+        cap = record.get("fine_cap")
+        cap_value = (row.get("expected_fine_cap") or "").strip()
+        if cap is not None:
+            try:
+                actual_cap = parse_amount(cap_value, "expected_fine_cap", rid, path)
+                if actual_cap != cap:
+                    errors.append(
+                        f"{path}: {rid}: expected_fine_cap={actual_cap} but catalog has {cap}"
+                    )
+            except ValueError as error:
+                errors.append(str(error))
+        elif cap_value:
+            errors.append(f"{path}: {rid}: expected_fine_cap must be blank")
+    else:
+        for field in (
+            "expected_fine_min", "expected_fine_max", "expected_fine_cap",
+            "expected_fine_org_min", "expected_fine_org_max", "expected_fine_org_cap",
+        ):
+            if (row.get(field) or "").strip():
+                errors.append(f"{path}: {rid}: {field} must be blank for a non-fine record")
+
+    org = record.get("fine_by_subject", {}).get("to_chuc")
+    org_ok = (row.get("org_fine_ok") or "").strip().upper()
+    if org:
+        if org_ok != "OK":
+            errors.append(f"{path}: {rid}: org_fine_ok must be OK (got {org_ok!r})")
+        for side in ("min", "max"):
+            field = f"expected_fine_org_{side}"
+            try:
+                actual = parse_amount(row.get(field, ""), field, rid, path)
+            except ValueError as error:
+                errors.append(str(error))
+                continue
+            if actual != org.get(side):
+                errors.append(
+                    f"{path}: {rid}: {field}={actual} but catalog has {org.get(side)}"
+                )
+        cap = org.get("cap")
+        cap_value = (row.get("expected_fine_org_cap") or "").strip()
+        if cap is not None:
+            try:
+                actual_cap = parse_amount(cap_value, "expected_fine_org_cap", rid, path)
+                if actual_cap != cap:
+                    errors.append(
+                        f"{path}: {rid}: expected_fine_org_cap={actual_cap} but catalog has {cap}"
+                    )
+            except ValueError as error:
+                errors.append(str(error))
+        elif cap_value:
+            errors.append(f"{path}: {rid}: expected_fine_org_cap must be blank")
+    else:
+        if org_ok != "NA":
+            errors.append(f"{path}: {rid}: org_fine_ok must be NA because there is no organization fine")
+        for field in ("expected_fine_org_min", "expected_fine_org_max", "expected_fine_org_cap"):
+            if (row.get(field) or "").strip():
+                errors.append(f"{path}: {rid}: {field} must be blank without an organization fine")
 
     return reviewer or None
 

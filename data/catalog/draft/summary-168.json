@@ -9,7 +9,7 @@
     18,
     32
   ],
-  "violations": 270,
+  "violations": 272,
   "by_article": {
     "6": 74,
     "7": 65,
@@ -17,16 +17,16 @@
     "13": 23,
     "14": 13,
     "18": 24,
-    "32": 67
+    "32": 69
   },
   "by_vehicle": {
     "xe_may": 108,
-    "o_to": 159,
+    "o_to": 161,
     "both": 3
   },
-  "with_additional_penalty": 71,
+  "with_additional_penalty": 73,
   "with_remedial_measures": 59,
-  "with_license_points": 109,
-  "penalty_rules": 57,
+  "with_license_points": 111,
+  "penalty_rules": 59,
   "status": "draft"
 }

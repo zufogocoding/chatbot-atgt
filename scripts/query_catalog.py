@@ -27,6 +27,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from catalog_common import (  # noqa: E402
+    format_fine,
     format_penalty,
     format_range,
     legal_path,
@@ -93,7 +94,13 @@ def detect_vehicle(query_ascii: str) -> str | None:
 
 def parse_record(row: sqlite3.Row) -> dict[str, Any]:
     rec = dict(row)
-    for field in ("additional_penalties", "remedial_measures", "penalty_rule_ids", "amended_by"):
+    for field in (
+        "additional_penalties",
+        "remedial_measures",
+        "penalty_rule_ids",
+        "license_point_tiers",
+        "amended_by",
+    ):
         if field in rec and isinstance(rec[field], str):
             rec[field] = json.loads(rec[field])
     return rec
@@ -132,7 +139,8 @@ def find_aliases(con: sqlite3.Connection, query_ascii: str) -> list[dict[str, An
 def alias_record_ids(con: sqlite3.Connection, alias_id: str, vehicle: str | None) -> list[dict[str, Any]]:
     sql = """
         SELECT ar.record_id, ar.vehicle_type, ar.qualifier, v.fine_min, v.fine_max,
-               v.license_points, v.article, v.clause, v.point, v.legal_path
+               v.fine_unit, v.fine_cap, v.license_points, v.article, v.clause, v.point,
+               v.legal_path
         FROM alias_records ar
         JOIN violations v ON v.id = ar.record_id
         WHERE ar.alias_id = ?
@@ -271,7 +279,14 @@ def print_search_results(results: list[dict[str, Any]], show_score: bool = False
         elif rec["record_kind"] == "additional_only":
             extra.append("không phạt tiền")
         else:
-            extra.append(format_range(rec["fine_min"], rec["fine_max"]))
+            extra.append(
+                format_fine(
+                    rec["fine_min"],
+                    rec["fine_max"],
+                    rec.get("fine_unit"),
+                    rec.get("fine_cap"),
+                )
+            )
         if rec["license_points"]:
             extra.append(f"trừ {rec['license_points']} điểm")
         if rec["additional_penalties"]:
@@ -337,11 +352,19 @@ def print_answer(rec: dict[str, Any], full_quote: bool = False, title: str | Non
     elif rec["record_kind"] == "additional_only":
         print("- Mức phạt tiền: Không có")
     else:
-        fine = format_range(rec["fine_min"], rec["fine_max"])
+        fine = format_fine(
+            rec["fine_min"],
+            rec["fine_max"],
+            rec.get("fine_unit"),
+            rec.get("fine_cap"),
+        )
         org_min, org_max = rec.get("fine_org_min"), rec.get("fine_org_max")
         if org_min is not None and org_max is not None:
             print(f"- Mức phạt (cá nhân): {fine}")
-            print(f"- Mức phạt (tổ chức): {format_range(org_min, org_max)}")
+            print(
+                "- Mức phạt (tổ chức): "
+                + format_fine(org_min, org_max, rec.get("fine_unit"), rec.get("fine_org_cap"))
+            )
         else:
             print(f"- Mức phạt: {fine}")
 
@@ -352,7 +375,12 @@ def print_answer(rec: dict[str, Any], full_quote: bool = False, title: str | Non
     else:
         print("- Hình phạt bổ sung: Không")
 
-    if rec["license_points"]:
+    tiers = rec.get("license_point_tiers") or []
+    if tiers:
+        print("- Trừ điểm GPLX:")
+        for tier in tiers:
+            print(f"  - {tier['points']} điểm nếu {tier['condition']}")
+    elif rec["license_points"]:
         condition = rec.get("license_points_condition")
         if condition:
             print(
@@ -411,7 +439,7 @@ def explain_clarification(alias: dict[str, Any], items: list[dict[str, Any]]) ->
         path = legal_path(item)
         print(
             f"{index}. {qualifier}: "
-            f"{format_range(item['fine_min'], item['fine_max'])} "
+            f"{format_fine(item['fine_min'], item['fine_max'], item.get('fine_unit'), item.get('fine_cap'))} "
             f"({path})"
         )
     if alias.get("notes"):

@@ -21,6 +21,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from catalog_common import finalize_license_points, set_license_points
+
 ROOT = Path(__file__).resolve().parents[1]
 IN_VIOLATIONS = ROOT / "data/catalog/draft/violations-168.jsonl"
 IN_RULES = ROOT / "data/catalog/draft/penalty-rules-168.jsonl"
@@ -132,7 +134,7 @@ def add_record(records: dict[str, dict[str, Any]], added: dict[str, Any]) -> Non
         "subject": added.get("subject", "nguoi_dieu_khien"),
         "behavior_group": added["behavior_group"],
         "behavior_text": added["behavior_text"],
-        "clause_text": added["behavior_text"],
+        "clause_text": added.get("clause_text", added["behavior_text"]),
         "fine_min": added["fine_min"],
         "fine_max": added["fine_max"],
         "fine_text": added["fine_text"],
@@ -141,6 +143,7 @@ def add_record(records: dict[str, dict[str, Any]], added: dict[str, Any]) -> Non
         "remedial_measures": [],
         "license_points": 0,
         "license_points_condition": None,
+        "license_point_tiers": [],
         "penalty_rule_ids": [],
         "legal_basis": {**added["legal_basis"], "document": DOC},
         "source_url": SOURCE_URL_AMENDMENT,
@@ -160,6 +163,11 @@ def add_record(records: dict[str, dict[str, Any]], added: dict[str, Any]) -> Non
             "consolidated_as_of": CONSOLIDATED_AS_OF,
         },
     }
+    if added.get("fine_unit"):
+        rec["fine_unit"] = added["fine_unit"]
+        rec["fine_cap"] = added.get("fine_cap")
+    if added.get("fine_by_subject"):
+        rec["fine_by_subject"] = added["fine_by_subject"]
     records[rid] = rec
 
 
@@ -180,6 +188,8 @@ def patch_rules(rules: dict[str, dict[str, Any]], patch: dict[str, Any]) -> None
         rule["text"] = patch["text"]
     elif op not in ("replace", "set_text"):
         raise SystemExit(f"rule patch {rid}: unsupported op {op!r}")
+    if patch.get("ref_overrides"):
+        rule["ref_overrides"] = patch["ref_overrides"]
     if patch.get("remove_refs"):
         remove = {(r["clause"], r.get("point")) for r in patch["remove_refs"]}
         rule["refs"] = [
@@ -229,6 +239,7 @@ def attach_penalties(records: list[dict[str, Any]], rules: list[dict[str, Any]])
         rec["remedial_measures"] = []
         rec["license_points"] = 0
         rec["license_points_condition"] = None
+        rec["license_point_tiers"] = []
         rec["penalty_rule_ids"] = []
 
     for rule in rules:
@@ -237,22 +248,28 @@ def attach_penalties(records: list[dict[str, Any]], rules: list[dict[str, Any]])
             for rec in records:
                 if not rule_matches(rec, rule, ref):
                     continue
-                if penalty["type"] == "tru_diem_gplx":
-                    rec["license_points"] = max(rec["license_points"], penalty["points"])
-                    if penalty.get("condition"):
-                        rec["license_points_condition"] = penalty["condition"]
-                elif penalty["type"] in REMEDIAL_TYPES:
-                    if penalty not in rec["remedial_measures"]:
-                        rec["remedial_measures"].append(penalty)
+                # Some rules group clauses whose conditions differ. A
+                # per-reference override keeps the citizen-facing condition
+                # specific to the clause being attached.
+                override = (rule.get("ref_overrides") or {}).get(str(ref["clause"]))
+                applied = {**penalty, **override} if override else penalty
+                if applied["type"] == "tru_diem_gplx":
+                    set_license_points(rec, applied["points"], applied.get("condition"))
+                elif applied["type"] in REMEDIAL_TYPES:
+                    if applied not in rec["remedial_measures"]:
+                        rec["remedial_measures"].append(applied)
                 else:
-                    if penalty not in rec["additional_penalties"]:
-                        rec["additional_penalties"].append(penalty)
+                    if applied not in rec["additional_penalties"]:
+                        rec["additional_penalties"].append(applied)
                 if rule["id"] not in rec["penalty_rule_ids"]:
                     rec["penalty_rule_ids"].append(rule["id"])
 
+    for rec in records:
+        finalize_license_points(rec)
+
 
 def clause_sort_key(clause: Any) -> tuple[int, float, str]:
-    """Order numeric clauses, with inserted clauses like 1a before clause 1."""
+    """Order numeric clauses and inserted clauses such as 1a, 9a."""
     if isinstance(clause, int):
         return (0, float(clause), "")
     text = str(clause)
@@ -263,9 +280,10 @@ def clause_sort_key(clause: Any) -> tuple[int, float, str]:
     suffix = m.group(2)
     if not suffix:
         return (0, float(number), "")
-    # "1a" was inserted *before* clause 1 by 238/2026.
-    offset = 0.5 + (ord(suffix) - ord("a")) / 100.0
-    return (0, number - 1 + offset, suffix)
+    # 238/2026 inserted 1a *before* clause 1, but 9a *after* clause 9.
+    if text == "1a":
+        return (0, 0.5, suffix)
+    return (0, number + 0.5 + (ord(suffix) - ord("a")) / 100.0, suffix)
 
 
 def sort_key(rec: dict[str, Any]):

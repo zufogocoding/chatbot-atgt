@@ -28,6 +28,13 @@ class Source(BaseModel):
 class Fine(BaseModel):
     min: int | None
     max: int | None
+    unit: Literal["per_person"] | None = None
+    cap: int | None = None
+
+
+class LicensePointTier(BaseModel):
+    points: int
+    condition: str
 
 
 class Guidance(BaseModel):
@@ -46,6 +53,7 @@ class Penalty(BaseModel):
     organization_fine: Fine | None = None
     license_points: int
     license_points_condition: str | None = None
+    license_point_tiers: list[LicensePointTier] = Field(default_factory=list)
     additional_penalties: list[str]
     remedial_measures: list[str]
     guidance: list[Guidance] = Field(default_factory=list)

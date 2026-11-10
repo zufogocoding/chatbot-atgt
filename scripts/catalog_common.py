@@ -50,6 +50,58 @@ def format_range(fine_min: int | None, fine_max: int | None) -> str:
     return f"{format_money(fine_min)} – {format_money(fine_max)}"
 
 
+def format_fine(
+    fine_min: int | None,
+    fine_max: int | None,
+    unit: str | None = None,
+    cap: int | None = None,
+) -> str:
+    """Render a fine, including per-person units and the total cap."""
+    text = format_range(fine_min, fine_max)
+    if unit == "per_person":
+        text += " cho mỗi người vượt quá quy định"
+    if cap is not None:
+        text += f" (tổng tối đa {format_money(cap)})"
+    return text
+
+
+def set_license_points(rec: dict[str, Any], points: int, condition: str | None) -> None:
+    """Accumulate a licence-point rule for a record.
+
+    Clauses 5/6 have one tier for 50–100% over capacity and another for more
+    than 100%, so a single number plus a single condition cannot represent them.
+    Call finalize_license_points() after all rules have been attached.
+    """
+    tiers: list[dict[str, Any]] = rec.setdefault("license_point_tiers", [])
+    item = {"points": points, "condition": condition or None}
+    if item not in tiers:
+        tiers.append(item)
+    rec["license_points"] = max(tier["points"] for tier in tiers)
+    rec["license_points_condition"] = None
+    rec["license_point_tiers"] = sorted(
+        tiers, key=lambda tier: (tier["points"], tier["condition"] or "")
+    )
+
+
+def finalize_license_points(rec: dict[str, Any]) -> None:
+    """Collapse a single point tier back to the simple scalar representation."""
+    tiers = rec.get("license_point_tiers") or []
+    if not tiers:
+        return
+    unique = {(tier["points"], tier["condition"]) for tier in tiers}
+    if len(unique) == 1:
+        points, condition = next(iter(unique))
+        rec["license_points"] = points
+        rec["license_points_condition"] = condition
+        rec["license_point_tiers"] = []
+        return
+    rec["license_points"] = max(tier["points"] for tier in tiers)
+    rec["license_points_condition"] = None
+    rec["license_point_tiers"] = sorted(
+        tiers, key=lambda tier: (tier["points"], tier["condition"] or "")
+    )
+
+
 def format_penalty(penalty: dict[str, Any]) -> str:
     kind = penalty.get("type")
     condition = penalty.get("condition")

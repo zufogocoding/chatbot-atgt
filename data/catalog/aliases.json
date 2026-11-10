@@ -1356,6 +1356,165 @@
           }
         ]
       }
+    },
+    {
+      "id": "chu-xe-cho-qua-so-nguoi",
+      "canonical": "Giao xe ô tô cho người khác điều khiển chở quá số người quy định",
+      "citizen_phrases": [
+        "chở quá số người",
+        "chở quá số người quy định",
+        "quá số người quy định",
+        "nhồi nhét khách",
+        "cho quá số người",
+        "cho qua so nguoi"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k5",
+            "qualifier": "xe ô tô chở khách, chở người thông thường (Điều 20 khoản 2)"
+          },
+          {
+            "record_id": "nd168-d32-k6",
+            "qualifier": "xe khách tuyến cố định/hợp đồng có cự ly trên 300 km (Điều 20 khoản 4)"
+          }
+        ]
+      },
+      "notes": "Mức phạt tính trên mỗi người vượt quá quy định và có tổng mức tối đa; chủ xe là cá nhân và tổ chức có khung khác nhau."
+    },
+    {
+      "id": "khong-lap-thiet-bi-giam-sat-hanh-trinh",
+      "canonical": "Không lắp hoặc làm sai lệch thiết bị giám sát hành trình",
+      "citizen_phrases": [
+        "không lắp thiết bị giám sát hành trình",
+        "không có thiết bị giám sát hành trình",
+        "thiết bị giám sát hành trình không hoạt động",
+        "làm sai lệch dữ liệu giám sát hành trình",
+        "khong lap thiet bi giam sat hanh trinh",
+        "gps khong hoat dong"
+      ],
+      "requires_qualifier": true,
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k9a-a",
+            "qualifier": "chủ xe ô tô đầu kéo, xe vận tải nội bộ"
+          },
+          {
+            "record_id": "nd168-d32-k7-m",
+            "qualifier": "chủ xe cứu hộ giao thông đường bộ, xe cứu thương"
+          }
+        ]
+      },
+      "notes": "Điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe) chỉ có hiệu lực từ 01/01/2028 nên chưa có trong catalog."
+    },
+    {
+      "id": "chu-xe-cho-khach-thu-tien-khong-kinh-doanh",
+      "canonical": "Giao xe ô tô không kinh doanh vận tải hành khách để chở người có thu tiền",
+      "citizen_phrases": [
+        "chở khách thu tiền",
+        "chở người có thu tiền",
+        "xe không kinh doanh vận tải chở khách",
+        "giao xe chở khách thu tiền",
+        "chạy xe hợp đồng trá hình",
+        "cho nhan vien cho khach thu tien",
+        "cho khach thu tien"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k11-e"
+          }
+        ]
+      },
+      "notes": "Chủ xe giao phương tiện hoặc để người làm công, người điều khiển thực hiện hành vi tại khoản 8a Điều 20."
+    },
+    {
+      "id": "chu-xe-container-khong-dung-quy-dinh",
+      "canonical": "Giao xe chở công-ten-nơ không đúng quy chuẩn hoặc hàng không chằng buộc",
+      "citizen_phrases": [
+        "container không đúng quy chuẩn",
+        "container bị cắt nóc",
+        "chở container cắt nóc",
+        "chở hàng không chằng buộc",
+        "không chằng buộc hàng hóa",
+        "giao xe chở container sai quy định",
+        "container khong dung quy chuan",
+        "cho hang khong chang buoc"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k13-e"
+          }
+        ]
+      },
+      "notes": "Chủ xe giao phương tiện hoặc để người làm công, người đại diện thực hiện hành vi tại điểm c, d, e khoản 8 Điều 21."
+    },
+    {
+      "id": "chu-xe-cho-qua-so-nguoi-xe-thuong",
+      "canonical": "Chủ xe ô tô chở khách, chở người thông thường chở quá số người quy định",
+      "citizen_phrases": [
+        "ô tô chở khách chở quá số người",
+        "xe ô tô chở người chở quá số người",
+        "ô tô chở người chở quá số người",
+        "chở quá số người quy định tại khoản 2 điều 20",
+        "o to cho khach cho qua so nguoi"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k5",
+            "qualifier": "xe ô tô chở khách, chở người thông thường (Điều 20 khoản 2)"
+          }
+        ]
+      },
+      "notes": "Mức phạt tính trên mỗi người vượt quá quy định và có tổng mức tối đa; chủ xe là cá nhân và tổ chức có khung khác nhau."
+    },
+    {
+      "id": "chu-xe-cho-qua-so-nguoi-tuyen-dai",
+      "canonical": "Chủ xe ô tô khách tuyến cố định hoặc hợp đồng trên 300 km chở quá số người",
+      "citizen_phrases": [
+        "xe khách tuyến cố định trên 300 km chở quá số người",
+        "xe hợp đồng trên 300 km chở quá số người",
+        "chở quá số người tuyến trên 300 km",
+        "chở quá số người cự ly trên 300 km",
+        "xe ô tô khách chạy trên 300 km chở quá số người",
+        "xe khach tuyen co dinh tren 300 km cho qua so nguoi",
+        "trên 300 km chở quá số người",
+        "tuyến cố định trên 300 km chở quá số người",
+        "xe ô tô khách tuyến cố định chạy trên 300 km chở quá số người"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k6",
+            "qualifier": "xe khách tuyến cố định/hợp đồng có cự ly trên 300 km (Điều 20 khoản 4)"
+          }
+        ]
+      },
+      "notes": "Mức phạt tính trên mỗi người vượt quá quy định và có tổng mức tối đa; chủ xe là cá nhân và tổ chức có khung khác nhau."
+    },
+    {
+      "id": "khong-lap-thiet-bi-giam-sat-hanh-trinh-dau-keo",
+      "canonical": "Chủ xe ô tô đầu kéo, xe vận tải nội bộ không lắp hoặc làm sai lệch thiết bị giám sát hành trình",
+      "citizen_phrases": [
+        "ô tô đầu kéo không lắp thiết bị giám sát hành trình",
+        "xe ô tô đầu kéo không lắp thiết bị giám sát hành trình",
+        "xe vận tải nội bộ không lắp thiết bị giám sát hành trình",
+        "đầu kéo làm sai lệch dữ liệu giám sát hành trình",
+        "o to dau keo khong lap thiet bi giam sat hanh trinh"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d32-k9a-a",
+            "qualifier": "chủ xe ô tô đầu kéo, xe vận tải nội bộ"
+          }
+        ]
+      },
+      "notes": "Điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe) chỉ có hiệu lực từ 01/01/2028 nên chưa có trong catalog."
     }
   ]
 }

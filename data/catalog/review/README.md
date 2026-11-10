@@ -4,12 +4,13 @@ Thư mục này chứa phiếu xuất từ catalog và các bản ghi phục v�
 
 | Tệp | Nội dung |
 |---|---|
-| `review-2026-11-09.csv` | Phiếu đầy đủ 271 bản ghi, sinh tự động |
-| `review-2026-11-09-fine.csv` | Phiếu 259 bản ghi có phạt tiền |
-| `nguoi-ra-soat-1.csv` | Phiếu trống cho người rà soát 1 (259 bản ghi có phạt tiền) |
-| `nguoi-ra-soat-2.csv` | Phiếu trống cho người rà soát 2 (259 bản ghi có phạt tiền) |
-| `fine-audit-2026-11-10.csv` | Kết quả đối chiếu tự động mức tiền với đoạn luật |
-| `spotcheck-2026-11-10.csv` | Mẫu 30 bản ghi rủi ro cao cho một người spot-check, **không phải phiếu xác minh hai người** |
+| `review-2026-11-09.csv` | Phiếu đầy đủ 276 bản ghi, sinh tự động |
+| `review-2026-11-09-fine.csv` | Phiếu 264 bản ghi có phạt tiền |
+| `nguoi-ra-soat-1.csv` | Phiếu trống cho người rà soát 1 (264 bản ghi có phạt tiền) |
+| `nguoi-ra-soat-2.csv` | Phiếu trống cho người rà soát 2 (264 bản ghi có phạt tiền) |
+| `fine-audit-2026-11-11.csv` | Kết quả đối chiếu tự động mức tiền, mức trần và đoạn luật |
+| `spotcheck-2026-11-11.csv` | Mẫu 30 bản ghi rủi ro cao cho một người spot-check, **không phải phiếu xác minh hai người** |
+| `spotcheck-2026-11-10.csv` | Mẫu spot-check cũ, giữ lại để đối chiếu với lượt AI ngày 10/11 |
 | `spotcheck-2026-11-10-ai-review.csv` | Bản AI điền thử 30 dòng spot-check, **không phải phiếu của người rà soát** |
 | `spotcheck-2026-11-10-ai-review.md` | Ghi chú, bảng căn cứ và hạn chế của lượt AI spot-check |
 | `ai-precheck-2026-11-10.csv` | Bản AI điền thử, **không phải phiếu của người rà soát** |
@@ -18,16 +19,17 @@ Thư mục này chứa phiếu xuất từ catalog và các bản ghi phục v�
 ## Quy tắc điền phiếu
 
 1. Mỗi người mở một phiếu riêng, không xem phiếu của người kia trước khi điền xong.
-2. Chỉ điền 8 cột: `expected_fine_min`, `expected_fine_max`, `fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`.
-3. Không sửa các cột dữ liệu catalog (`behavior_text`, `fine_min`, `fine_max`, `additional_penalties`, `remedial_measures`, `source_quote`, `verification_status`...). Nếu thấy sai, đánh `SAI` và ghi lý do vào `note`.
-4. Giá trị hợp lệ cho `*_ok`: `OK`, `SAI`, `NA`.
-5. Hai phiếu phải có tên người rà soát khác nhau.
+2. Chỉ điền các cột review: `expected_fine_min`, `expected_fine_max`, `expected_fine_cap`, `expected_fine_org_min`, `expected_fine_org_max`, `expected_fine_org_cap`, `fine_ok`, `org_fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`.
+3. Không sửa các cột dữ liệu catalog (`behavior_text`, `fine_min`, `fine_max`, `fine_unit`, `fine_cap`, `fine_org_min/max/cap`, `additional_penalties`, `remedial_measures`, `source_quote`, `verification_status`...). Nếu thấy sai, đánh `SAI` và ghi lý do vào `note`.
+4. Giá trị hợp lệ cho `*_ok`: `OK`, `SAI`, `NA`. `org_fine_ok` phải là `OK` nếu bản ghi có khung tổ chức và `NA` nếu không có.
+5. Với bản ghi phạt theo người (Điều 32 khoản 5–6), điền cả `expected_fine_cap` và `expected_fine_org_cap`.
+6. Hai phiếu phải có tên người rà soát khác nhau.
 
 `scripts/merge_reviews.py` kiểm tra lại các cột catalog so với catalog hiện tại. Nếu phiếu bị sửa cột dữ liệu, script từ chối gộp và yêu cầu xuất lại phiếu.
 
 ## Mẫu spot-check 30 bản ghi rủi ro cao
 
-`spotcheck-2026-11-10.csv` được sinh bằng `python3 scripts/export_spotcheck.py`. Đây là mẫu **một người** rà soát nhanh, không thay thế quy trình hai người và không thể gộp thành snapshot `verified`.
+`spotcheck-2026-11-11.csv` được sinh bằng `python3 scripts/export_spotcheck.py`. Đây là mẫu **một người** rà soát nhanh, không thay thế quy trình hai người và không thể gộp thành snapshot `verified`. Mẫu cũ `spotcheck-2026-11-10.csv` vẫn giữ để đối chiếu với lượt AI đã chạy trước khi bổ sung Điều 32 khoản 5–6 và các điểm 9a.a/11.e/13.e.
 
 Mẫu chọn tự động, chia đều qua các nhóm rủi ro:
 
@@ -38,7 +40,7 @@ Mẫu chọn tự động, chia đều qua các nhóm rủi ro:
 - bản ghi có hình phạt bổ sung;
 - bản ghi có biện pháp khắc phục.
 
-Cột `risk_reason` ghi lý do bản ghi nằm trong mẫu. Người rà soát điền các cột còn lại như phiếu thường (`expected_fine_min`, `expected_fine_max`, `fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`). Kết quả chỉ dùng để báo cáo độ tin cậy và phát hiện lỗi hệ thống, không dùng để đổi `verification_status`.
+Cột `risk_reason` ghi lý do bản ghi nằm trong mẫu. Người rà soát điền các cột còn lại như phiếu thường (`expected_fine_min/max/cap`, `expected_fine_org_min/max/cap`, `fine_ok`, `org_fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`). Kết quả chỉ dùng để báo cáo độ tin cậy và phát hiện lỗi hệ thống, không dùng để đổi `verification_status`.
 
 ## Kết quả AI spot-check ngày 10/11/2026
 
@@ -54,7 +56,7 @@ Hai tệp `spotcheck-2026-11-10-ai-review.csv` và `.md` ghi kết quả một l
 
 ## Bản AI precheck ngày 10/11/2026
 
-Tệp `ai-precheck-2026-11-10.csv` do AI điền, không đáp ứng quy trình hai người rà soát độc lập:
+Tệp `ai-precheck-2026-11-10.csv` do AI điền, không đáp ứng quy trình hai người rà soát độc lập. Số liệu dưới đây là của snapshot trước khi bổ sung Điều 32 khoản 5–6 và các điểm 9a.a/11.e/13.e (259 bản ghi có phạt tiền lúc đó):
 
 - Cột `reviewer` có hai nhãn AI trong cùng một phiếu: `Claude` (170 dòng) và `GPT-6 (đối chiếu tệp Công báo)` (89 dòng).
 - Các cột `*_ok` dùng `TRUE`/`FALSE` thay vì `OK`/`SAI`/`NA`.

@@ -6,7 +6,12 @@ export type ChatRequest = {
   record_id?: string;
 };
 
-export type Fine = { min: number | null; max: number | null };
+export type Fine = {
+  min: number | null;
+  max: number | null;
+  unit: "per_person" | null;
+  cap: number | null;
+};
 
 export type Guidance = { title: string; text: string };
 
@@ -21,6 +26,7 @@ export type Penalty = {
   organization_fine: Fine | null;
   license_points: number;
   license_points_condition: string | null;
+  license_point_tiers: { points: number; condition: string }[];
   additional_penalties: string[];
   remedial_measures: string[];
   guidance: Guidance[];

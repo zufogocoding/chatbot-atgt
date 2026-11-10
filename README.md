@@ -48,14 +48,14 @@ Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vư
 |---|---|
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
-| Bản ghi vi phạm | 271 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
-| Alias tiếng dân | 49 nhóm, 317 cách nói (253 biến thể sau chuẩn hóa) |
-| Kiểm chứng | 271/271 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
+| Bản ghi vi phạm | 276 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
+| Alias tiếng dân | 56 nhóm, 363 cách nói (290 biến thể sau chuẩn hóa) |
+| Kiểm chứng | 276/276 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
-| Bộ đánh giá | 254 câu có nhãn kỳ vọng, có script chấm baseline |
+| Bộ đánh giá | 261 câu có nhãn kỳ vọng, có script chấm baseline |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
-Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe. Chưa gồm: Điều 32 khoản 5–6 (phạt trên mỗi người vượt quá, có trần), các điểm 238/2026 thêm mới 9a/11.e/13.e (xe đầu kéo/vận tải nội bộ, tham chiếu Điều 20/21), Điều 17 và các điều vận tải 20–24.
+Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe, khoản 5–6 (phạt trên mỗi người vượt quá, có trần) và các điểm 238/2026 thêm mới 9a.a/11.e/13.e. Chưa gồm: điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe, hiệu lực 01/01/2028), Điều 17 và các điều vận tải 20–24.
 
 Dữ liệu thủ tục nằm trong [`data/procedures/`](data/procedures/) và được lập chỉ mục BM25 trong [`data/build/catalog.db`](data/build/catalog.db). SQLite chứa bảng `procedures`, `procedure_sources` và `procedure_citations` để tra đoạn thủ tục và căn cứ. Kết quả và cách chạy golden set nằm trong [`data/eval/README.md`](data/eval/README.md).
 

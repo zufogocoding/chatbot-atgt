@@ -14,10 +14,12 @@ export function formatDate(value: string) {
   return year && month && day ? [day, month, year].join("/") : value;
 }
 
-function fineLabel({ min, max }: Fine) {
+function fineLabel({ min, max, unit, cap }: Fine) {
   if (min === null || max === null) return "Không phạt tiền";
-  if (min === max) return number.format(min) + " ₫";
-  return number.format(min) + " – " + number.format(max) + " ₫";
+  let label = min === max ? number.format(min) + " ₫" : number.format(min) + " – " + number.format(max) + " ₫";
+  if (unit === "per_person") label += " / người vượt quá";
+  if (cap !== null) label += " (tối đa " + number.format(cap) + " ₫)";
+  return label;
 }
 
 function sourceUrl(value: string) {
@@ -104,8 +106,22 @@ function PenaltyDetails({ penalty, sources }: { penalty: Penalty; sources: Sourc
         )}
         <div className="fact">
           <span>Điểm GPLX bị trừ</span>
-          <strong>{number.format(penalty.license_points)} điểm</strong>
-          {penalty.license_points_condition && <small>Nếu {penalty.license_points_condition}</small>}
+          {penalty.license_point_tiers.length > 0 ? (
+            <>
+              <strong>
+                {number.format(penalty.license_point_tiers[0].points)}–
+                {number.format(penalty.license_point_tiers[penalty.license_point_tiers.length - 1].points)} điểm
+              </strong>
+              {penalty.license_point_tiers.map((tier) => (
+                <small key={tier.points}>Trừ {number.format(tier.points)} điểm nếu {tier.condition}</small>
+              ))}
+            </>
+          ) : (
+            <>
+              <strong>{number.format(penalty.license_points)} điểm</strong>
+              {penalty.license_points_condition && <small>Nếu {penalty.license_points_condition}</small>}
+            </>
+          )}
         </div>
       </div>
       {[

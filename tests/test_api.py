@@ -56,15 +56,36 @@ def test_penalty_boundaries_and_sources(question, record_id, minimum, maximum):
     reply = ask(question)
     assert reply["answer_type"] == "penalty"
     assert reply["penalty"]["record_id"] == record_id
-    assert reply["penalty"]["fine"] == {"min": minimum, "max": maximum}
+    assert reply["penalty"]["fine"]["min"] == minimum
+    assert reply["penalty"]["fine"]["max"] == maximum
+    assert reply["penalty"]["fine"]["unit"] is None
+    assert reply["penalty"]["fine"]["cap"] is None
     assert reply["sources"][0]["url"].startswith("https://")
     assert "[1]" in reply["answer"]
 
 
 def test_organization_fine():
     reply = ask("Công ty mua ô tô mà chưa sang tên")
-    assert reply["penalty"]["organization_fine"] == {"min": 8_000_000, "max": 12_000_000}
+    assert reply["penalty"]["organization_fine"]["min"] == 8_000_000
+    assert reply["penalty"]["organization_fine"]["max"] == 12_000_000
     assert reply["answer"].startswith("Mức phạt tổ chức")
+
+
+def test_per_person_fine_and_licence_point_tiers():
+    reply = call("POST", "/chat", {
+        "question": "Xem mức phạt cho chủ xe",
+        "record_id": "nd168-d32-k5",
+    }).json()
+    assert reply["answer_type"] == "penalty"
+    assert reply["penalty"]["record_id"] == "nd168-d32-k5"
+    fine = reply["penalty"]["fine"]
+    assert (fine["min"], fine["max"], fine["unit"], fine["cap"]) == (
+        800_000, 1_200_000, "per_person", 75_000_000,
+    )
+    assert reply["penalty"]["organization_fine"]["cap"] == 150_000_000
+    assert "mỗi người vượt quá" in reply["answer"]
+    assert "75.000.000" in reply["answer"]
+    assert [(tier["points"]) for tier in reply["penalty"]["license_point_tiers"]] == [4, 10]
 
 
 def test_penalty_includes_legal_quote():
@@ -249,3 +270,19 @@ def test_missing_catalog_returns_503_without_creating_a_file():
         assert call("GET", "/health", application=application).status_code == 503
         assert call("POST", "/chat", {"question": "Xe máy vượt đèn đỏ"}, application).status_code == 503
         assert not db.exists()
+
+
+@pytest.mark.parametrize(
+    "question, record_id",
+    [
+        ("Ô tô chở khách chở quá số người quy định bị phạt bao nhiêu?", "nd168-d32-k5"),
+        ("Xe ô tô khách tuyến cố định chạy trên 300 km chở quá số người bị phạt bao nhiêu?", "nd168-d32-k6"),
+        ("Chủ xe ô tô đầu kéo không lắp thiết bị giám sát hành trình bị phạt bao nhiêu?", "nd168-d32-k9a-a"),
+        ("Chủ xe ô tô cho nhân viên chở khách thu tiền bị phạt bao nhiêu?", "nd168-d32-k11-e"),
+        ("Chủ xe ô tô giao xe chở container bị cắt nóc bị phạt bao nhiêu?", "nd168-d32-k13-e"),
+    ],
+)
+def test_new_article_32_routes(question, record_id):
+    reply = ask(question)
+    assert reply["answer_type"] == "penalty"
+    assert reply["penalty"]["record_id"] == record_id

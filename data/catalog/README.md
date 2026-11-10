@@ -9,17 +9,17 @@ Thư mục này là **nguồn sự thật** cho phần tra cứu mức phạt c�
 | Văn bản gốc | Nghị định 168/2024/NĐ-CP |
 | Văn bản sửa đổi | Nghị định 238/2026/NĐ-CP, hiệu lực 15/08/2026 |
 | Ngày hợp nhất | 09/11/2026 |
-| Số bản ghi | **271** |
+| Số bản ghi | **276** |
 | Điều đã trích xuất | 6, 7, 12, 13, 14, 18, 32 |
-| Bản ghi có phạt tiền | 259 |
+| Bản ghi có phạt tiền | 264 |
 | Bản ghi chỉ có hình phạt bổ sung | 10 (tịch thu phương tiện) |
 | Bản ghi cảnh cáo | 2 |
-| Có hình phạt bổ sung | 67 |
-| Có biện pháp khắc phục hậu quả | 68 |
-| Có trừ điểm GPLX | 109 |
-| Quy tắc hình phạt/trừ điểm | 57 |
-| Alias tiếng dân | 44 nhóm, 285 cách nói (229 biến thể sau chuẩn hóa) |
-| Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 271/271. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
+| Có hình phạt bổ sung | 69 |
+| Có biện pháp khắc phục hậu quả | 69 |
+| Có trừ điểm GPLX | 112 |
+| Quy tắc hình phạt/trừ điểm | 59 |
+| Alias tiếng dân | 56 nhóm, 363 cách nói (290 biến thể sau chuẩn hóa) |
+| Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 276/276. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
 
 Phân bố theo Điều:
 
@@ -31,7 +31,11 @@ Phân bố theo Điều:
 | 13 | Ô tô – điều kiện phương tiện | – | 23 | – |
 | 14 | Xe máy – điều kiện phương tiện | 13 | – | – |
 | 18 | Điều kiện người điều khiển | 12 | 11 | 1 |
-| 32 | Chủ phương tiện (sang tên, biển số, đăng ký, cải tạo, giao xe...) | 15 | 50 | 2 |
+| 32 | Chủ phương tiện (sang tên, biển số, đăng ký, cải tạo, giao xe...) | 15 | 55 | 2 |
+
+Điều 32 đã phủ khoản 1–17 (trừ các điểm bị 238/2026 bãi bỏ), khoản 18–21 và các bổ sung của 238/2026: điểm a khoản 9a (thiết bị giám sát hành trình), điểm e khoản 11, điểm e khoản 13. Điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe) có hiệu lực từ 01/01/2028 nên được ghi trong `data/amendments/238-2026.json` mục `deferred`, chưa đưa vào catalog hợp nhất ngày 09/11/2026.
+
+Khoản 5 và khoản 6 là mức phạt **trên mỗi người vượt quá quy định**, có tổng mức tối đa cho cá nhân/tổ chức; catalog lưu `fine_unit = "per_person"`, `fine_cap` và `fine_by_subject.to_chuc.cap`. Hai khoản này cũng có hai mức trừ điểm GPLX tùy tỷ lệ vượt quá, nên dùng `license_point_tiers` thay vì một con số duy nhất.
 
 ## 2. Cấu trúc thư mục
 
@@ -119,11 +123,14 @@ data/
 | `subject` | `nguoi_dieu_khien`, `nguoi_duoc_cho` (Điều 12) hoặc `chu_phuong_tien` (Điều 32) |
 | `record_kind` | `fine` (có khung tiền), `warning` (cảnh cáo, tiền = 0), `additional_only` (không phạt tiền, chỉ tịch thu) |
 | `fine_min`, `fine_max` | Đơn vị đồng, mức phạt cá nhân. `null` với `additional_only` |
-| `fine_by_subject.to_chuc` | Mức phạt tổ chức (thường gặp ở Điều 32) |
+| `fine_unit` | `"per_person"` khi luật phạt trên mỗi người vượt quá quy định (Điều 32 khoản 5–6); bỏ trống với khung tiền thông thường |
+| `fine_cap` | Tổng mức phạt tối đa cho cá nhân khi `fine_unit = "per_person"` |
+| `fine_by_subject.to_chuc` | Mức phạt tổ chức: `min`, `max` và `cap` nếu là phạt theo người (thường gặp ở Điều 32) |
 | `additional_penalties` | Tước GPLX/phù hiệu/giấy kiểm định, tịch thu phương tiện/biển số/thiết bị, thu hồi GPLX |
 | `remedial_measures` | Buộc khắc phục hậu quả, thu hồi hồ sơ/đăng ký/giấy tờ không hợp lệ |
-| `license_points` | Số điểm bị trừ, `0` nếu không trừ |
+| `license_points` | Số điểm bị trừ, `0` nếu không trừ; với nhiều mức thì đây là mức cao nhất |
 | `license_points_condition` | Điều kiện trừ điểm (vd. chỉ khi chủ phương tiện trực tiếp điều khiển) |
+| `license_point_tiers` | Danh sách `{points, condition}` khi một hành vi có nhiều mức trừ điểm (Điều 32 khoản 5–6: 4 điểm nếu vượt trên 50%–100%, 10 điểm nếu vượt trên 100%) |
 | `penalty_rule_ids` | Truy vết tới quy tắc trong `penalty-rules.jsonl` |
 | `legal_basis.path` | Đường dẫn `Điều.Khoản.Điểm` để hiển thị trích dẫn |
 | `source_quote` | Nguyên văn đoạn luật dùng để kiểm chứng |
@@ -206,16 +213,16 @@ python3 scripts/build_db.py
 Kết quả mong đợi:
 
 ```
-records: 271
-penalty rules: 57
-fine records checked: 259
-source quotes checked: 271
+records: 276
+penalty rules: 59
+fine records checked: 264
+source quotes checked: 276
 errors: 0
 warnings: 0 (hoặc chỉ warning về record chưa có alias)
 built data/build/catalog.db
-  violations: 271
-  penalty rules: 57
-  alias groups: 44 (229 phrases)
+  violations: 276
+  penalty rules: 59
+  alias groups: 56 (290 phrases)
 ```
 
 ### Tra thử bằng CLI
@@ -245,15 +252,15 @@ Nguyên tắc của `answer`:
 - Thiếu loại xe → hỏi lại.
 - Nhiều khung phạt (tốc độ, nồng độ cồn, không bằng lái...) → liệt kê để người dùng chọn.
 - Không khớp alias → chỉ gợi ý các record gần nhất, không khẳng định mức phạt.
-- Hình phạt có `condition` luôn hiển thị dạng "có thể bị... nếu...".
+- Hình phạt bổ sung có `condition` hiển thị kèm điều kiện: tịch thu phương tiện dạng "Bị tịch thu phương tiện nếu...", các loại khác dạng "(điều kiện: ...)".
 
 ### Xuất phiếu review thủ công
 
 ```bash
-# Toàn bộ 271 bản ghi
+# Toàn bộ 276 bản ghi
 python3 scripts/export_review.py
 
-# Chỉ 259 bản ghi có phạt tiền
+# Chỉ 264 bản ghi có phạt tiền
 python3 scripts/export_review.py --fine-only
 
 # Phiếu riêng cho từng người rà soát
@@ -261,13 +268,13 @@ python3 scripts/export_review.py --fine-only --out data/catalog/review/nguoi-ra-
 python3 scripts/export_review.py --fine-only --out data/catalog/review/nguoi-ra-soat-2.csv
 ```
 
-Repo có sẵn hai phiếu trống `nguoi-ra-soat-1.csv` và `nguoi-ra-soat-2.csv` cho 259 bản ghi có phạt tiền; hai người có thể mở trực tiếp và điền, hoặc tạo lại bằng lệnh trên.
+Repo có sẵn hai phiếu trống `nguoi-ra-soat-1.csv` và `nguoi-ra-soat-2.csv` cho 264 bản ghi có phạt tiền; hai người có thể mở trực tiếp và điền, hoặc tạo lại bằng lệnh trên.
 
 File CSV dùng UTF-8 (mở trực tiếp bằng Excel/LibreOffice):
 
-- Các cột đầu là dữ liệu catalog: `id`, `behavior_text`, `fine_min/max`, `legal_path`, `source_quote`...
-- Các cột trống để người review điền: `expected_fine_min/max`, `fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`.
-- Giá trị gợi ý cho `*_ok`: `OK`, `SAI`, `NA`.
+- Các cột đầu là dữ liệu catalog: `id`, `behavior_text`, `fine_min/max`, `fine_unit`, `fine_cap`, `fine_org_min/max/cap`, `legal_path`, `source_quote`...
+- Các cột trống để người review điền: `expected_fine_min/max/cap`, `expected_fine_org_min/max/cap`, `fine_ok`, `org_fine_ok`, `citation_ok`, `text_ok`, `reviewer`, `reviewed_at`, `note`.
+- `fine_ok` và `org_fine_ok` nhận `OK`, `SAI`, `NA`. `org_fine_ok` phải là `OK` khi bản ghi có khung tổ chức và `NA` khi không có.
 
 Hai người đối chiếu độc lập với Công báo 168 và 238 theo đề cương. Mỗi người dùng một bản phiếu riêng. Chỉ chuyển bản ghi sang `verified` sau khi hai lượt đều xác nhận số tiền, căn cứ và nội dung. Tạo phiếu mới bằng `--out` để giữ kết quả đã điền.
 
@@ -280,7 +287,7 @@ python3 scripts/merge_reviews.py --fine-only \
   --out data/catalog/verified/violations-2026-11-09.jsonl
 ```
 
-Script từ chối ghi snapshot nếu thiếu bản ghi, hai phiếu cùng một người, có mục `SAI`/bỏ trống, số tiền hai người nhập khác catalog, hoặc phiếu bị sửa các cột dữ liệu catalog. Với `--fine-only`, 259 bản ghi có phạt tiền được chuyển `verified`; 12 bản ghi cảnh cáo/tịch thu không có mức tiền giữ nguyên `draft`. Báo cáo gộp được ghi cạnh snapshot (`.report.json`). Xem thêm quy tắc điền phiếu và ghi chú về bản AI precheck tại [`review/README.md`](review/README.md).
+Script từ chối ghi snapshot nếu thiếu bản ghi, hai phiếu cùng một người, có mục `SAI`/bỏ trống, số tiền hoặc mức trần hai người nhập khác catalog, hoặc phiếu bị sửa các cột dữ liệu catalog. Với `--fine-only`, 264 bản ghi có phạt tiền được chuyển `verified`; 12 bản ghi cảnh cáo/tịch thu không có mức tiền giữ nguyên `draft`. Báo cáo gộp được ghi cạnh snapshot (`.report.json`). Xem thêm quy tắc điền phiếu và ghi chú về bản AI precheck tại [`review/README.md`](review/README.md).
 
 Dùng snapshot đã xác nhận để build bản phát hành:
 
@@ -291,7 +298,7 @@ python3 scripts/evaluate_dataset.py \
   --violations data/catalog/verified/violations-2026-11-09.jsonl
 ```
 
-[`fine-audit-2026-11-10.csv`](review/fine-audit-2026-11-10.csv) lưu kết quả đối chiếu tự động riêng cho 271 bản ghi, gồm mức tiền cá nhân, tổ chức và đoạn luật dùng để đối chiếu. Chạy lại với `python3 scripts/audit_fines.py`. Dùng `--out` để xuất CSV mới.
+[`fine-audit-2026-11-11.csv`](review/fine-audit-2026-11-11.csv) lưu kết quả đối chiếu tự động riêng cho 276 bản ghi, gồm mức tiền cá nhân, tổ chức, mức trần và đoạn luật dùng để đối chiếu. Chạy lại với `python3 scripts/audit_fines.py`. Dùng `--out` để xuất CSV mới.
 
 ### Khi có văn bản mới
 
@@ -308,6 +315,8 @@ python3 scripts/evaluate_dataset.py \
 `scripts/validate_catalog.py` kiểm tra:
 
 - `fine_min <= fine_max`; bản ghi cảnh cáo có tiền = 0; bản ghi tịch thu có tiền = `null`.
+- Bản ghi `fine_unit = "per_person"` phải có `fine_cap`, câu chữ gốc phải chứa “trên mỗi người vượt quá” và “tổng mức phạt tiền tối đa”; khung tổ chức phải có `cap` tương ứng.
+- `license_point_tiers` phải có ít nhất hai mức điểm, `license_points` bằng mức cao nhất và mỗi mức có điều kiện.
 - `legal_basis.path` khớp với `article/clause/point`.
 - `source_quote` không rỗng.
 - Text hành vi và điều khoản xuất hiện trong văn bản gốc 168 hoặc 238 (sau khi chuẩn hóa khoảng trắng). Với record bị sửa, script hoàn nguyên patch rồi đối chiếu bản gốc.

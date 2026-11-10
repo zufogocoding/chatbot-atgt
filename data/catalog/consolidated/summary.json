@@ -12,7 +12,7 @@
     18,
     32
   ],
-  "violations": 271,
+  "violations": 276,
   "by_article": {
     "6": 75,
     "7": 65,
@@ -20,19 +20,19 @@
     "13": 23,
     "14": 13,
     "18": 24,
-    "32": 67
+    "32": 72
   },
   "by_vehicle": {
     "xe_may": 108,
-    "o_to": 160,
+    "o_to": 165,
     "both": 3
   },
-  "with_additional_penalty": 67,
-  "with_remedial_measures": 68,
-  "with_license_points": 109,
-  "penalty_rules": 57,
+  "with_additional_penalty": 69,
+  "with_remedial_measures": 69,
+  "with_license_points": 112,
+  "penalty_rules": 59,
   "patched_records": 20,
-  "added_records": 1,
-  "patched_rules": 7,
+  "added_records": 4,
+  "patched_rules": 10,
   "status": "draft"
 }

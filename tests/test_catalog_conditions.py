@@ -116,3 +116,65 @@ def test_revocation_description_comes_from_rule_text():
     assert "không đúng số khung" in description
     assert "không do cơ quan có thẩm quyền cấp" in description
     assert "giấy chứng nhận, tem kiểm định" not in description
+
+
+def test_per_person_fines_keep_unit_caps_and_org_ranges():
+    for rid, minimum, maximum, org_min, org_max in (
+        ("nd168-d32-k5", 800_000, 1_200_000, 1_600_000, 2_400_000),
+        ("nd168-d32-k6", 2_000_000, 4_000_000, 4_000_000, 8_000_000),
+    ):
+        rec = record(rid)
+        assert (rec["fine_min"], rec["fine_max"]) == (minimum, maximum)
+        assert rec["fine_unit"] == "per_person"
+        assert rec["fine_cap"] == 75_000_000
+        assert rec["fine_by_subject"]["to_chuc"] == {
+            "min": org_min, "max": org_max, "cap": 150_000_000,
+        }
+        assert "mỗi người vượt quá" in rec["clause_text"]
+        assert rec["vehicle_type"] == "o_to"
+        assert rec["subject"] == "chu_phuong_tien"
+
+
+def test_per_person_records_have_two_licence_point_tiers():
+    for rid in ("nd168-d32-k5", "nd168-d32-k6"):
+        rec = record(rid)
+        assert rec["license_points"] == 10
+        assert rec["license_points_condition"] is None
+        tiers = rec["license_point_tiers"]
+        assert [tier["points"] for tier in tiers] == [4, 10]
+        assert "50% đến 100%" in tiers[0]["condition"]
+        assert "trên 100%" in tiers[1]["condition"]
+
+
+def test_article_32_added_records():
+    expected = {
+        "nd168-d32-k9a-a": (5_000_000, 6_000_000),
+        "nd168-d32-k11-e": (10_000_000, 12_000_000),
+        "nd168-d32-k13-e": (20_000_000, 26_000_000),
+    }
+    for rid, amounts in expected.items():
+        rec = record(rid)
+        assert (rec["fine_min"], rec["fine_max"]) == amounts
+        assert rec["vehicle_type"] == "o_to"
+        assert rec["subject"] == "chu_phuong_tien"
+        assert rec["fine_by_subject"]["to_chuc"]["min"] == amounts[0] * 2
+        assert rec["fine_by_subject"]["to_chuc"]["max"] == amounts[1] * 2
+        assert "238/2026/NĐ-CP" in rec["source_quote"]
+
+
+def test_9a_remedial_measure_does_not_require_image_device():
+    rec = record("nd168-d32-k9a-a")
+    assert len(rec["remedial_measures"]) == 1
+    description = rec["remedial_measures"][0]["description"]
+    assert "thiết bị giám sát hành trình" in description
+    assert "thiết bị ghi nhận hình ảnh" not in description
+
+
+def test_clause_order_for_inserted_clauses():
+    with (ROOT / "data/catalog/consolidated/violations.jsonl").open(encoding="utf-8") as handle:
+        rows = [json.loads(line) for line in handle]
+    article_32 = [
+        row["id"] for row in rows if row["legal_basis"]["article"] == 32
+    ]
+    assert article_32.index("nd168-d32-k9a-a") > article_32.index("nd168-d32-k9-đ")
+    assert article_32.index("nd168-d32-k9a-a") < article_32.index("nd168-d32-k10")

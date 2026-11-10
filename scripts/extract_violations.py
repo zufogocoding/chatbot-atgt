@@ -27,6 +27,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from catalog_common import finalize_license_points, set_license_points
+
 ROOT = Path(__file__).resolve().parents[1]
 IN = ROOT / "data/parsed/168-provisions.jsonl"
 OUT_VIOLATIONS = ROOT / "data/catalog/draft/violations-168.jsonl"
@@ -68,12 +70,10 @@ ARTICLE_META = {
 # road obstructions...) and is outside this project's scope.
 ARTICLE_12_INCLUDE = {(2, "d"), (4, None), (5, "a"), (5, "b")}
 
-# Article 32 clauses that are intentionally out of scope for this pass:
-#   5, 6  : per-extra-passenger fines with caps, tied to Điều 20 (cars).
-#   9a    : added by 238/2026 for tractor/internal-transport vehicles.
-#   11.e  : added by 238/2026, references Điều 20 khoản 8a (not in catalog).
-#   13.e  : added by 238/2026, references Điều 21 khoản 8 (trucks).
-ARTICLE_32_SKIP_CLAUSES = {5, 6}
+# Points added or repealed by 238/2026 are handled in
+# data/amendments/238-2026.json, not in the base 168 extraction. Clause 9a and
+# points 11.e/13.e do not exist in the 168 text, so they are added there.
+#
 # 238/2026 Điều 19 khoản 17 repeals points d, đ, e, g of Article 32 clause 17.
 ARTICLE_32_SKIP_POINTS = {(17, "d"), (17, "đ"), (17, "e"), (17, "g")}
 
@@ -82,6 +82,8 @@ ARTICLE_32_VEHICLE = {
     2: "o_to",
     3: "xe_may",
     4: "xe_may",
+    5: "o_to",
+    6: "o_to",
     7: "o_to",
     8: "xe_may",
     9: "o_to",
@@ -110,8 +112,6 @@ def provision_in_scope(article: int, clause: int, point: str | None) -> bool:
             return clause in {2, 4, 5}
         return (clause, point) in ARTICLE_12_INCLUDE
     if article == 32:
-        if clause in ARTICLE_32_SKIP_CLAUSES:
-            return False
         if (clause, point) in ARTICLE_32_SKIP_POINTS:
             return False
     return True
@@ -131,6 +131,13 @@ ANY_FINE_RE = re.compile(
 )
 WARNING_RE = re.compile(r"Phạt cảnh cáo", re.IGNORECASE)
 CONFISCATE_RE = re.compile(r"Tịch thu phương tiện", re.IGNORECASE)
+# Article 32 clauses 5/6 fine every extra passenger but cap the total:
+# "... tổng mức phạt tiền tối đa không vượt quá 75.000.000 đồng đối với
+# chủ phương tiện là cá nhân, ... 150.000.000 đồng ... là tổ chức".
+FINE_CAP_RE = re.compile(
+    r"tối đa không vượt quá\s+([\d\.]+)\s+đồng đối với chủ phương tiện là (cá nhân|tổ chức)",
+    re.IGNORECASE,
+)
 
 # "điểm h, điểm i khoản 3; khoản 6; điểm a khoản 9"
 REF_CLAUSE_RE = re.compile(r"khoản\s+(\d+)", re.IGNORECASE)
@@ -247,10 +254,17 @@ def parse_penalty(text: str) -> dict[str, Any] | None:
                 "type": "tru_diem_gplx",
                 "points": int(m.group(1)),
             }
-            if "chủ phương tiện là người trực tiếp điều khiển phương tiện" in text.lower():
-                penalty["condition"] = (
-                    "chủ phương tiện là người trực tiếp điều khiển phương tiện"
-                )
+            # Keep the full condition, not only "chủ phương tiện là người
+            # trực tiếp điều khiển". Clauses 5/6 have two point tiers whose
+            # conditions differ by the percentage of extra passengers.
+            condition = re.search(
+                r"(chủ phương tiện là người trực tiếp điều khiển phương tiện.*?)"
+                r"(?:,\s*)?còn bị trừ điểm giấy phép lái xe",
+                text,
+                re.IGNORECASE,
+            )
+            if condition:
+                penalty["condition"] = condition.group(1).strip().rstrip(",")
             return penalty
     if "tước quyền sử dụng giấy phép lái xe" in text:
         m = re.search(
@@ -431,6 +445,7 @@ def extract_violations(
             # Penalty rule clause (Ngoài việc...) or a clause without a fine.
             continue
 
+        fine_unit = fine_cap = None
         fine_by_subject = None
         if article == 32:
             ranges = ANY_FINE_RE.findall(text)
@@ -441,13 +456,32 @@ def extract_violations(
                         "max": money(ranges[1][1]),
                     }
                 }
+            if "trên mỗi người vượt quá" in text.lower():
+                caps = {
+                    subject: money(value)
+                    for value, subject in FINE_CAP_RE.findall(text)
+                }
+                fine_unit = "per_person"
+                fine_cap = caps.get("cá nhân")
+                if fine_by_subject and caps.get("tổ chức"):
+                    fine_by_subject["to_chuc"]["cap"] = caps["tổ chức"]
+
+        # Clauses 5/6 put the per-person fine and cap before the behaviour.
+        # Keep source_quote intact but show the citizen only the actual act.
+        display_text = text
+        if article == 32 and clause in (5, 6):
+            marker = "đối với chủ phương tiện là tổ chức"
+            index = text.lower().find(marker)
+            if index >= 0:
+                display_text = text[index + len(marker) :].strip()
+                display_text = display_text[0].upper() + display_text[1:]
 
         def make_record(row: dict[str, Any]) -> dict[str, Any]:
             path = f"{article}.{clause}" + (f".{row['point']}" if row["point"] else "")
             rec_id = "nd168-d{}-k{}".format(article, clause) + (
                 f"-{row['point']}" if row["point"] else ""
             )
-            behavior = row["text"] if row["point"] else text
+            behavior = row["text"] if row["point"] else display_text
             record = {
                 "id": rec_id,
                 "document": DOC,
@@ -469,6 +503,7 @@ def extract_violations(
                 "remedial_measures": [],
                 "license_points": 0,
                 "license_points_condition": None,
+                "license_point_tiers": [],
                 "penalty_rule_ids": [],
                 "legal_basis": {
                     "document": DOC,
@@ -491,6 +526,9 @@ def extract_violations(
                     "amended_by": [],
                 },
             }
+            if fine_unit:
+                record["fine_unit"] = fine_unit
+                record["fine_cap"] = fine_cap
             if fine_by_subject:
                 record["fine_by_subject"] = fine_by_subject
             return record
@@ -528,9 +566,7 @@ def extract_violations(
                     pass
                 penalty = rule["penalty"]
                 if penalty["type"] == "tru_diem_gplx":
-                    rec["license_points"] = max(rec["license_points"], penalty["points"])
-                    if penalty.get("condition"):
-                        rec["license_points_condition"] = penalty["condition"]
+                    set_license_points(rec, penalty["points"], penalty.get("condition"))
                 elif penalty["type"] in ("bien_phap_khac_phuc", "thu_hoi_dang_ky_xe"):
                     if penalty not in rec["remedial_measures"]:
                         rec["remedial_measures"].append(penalty)
@@ -539,6 +575,9 @@ def extract_violations(
                         rec["additional_penalties"].append(penalty)
                 if rule["id"] not in rec["penalty_rule_ids"]:
                     rec["penalty_rule_ids"].append(rule["id"])
+
+    for rec in records:
+        finalize_license_points(rec)
 
     # Stable order: article, clause, point.
     def sort_key(rec: dict[str, Any]):

@@ -23,6 +23,7 @@ def row(rid: str, reviewer: str, fine_min="", fine_max="", fine_ok="NA") -> dict
         "expected_fine_min": fine_min,
         "expected_fine_max": fine_max,
         "fine_ok": fine_ok,
+        "org_fine_ok": "NA",
         "citation_ok": "OK",
         "text_ok": "OK",
         "reviewer": reviewer,
@@ -124,3 +125,76 @@ def test_fine_only_keeps_other_records_draft(tmp_path: Path):
     by_id = {record["id"]: record for record in verified}
     assert by_id["fine-1"]["verification"]["status"] == "verified"
     assert by_id["other-1"]["verification"]["status"] == "draft"
+
+
+def per_person_catalog() -> list[dict]:
+    rec = record("per-person-1", 800_000, 1_200_000, "fine")
+    rec.update({
+        "fine_unit": "per_person",
+        "fine_cap": 75_000_000,
+        "fine_by_subject": {
+            "to_chuc": {"min": 1_600_000, "max": 2_400_000, "cap": 150_000_000}
+        },
+    })
+    return [rec]
+
+
+def per_person_row(rid: str, reviewer: str, **overrides: str) -> dict[str, str]:
+    values = {
+        "id": rid,
+        "expected_fine_min": "800000",
+        "expected_fine_max": "1200000",
+        "expected_fine_cap": "75000000",
+        "expected_fine_org_min": "1600000",
+        "expected_fine_org_max": "2400000",
+        "expected_fine_org_cap": "150000000",
+        "fine_ok": "OK",
+        "org_fine_ok": "OK",
+        "citation_ok": "OK",
+        "text_ok": "OK",
+        "reviewer": reviewer,
+        "reviewed_at": "2026-11-10",
+    }
+    values.update(overrides)
+    return values
+
+
+def test_merge_accepts_per_person_caps_and_org_fine(tmp_path: Path):
+    verified, errors, _, _ = merge(
+        per_person_catalog(),
+        {"per-person-1": per_person_row("per-person-1", "An")},
+        {"per-person-1": per_person_row("per-person-1", "Binh")},
+        tmp_path / "a.csv", tmp_path / "b.csv",
+    )
+    assert errors == []
+    assert verified[0]["verification"]["status"] == "verified"
+
+
+def test_merge_rejects_missing_per_person_cap(tmp_path: Path):
+    _, errors, _, _ = merge(
+        per_person_catalog(),
+        {"per-person-1": per_person_row("per-person-1", "An", expected_fine_cap="")},
+        {"per-person-1": per_person_row("per-person-1", "Binh")},
+        tmp_path / "a.csv", tmp_path / "b.csv",
+    )
+    assert any("missing expected_fine_cap" in error for error in errors)
+
+
+def test_merge_rejects_wrong_org_cap(tmp_path: Path):
+    _, errors, _, _ = merge(
+        per_person_catalog(),
+        {"per-person-1": per_person_row("per-person-1", "An", expected_fine_org_cap="140000000")},
+        {"per-person-1": per_person_row("per-person-1", "Binh")},
+        tmp_path / "a.csv", tmp_path / "b.csv",
+    )
+    assert any("expected_fine_org_cap=140000000" in error for error in errors)
+
+
+def test_merge_requires_org_check_when_org_fine_exists(tmp_path: Path):
+    _, errors, _, _ = merge(
+        per_person_catalog(),
+        {"per-person-1": per_person_row("per-person-1", "An", org_fine_ok="NA")},
+        {"per-person-1": per_person_row("per-person-1", "Binh")},
+        tmp_path / "a.csv", tmp_path / "b.csv",
+    )
+    assert any("org_fine_ok must be OK" in error for error in errors)

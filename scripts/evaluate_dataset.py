@@ -18,7 +18,7 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 from audit_fines import audit
-from catalog_common import format_range, load_jsonl, normalize_text
+from catalog_common import format_fine, format_range, load_jsonl, normalize_text
 import query_catalog as lookup
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -107,8 +107,14 @@ def check_dataset(cases: list[dict], procedures: list[dict], records: dict, snap
                 raise ValueError(f"{case['id']}: unknown fine subject")
             prefix = "expected_fine_org" if org else "expected_fine"
             expected = {side: source[f"{prefix}_{side}"] for side in ("min", "max")}
+            expected_unit = case.get("expected_fine_unit")
+            cap_field = "expected_fine_org_cap" if org else "expected_fine_cap"
+            expected_cap = case.get(cap_field)
+            unit_ok = expected_unit == source["fine_unit"]
+            cap_ok = expected_cap == source[cap_field]
             vehicle = case["expected_vehicle_type"]
             if (source["audit_result"] != "match" or case["expected_fine"] != expected
+                    or not unit_ok or not cap_ok
                     or case["expected_record_kind"] != rec["record_kind"]
                     or case["expected_legal_basis"] != rec["legal_basis"]
                     or rec["vehicle_type"] not in {vehicle, "both"}
@@ -182,15 +188,20 @@ def score(con: sqlite3.Connection, cases: list[dict], details: bool) -> dict:
         )
         if rec:
             fine = case["expected_fine"]
-            label = "Mức phạt (tổ chức)" if case["expected_fine_subject"] == "to_chuc" else "Mức phạt"
+            org = case["expected_fine_subject"] == "to_chuc"
+            label = "Mức phạt (tổ chức)" if org else "Mức phạt"
             if fine["min"] is None:
                 fine_line = "- Mức phạt tiền: Không có"
             elif fine["min"] == 0:
                 fine_line = "- Mức phạt: Phạt cảnh cáo"
             else:
-                fine_line = f"- {label}: {format_range(fine['min'], fine['max'])}"
-            if label == "Mức phạt" and rec.get("fine_org_min") is not None and fine["min"]:
-                fine_line = fine_line.replace("Mức phạt:", "Mức phạt (cá nhân):")
+                cap = case.get("expected_fine_org_cap" if org else "expected_fine_cap")
+                rendered = format_fine(
+                    fine["min"], fine["max"], case.get("expected_fine_unit"), cap,
+                )
+                if label == "Mức phạt" and rec.get("fine_org_min") is not None:
+                    label = "Mức phạt (cá nhân)"
+                fine_line = f"- {label}: {rendered}"
             stats["penalty_fine_exact"] += fine_line in answer.splitlines()
         if details and (not rec or rec["id"] != expected_id):
             print(f"{case['id']} {question} → {rec['id'] if rec else actual_type}, expected {expected_id}")
@@ -216,8 +227,18 @@ def evaluate_api(url: str, cases: list[dict], failures: bool) -> None:
             stats["without_sources"] += 1
         if kind == "penalty":
             penalty = answer["penalty"] or {}
-            fine_key = "organization_fine" if case["expected_fine_subject"] == "to_chuc" else "fine"
-            stats["fine_exact"] += matches and penalty.get(fine_key) == case["expected_fine"]
+            org = case["expected_fine_subject"] == "to_chuc"
+            fine_key = "organization_fine" if org else "fine"
+            actual_fine = penalty.get(fine_key) or {}
+            expected_fine = case["expected_fine"]
+            expected_cap = case.get("expected_fine_org_cap" if org else "expected_fine_cap")
+            stats["fine_exact"] += matches and (
+                actual_fine.get("min"), actual_fine.get("max"),
+                actual_fine.get("unit"), actual_fine.get("cap"),
+            ) == (
+                expected_fine["min"], expected_fine["max"],
+                case.get("expected_fine_unit"), expected_cap,
+            )
             citation_matches = (
                 matches and bool(answer["sources"])
                 and penalty.get("legal_path") == case["expected_legal_basis"]["path"]

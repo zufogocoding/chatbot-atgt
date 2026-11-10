@@ -41,6 +41,11 @@ FIELDS = [
     "fine_text",
     "fine_min",
     "fine_max",
+    "fine_unit",
+    "fine_cap",
+    "fine_org_min",
+    "fine_org_max",
+    "fine_org_cap",
     "license_points",
     "additional_penalties",
     "remedial_measures",
@@ -48,7 +53,12 @@ FIELDS = [
     "verification_status",
     "expected_fine_min",
     "expected_fine_max",
+    "expected_fine_cap",
+    "expected_fine_org_min",
+    "expected_fine_org_max",
+    "expected_fine_org_cap",
     "fine_ok",
+    "org_fine_ok",
     "citation_ok",
     "text_ok",
     "reviewer",
@@ -67,6 +77,7 @@ def clause_key(clause: Any) -> tuple[int, str]:
 
 def review_row(rec: dict[str, Any]) -> dict[str, Any]:
     basis = rec["legal_basis"]
+    org = rec.get("fine_by_subject", {}).get("to_chuc")
     return {
         "id": rec["id"],
         "record_kind": rec["record_kind"],
@@ -79,6 +90,11 @@ def review_row(rec: dict[str, Any]) -> dict[str, Any]:
         "fine_text": rec.get("fine_text") or "",
         "fine_min": rec.get("fine_min") if rec.get("fine_min") is not None else "",
         "fine_max": rec.get("fine_max") if rec.get("fine_max") is not None else "",
+        "fine_unit": rec.get("fine_unit") or "",
+        "fine_cap": rec.get("fine_cap") if rec.get("fine_cap") is not None else "",
+        "fine_org_min": org.get("min") if org else "",
+        "fine_org_max": org.get("max") if org else "",
+        "fine_org_cap": org.get("cap") if org and org.get("cap") is not None else "",
         "license_points": rec.get("license_points", 0),
         "additional_penalties": "; ".join(
             format_penalty(p) for p in rec.get("additional_penalties", [])
@@ -90,7 +106,12 @@ def review_row(rec: dict[str, Any]) -> dict[str, Any]:
         "verification_status": rec.get("verification", {}).get("status", ""),
         "expected_fine_min": "",
         "expected_fine_max": "",
+        "expected_fine_cap": "",
+        "expected_fine_org_min": "",
+        "expected_fine_org_max": "",
+        "expected_fine_org_cap": "",
         "fine_ok": "",
+        "org_fine_ok": "",
         "citation_ok": "",
         "text_ok": "",
         "reviewer": "",
@@ -130,7 +151,11 @@ def main() -> int:
 
     display_path = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
     print(f"wrote {display_path} ({len(records)} rows)")
-    print("review columns: expected_fine_min, expected_fine_max, fine_ok, citation_ok, text_ok, reviewer, reviewed_at, note")
+    print(
+        "review columns: expected_fine_min/max/cap, "
+        "expected_fine_org_min/max/cap, fine_ok, org_fine_ok, "
+        "citation_ok, text_ok, reviewer, reviewed_at, note"
+    )
     return 0
 
 

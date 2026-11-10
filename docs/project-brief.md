@@ -1,6 +1,6 @@
 # Chatbot tra cứu xử phạt vi phạm giao thông
 
-**Trạng thái:** Có catalog hợp nhất 271 bản ghi, corpus thủ tục, golden set 254 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
+**Trạng thái:** Có catalog hợp nhất 276 bản ghi, corpus thủ tục, golden set 261 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
 
 **Cập nhật:** 10/11/2026
 
@@ -128,14 +128,14 @@ Nguồn sự thật là các file JSONL/JSON trong `data/`; SQLite chỉ là b�
 |---|---|
 | `data/parsed/168-provisions.jsonl` | 1.242 điều/khoản/điểm đã parse từ Công báo 168/2024 |
 | `data/parsed/238-2026-nd-cp.txt` | Toàn văn Nghị định 238/2026 |
-| `data/amendments/238-2026.json` | 20 bản vá nội dung, 1 bản ghi mới và 7 bản vá quy tắc |
-| `data/catalog/consolidated/violations.jsonl` | **271 bản ghi vi phạm** đã hợp nhất 168 + 238 |
-| `data/catalog/consolidated/penalty-rules.jsonl` | 57 quy tắc hình phạt bổ sung/trừ điểm |
-| `data/catalog/aliases.json` | 49 nhóm alias, 317 cách nói của người dân (253 biến thể sau chuẩn hóa) |
+| `data/amendments/238-2026.json` | 20 bản vá nội dung, 4 bản ghi mới, 10 bản vá quy tắc và 1 quy định hoãn hiệu lực |
+| `data/catalog/consolidated/violations.jsonl` | **276 bản ghi vi phạm** đã hợp nhất 168 + 238 |
+| `data/catalog/consolidated/penalty-rules.jsonl` | 59 quy tắc hình phạt bổ sung/trừ điểm |
+| `data/catalog/aliases.json` | 56 nhóm alias, 363 cách nói của người dân (290 biến thể sau chuẩn hóa) |
 | `data/overrides/penalty-conditions.json` | Điều kiện áp dụng cho hình phạt có điều kiện |
 | `data/build/catalog.db` | SQLite sinh tự động: violations, penalty_rules, alias_*, FTS5 |
 | `data/procedures/` | 23 đoạn thủ tục và danh mục nguồn |
-| `data/eval/golden.jsonl` | 254 câu có nhãn và căn cứ kỳ vọng |
+| `data/eval/golden.jsonl` | 261 câu có nhãn và căn cứ kỳ vọng |
 
 ### 6.2. Schema một bản ghi vi phạm
 
@@ -369,20 +369,20 @@ chatbot-atgt/
 **Đã xong:**
 
 - Thu thập 168/2024, 238/2026, Luật 36/2024 hợp nhất.
-- Parse 1.242 điều/khoản/điểm; trích xuất 271 bản ghi cho Điều 6, 7, 12 (người được chở), 13, 14, 18, 32.
-- Hợp nhất 238/2026; validation 0 lỗi, còn cảnh báo các record chưa có alias.
-- 49 nhóm alias / 317 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn, bốn nhóm cho người được chở, chín nhóm thiết bị/điều kiện xe, nhường đường cho xe ưu tiên, còi ban đêm, biển báo/vạch kẻ đường, ô tô đi trên vỉa hè và chạy dưới tốc độ tối thiểu.
-- Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển và mức phạt tổ chức.
-- Đối chiếu khung tiền, loại xử phạt và căn cứ của 271 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
-- Xuất mẫu spot-check 30 bản ghi rủi ro cao (người được chở, sửa đổi 238/2026, phạt tổ chức, điều kiện trừ điểm, hình phạt bổ sung, khắc phục hậu quả) bằng `scripts/export_spotcheck.py`; phiếu nằm trong `data/catalog/review/spotcheck-2026-11-10.csv`. Đây là mẫu một người, không thay thế quy trình hai người.
-- Thu thập 23 đoạn thủ tục và chạy golden set 254 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
+- Parse 1.242 điều/khoản/điểm; trích xuất 276 bản ghi cho Điều 6, 7, 12 (người được chở), 13, 14, 18, 32, gồm khoản 5–6 (phạt theo người, có trần) và các điểm 238/2026 thêm mới 9a.a/11.e/13.e.
+- Hợp nhất 238/2026; validation 0 lỗi, còn cảnh báo các record chưa có alias. Điểm b khoản 9a được ghi nhận hoãn hiệu lực đến 01/01/2028, chưa đưa vào catalog.
+- 56 nhóm alias / 363 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn, bốn nhóm cho người được chở, chín nhóm thiết bị/điều kiện xe, nhường đường cho xe ưu tiên, còi ban đêm, biển báo/vạch kẻ đường, ô tô đi trên vỉa hè, chạy dưới tốc độ tối thiểu và các nhóm chủ xe chở quá số người/thiết bị giám sát hành trình.
+- Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển, mức phạt tổ chức, phạt theo người và nhiều mức trừ điểm GPLX.
+- Đối chiếu khung tiền, mức trần, loại xử phạt và căn cứ của 276 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-11.csv`.
+- Xuất mẫu spot-check 30 bản ghi rủi ro cao (người được chở, sửa đổi 238/2026, phạt tổ chức, điều kiện trừ điểm, hình phạt bổ sung, khắc phục hậu quả) bằng `scripts/export_spotcheck.py`; phiếu mới nằm trong `data/catalog/review/spotcheck-2026-11-11.csv`. Đây là mẫu một người, không thay thế quy trình hai người.
+- Thu thập 23 đoạn thủ tục và chạy golden set 261 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
 - Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
 - API trả `penalty.source_quote` (đoạn luật áp dụng), `penalty.guidance` (hạn nộp, nơi nộp, thời hiệu khiếu nại kèm trích dẫn), `options` (phương án hỏi lại) và `related` (bản ghi tương ứng cho loại xe còn lại khi xác định duy nhất). Client có thể gửi `record_id` để tra thẳng phương án đã chọn.
 - Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn luật áp dụng, hướng dẫn nộp phạt/khiếu nại, đoạn thủ tục, nguồn, nút chọn phương án hỏi lại và nút so sánh loại xe còn lại.
 
 **Việc tiếp theo:**
 
-1. Hai người điền phiếu rà soát độc lập cho 259 bản ghi có phạt tiền, rồi chạy `scripts/merge_reviews.py --fine-only` để chuyển `verified` và lưu snapshot vào `data/catalog/verified/`. Script đã chặn thiếu bản ghi, trùng người và lệch số tiền.
-2. Bổ sung phần còn thiếu của Điều 32 (khoản 5–6 phạt theo số người vượt quá có trần; điểm 238/2026 thêm mới 9a/11.e/13.e), sau đó cân nhắc Điều 17 và 20–24.
-3. Cải thiện baseline CLI: recall@5 hiện 86/182, trả lời được 42/182; API đã đạt 182/182 trên golden set. Mở rộng định tuyến cho cách nói tự nhiên và câu hỏi phức tạp.
+1. Hai người điền phiếu rà soát độc lập cho 264 bản ghi có phạt tiền, rồi chạy `scripts/merge_reviews.py --fine-only` để chuyển `verified` và lưu snapshot vào `data/catalog/verified/`. Script đã chặn thiếu bản ghi, trùng người, lệch số tiền/mức trần và thiếu kiểm tra khung tổ chức.
+2. Cân nhắc mở rộng sang Điều 17 và các điều vận tải 20–24; điểm b khoản 9a Điều 32 chỉ áp dụng từ 01/01/2028.
+3. Cải thiện baseline CLI: recall@5 hiện 91/187, trả lời được 42/187; API đã đạt 187/187 trên golden set. Mở rộng định tuyến cho cách nói tự nhiên và câu hỏi phức tạp.
 4. Đánh giá chất lượng câu trả lời thủ tục có trích dẫn (không chỉ recall@5) và bổ sung corpus nếu thiếu.

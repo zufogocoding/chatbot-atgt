@@ -3,7 +3,7 @@
 
 This is **not** the two-person verification gate. It gives one reviewer a
 30-record sample of the highest-risk fine records so the project can report a
-real human spot-check without reviewing all 259 fines. The sample covers:
+real human spot-check without reviewing all 264 fines. The sample covers:
 
 * passenger records (Điều 12);
 * records amended by 238/2026/NĐ-CP;
@@ -35,7 +35,7 @@ from export_review import FIELDS as REVIEW_FIELDS, clause_key, review_row  # noq
 
 ROOT = Path(__file__).resolve().parents[1]
 VIOLATIONS = ROOT / "data/catalog/consolidated/violations.jsonl"
-DEFAULT_OUT = ROOT / "data/catalog/review/spotcheck-2026-11-10.csv"
+DEFAULT_OUT = ROOT / "data/catalog/review/spotcheck-2026-11-11.csv"
 AMENDMENT = "238/2026/NĐ-CP"
 
 RISKS: list[tuple[str, Callable[[dict[str, Any]], bool]]] = [

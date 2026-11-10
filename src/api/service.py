@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import sqlite3
 
-from scripts.catalog_common import format_penalty, format_range, legal_path, normalize_text
+from scripts.catalog_common import format_money, format_penalty, format_range, legal_path, normalize_text
 from scripts.query_catalog import alias_record_ids, find_aliases, fts_search, get_record, search_procedures
 
 from .routing import (
@@ -15,7 +15,8 @@ from .routing import (
     Clarification, direct_path, includes, mentioned_vehicles, normalize_question,
 )
 from .schemas import (
-    ChatRequest, ChatResponse, Choice, Fine, Guidance, HealthResponse, Intent, Penalty, Source, Vehicle,
+    ChatRequest, ChatResponse, Choice, Fine, Guidance, HealthResponse, Intent,
+    LicensePointTier, Penalty, Source, Vehicle,
 )
 
 REQUIRED_TABLES = {
@@ -167,9 +168,15 @@ def penalty_response(
     guidance = penalty_guidance(
         con, as_of, sources, include_payment=record["record_kind"] == "fine",
     )
-    fine = Fine(min=record["fine_min"], max=record["fine_max"])
+    fine = Fine(
+        min=record["fine_min"], max=record["fine_max"],
+        unit=record.get("fine_unit"), cap=record.get("fine_cap"),
+    )
     organization_fine = (
-        Fine(min=record["fine_org_min"], max=record["fine_org_max"])
+        Fine(
+            min=record["fine_org_min"], max=record["fine_org_max"],
+            unit=record.get("fine_unit"), cap=record.get("fine_org_cap"),
+        )
         if record["fine_org_min"] is not None else None
     )
     penalty = Penalty(
@@ -177,25 +184,45 @@ def penalty_response(
         record_kind=record["record_kind"], behavior=record["behavior_text"], legal_path=record["legal_path"],
         fine=fine, organization_fine=organization_fine, license_points=record["license_points"],
         license_points_condition=record["license_points_condition"],
+        license_point_tiers=[
+            LicensePointTier(points=value["points"], condition=value["condition"])
+            for value in (record.get("license_point_tiers") or [])
+        ],
         additional_penalties=[format_penalty(value) for value in record["additional_penalties"]],
         remedial_measures=[format_penalty(value) for value in record["remedial_measures"]],
         guidance=guidance,
         verification_status=record["verification_status"],
         source_quote=record["source_quote"],
     )
+
+    def fine_with_unit(value: Fine) -> str:
+        text = format_range(value.min, value.max)
+        if value.unit == "per_person":
+            text += " cho mỗi người vượt quá quy định"
+        if value.cap is not None:
+            text += f", tổng mức phạt tối đa {format_money(value.cap)}"
+        return text
+
     if penalty.record_kind == "warning":
         lines = ["Hình thức xử phạt: cảnh cáo."]
     elif penalty.record_kind == "additional_only":
         lines = ["Mức phạt tiền: không áp dụng cho bản ghi này."]
     elif organization_fine is not None:
-        individual = f"Mức phạt cá nhân: {format_range(fine.min, fine.max)}."
-        organization = f"Mức phạt tổ chức: {format_range(organization_fine.min, organization_fine.max)}."
+        individual = f"Mức phạt cá nhân: {fine_with_unit(fine)}."
+        organization = f"Mức phạt tổ chức: {fine_with_unit(organization_fine)}."
         lines = [organization, individual] if includes(r"\b(?:cong ty|to chuc|doanh nghiep)\b", text) else [individual, organization]
     else:
-        lines = [f"Mức phạt tiền: {format_range(fine.min, fine.max)}."]
-    lines.append(f"Trừ điểm GPLX: {penalty.license_points} điểm" + (
-        f" nếu {penalty.license_points_condition}." if penalty.license_points_condition else "."
-    ))
+        lines = [f"Mức phạt tiền: {fine_with_unit(fine)}."]
+    if penalty.license_point_tiers:
+        tiers = "; ".join(
+            f"trừ {tier.points} điểm nếu {tier.condition}"
+            for tier in penalty.license_point_tiers
+        )
+        lines.append(f"Trừ điểm GPLX: {tiers}.")
+    else:
+        lines.append(f"Trừ điểm GPLX: {penalty.license_points} điểm" + (
+            f" nếu {penalty.license_points_condition}." if penalty.license_points_condition else "."
+        ))
     if penalty.additional_penalties:
         lines.append("Hình phạt bổ sung: " + "; ".join(penalty.additional_penalties) + ".")
     if penalty.remedial_measures:

@@ -22,7 +22,92 @@
         "point": null,
         "path": "6.1a"
       },
-      "source_quote": "238/2026/NĐ-CP Điều 2 khoản 1: \"1a. Phạt cảnh cáo đối với người điều khiển xe ô tô thực hiện hành vi chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe mà không sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định (trừ xe ô tô kinh doanh vận tải hành khách).\""
+      "source_quote": "238/2026/NĐ-CP Điều 2 khoản 1: \"1a. Phạt cảnh cáo đối với người điều khiển xe ô tô thực hiện hành vi chở trẻ em dưới 10 tuổi và chiều cao dưới 1,35 mét trên xe mà không sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định (trừ xe ô tô kinh doanh vận tải hành khách).\"",
+      "amendment_basis": "238/2026/NĐ-CP Điều 2 khoản 1"
+    },
+    {
+      "id": "nd168-d32-k9a-a",
+      "article_title": "Xử phạt, trừ điểm giấy phép lái xe đối với chủ phương tiện vi phạm quy định liên quan đến giao thông đường bộ",
+      "vehicle_type": "o_to",
+      "subject": "chu_phuong_tien",
+      "behavior_group": "chu_phuong_tien",
+      "behavior_text": "Đưa xe không lắp thiết bị giám sát hành trình của xe hoặc có lắp thiết bị giám sát hành trình nhưng không hoạt động, không đúng quy chuẩn theo quy định hoặc làm sai lệch dữ liệu của thiết bị giám sát hành trình của xe ô tô;",
+      "clause_text": "Phạt tiền từ 5.000.000 đồng đến 6.000.000 đồng đối với cá nhân, từ 10.000.000 đồng đến 12.000.000 đồng đối với tổ chức là chủ xe ô tô đầu kéo, xe vận tải nội bộ thực hiện một trong các hành vi vi phạm sau đây:",
+      "fine_min": 5000000,
+      "fine_max": 6000000,
+      "fine_text": "Phạt tiền từ 5.000.000 đồng đến 6.000.000 đồng đối với cá nhân, từ 10.000.000 đồng đến 12.000.000 đồng đối với tổ chức",
+      "fine_by_subject": {
+        "to_chuc": {
+          "min": 10000000,
+          "max": 12000000
+        }
+      },
+      "record_kind": "fine",
+      "legal_basis": {
+        "document": "168/2024/NĐ-CP",
+        "article": 32,
+        "clause": "9a",
+        "point": "a",
+        "path": "32.9a.a"
+      },
+      "source_quote": "238/2026/NĐ-CP Điều 11 khoản 1: \"9a. Phạt tiền từ 5.000.000 đồng đến 6.000.000 đồng đối với cá nhân, từ 10.000.000 đồng đến 12.000.000 đồng đối với tổ chức là chủ xe ô tô đầu kéo, xe vận tải nội bộ thực hiện một trong các hành vi vi phạm sau đây: a) Đưa xe không lắp thiết bị giám sát hành trình của xe hoặc có lắp thiết bị giám sát hành trình nhưng không hoạt động, không đúng quy chuẩn theo quy định hoặc làm sai lệch dữ liệu của thiết bị giám sát hành trình của xe ô tô;\"",
+      "amendment_basis": "238/2026/NĐ-CP Điều 11 khoản 1"
+    },
+    {
+      "id": "nd168-d32-k11-e",
+      "article_title": "Xử phạt, trừ điểm giấy phép lái xe đối với chủ phương tiện vi phạm quy định liên quan đến giao thông đường bộ",
+      "vehicle_type": "o_to",
+      "subject": "chu_phuong_tien",
+      "behavior_group": "chu_phuong_tien",
+      "behavior_text": "Giao phương tiện hoặc để cho người làm công, người điều khiển phương tiện thực hiện hành vi vi phạm quy định tại khoản 8a Điều 20 của Nghị định này.",
+      "clause_text": "Phạt tiền từ 10.000.000 đồng đến 12.000.000 đồng đối với cá nhân, từ 20.000.000 đồng đến 24.000.000 đồng đối với tổ chức là chủ xe ô tô, xe chở người bốn bánh có gắn động cơ, xe chở hàng bốn bánh có gắn động cơ, xe máy chuyên dùng và các loại xe tương tự xe ô tô thực hiện một trong các hành vi vi phạm sau đây:",
+      "fine_min": 10000000,
+      "fine_max": 12000000,
+      "fine_text": "Phạt tiền từ 10.000.000 đồng đến 12.000.000 đồng đối với cá nhân, từ 20.000.000 đồng đến 24.000.000 đồng đối với tổ chức",
+      "fine_by_subject": {
+        "to_chuc": {
+          "min": 20000000,
+          "max": 24000000
+        }
+      },
+      "record_kind": "fine",
+      "legal_basis": {
+        "document": "168/2024/NĐ-CP",
+        "article": 32,
+        "clause": 11,
+        "point": "e",
+        "path": "32.11.e"
+      },
+      "source_quote": "238/2026/NĐ-CP Điều 11 khoản 2: \"e) Giao phương tiện hoặc để cho người làm công, người điều khiển phương tiện thực hiện hành vi vi phạm quy định tại khoản 8a Điều 20 của Nghị định này.\"",
+      "amendment_basis": "238/2026/NĐ-CP Điều 11 khoản 2"
+    },
+    {
+      "id": "nd168-d32-k13-e",
+      "article_title": "Xử phạt, trừ điểm giấy phép lái xe đối với chủ phương tiện vi phạm quy định liên quan đến giao thông đường bộ",
+      "vehicle_type": "o_to",
+      "subject": "chu_phuong_tien",
+      "behavior_group": "chu_phuong_tien",
+      "behavior_text": "Giao phương tiện hoặc để cho người làm công, người đại diện điều khiển phương tiện thực hiện hành vi vi phạm quy định tại điểm c, điểm d, điểm e khoản 8 Điều 21 của Nghị định này hoặc trực tiếp điều khiển phương tiện thực hiện hành vi vi phạm quy định tại điểm c, điểm d, điểm e khoản 8 Điều 21 của Nghị định này.",
+      "clause_text": "Phạt tiền từ 20.000.000 đồng đến 26.000.000 đồng đối với cá nhân, từ 40.000.000 đồng đến 52.000.000 đồng đối với tổ chức là chủ xe ô tô, xe máy chuyên dùng và các loại xe tương tự xe ô tô thực hiện một trong các hành vi vi phạm sau đây:",
+      "fine_min": 20000000,
+      "fine_max": 26000000,
+      "fine_text": "Phạt tiền từ 20.000.000 đồng đến 26.000.000 đồng đối với cá nhân, từ 40.000.000 đồng đến 52.000.000 đồng đối với tổ chức",
+      "fine_by_subject": {
+        "to_chuc": {
+          "min": 40000000,
+          "max": 52000000
+        }
+      },
+      "record_kind": "fine",
+      "legal_basis": {
+        "document": "168/2024/NĐ-CP",
+        "article": 32,
+        "clause": 13,
+        "point": "e",
+        "path": "32.13.e"
+      },
+      "source_quote": "238/2026/NĐ-CP Điều 11 khoản 3: \"e) Giao phương tiện hoặc để cho người làm công, người đại diện điều khiển phương tiện thực hiện hành vi vi phạm quy định tại điểm c, điểm d, điểm e khoản 8 Điều 21 của Nghị định này hoặc trực tiếp điều khiển phương tiện thực hiện hành vi vi phạm quy định tại điểm c, điểm d, điểm e khoản 8 Điều 21 của Nghị định này.\"",
+      "amendment_basis": "238/2026/NĐ-CP Điều 11 khoản 3"
     }
   ],
   "patches": [
@@ -229,7 +314,15 @@
           "point": "g"
         }
       ],
-      "source": "238/2026/NĐ-CP Điều 19 khoản 12"
+      "source": "238/2026/NĐ-CP Điều 19 khoản 12",
+      "ref_overrides": {
+        "5": {
+          "condition": "chở vượt trên 50% số người quy định được phép chở của phương tiện và có phù hiệu"
+        },
+        "6": {
+          "condition": "chở vượt trên 50% số người quy định được phép chở của phương tiện và có phù hiệu"
+        }
+      }
     },
     {
       "id": "nd168-d32-k19-đ",
@@ -251,6 +344,55 @@
       "old": "giấy chứng nhận kiểm định",
       "new": "chứng nhận kiểm định",
       "source": "238/2026/NĐ-CP Điều 19 khoản 11"
+    },
+    {
+      "id": "nd168-d32-k19-l",
+      "op": "replace",
+      "old": "điểm o khoản 7 Điều này buộc",
+      "new": "điểm o khoản 7, khoản 9a Điều này buộc",
+      "add_refs": [
+        {
+          "clause": "9a",
+          "point": null
+        }
+      ],
+      "source": "238/2026/NĐ-CP Điều 11 khoản 4",
+      "source_quote": "Sửa đổi, bổ sung điểm l khoản 19: \"l) Thực hiện hành vi vi phạm quy định tại điểm o khoản 7, khoản 9a Điều này buộc lắp đặt dụng cụ, thiết bị chuyên dùng để cứu hộ, hỗ trợ cứu hộ, thiết bị giám sát hành trình, thiết bị ghi nhận hình ảnh người lái xe trên xe theo đúng quy định.\".",
+      "ref_overrides": {
+        "9a": {
+          "description": "lắp đặt dụng cụ, thiết bị chuyên dùng để cứu hộ, hỗ trợ cứu hộ, thiết bị giám sát hành trình trên xe theo đúng quy định"
+        }
+      }
+    },
+    {
+      "id": "nd168-d32-k19-l",
+      "op": "replace",
+      "old": "lắp đặt dụng cụ, thiết bị chuyên dùng để cứu hộ, hỗ trợ cứu hộ trên xe theo đúng quy định",
+      "new": "lắp đặt dụng cụ, thiết bị chuyên dùng để cứu hộ, hỗ trợ cứu hộ, thiết bị giám sát hành trình, thiết bị ghi nhận hình ảnh người lái xe trên xe theo đúng quy định",
+      "source": "238/2026/NĐ-CP Điều 11 khoản 4"
+    },
+    {
+      "id": "nd168-d32-k21-c",
+      "op": "replace",
+      "old": "điểm a, điểm b, điểm đ khoản 13;",
+      "new": "điểm a, điểm b, điểm đ, điểm e khoản 13;",
+      "add_refs": [
+        {
+          "clause": 13,
+          "point": "e"
+        }
+      ],
+      "source": "238/2026/NĐ-CP Điều 11 khoản 5",
+      "source_quote": "Sửa đổi, bổ sung điểm c khoản 21: \"c) Thực hiện hành vi quy định tại điểm a, điểm b, điểm đ, điểm e khoản 13; ... còn bị trừ điểm giấy phép lái xe 04 điểm;\"."
+    }
+  ],
+  "deferred": [
+    {
+      "id": "nd168-d32-k9a-b",
+      "legal_path": "32.9a.b",
+      "effective_from": "2028-01-01",
+      "behavior_text": "Đưa xe không lắp thiết bị ghi nhận hình ảnh người lái xe hoặc có lắp thiết bị ghi nhận hình ảnh người lái xe nhưng không ghi, không lưu trữ được dữ liệu theo quy định hoặc làm sai lệch dữ liệu của thiết bị ghi nhận hình ảnh người lái xe lắp trên xe ô tô.",
+      "note": "238/2026/NĐ-CP Điều 18 khoản 3: quy định xử phạt liên quan đến thiết bị ghi nhận hình ảnh người lái xe tại điểm b khoản 9a Điều 32 có hiệu lực từ 01/01/2028, nên chưa đưa vào catalog hợp nhất ngày 09/11/2026."
     }
   ]
 }

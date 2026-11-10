@@ -118,6 +118,56 @@ def main() -> int:
         else:
             errors.append(f"{rid}: unknown record_kind {rec['record_kind']!r}")
 
+        # 1b. Per-person fines and their statutory cap.
+        unit, cap = rec.get("fine_unit"), rec.get("fine_cap")
+        if unit not in (None, "per_person"):
+            errors.append(f"{rid}: invalid fine_unit {unit!r}")
+        if unit == "per_person":
+            if rec["record_kind"] != "fine":
+                errors.append(f"{rid}: per-person unit requires a fine record")
+            if cap is None:
+                errors.append(f"{rid}: per-person fine missing fine_cap")
+            elif fmax is not None and cap < fmax:
+                errors.append(f"{rid}: fine_cap {cap} is below fine_max {fmax}")
+            normalized_clause = normalize(rec.get("clause_text", ""))
+            if "trên mỗi người vượt quá" not in normalized_clause:
+                errors.append(f"{rid}: per-person fine missing 'trên mỗi người vượt quá'")
+            if "tổng mức phạt tiền tối đa" not in normalized_clause:
+                errors.append(f"{rid}: per-person fine missing statutory cap wording")
+        elif cap is not None:
+            errors.append(f"{rid}: fine_cap requires fine_unit='per_person'")
+
+        org_fine = rec.get("fine_by_subject", {}).get("to_chuc")
+        if org_fine:
+            if org_fine.get("min") is None or org_fine.get("max") is None:
+                errors.append(f"{rid}: organization fine missing min/max")
+            elif org_fine["min"] > org_fine["max"]:
+                errors.append(f"{rid}: organization fine min > max")
+            if unit == "per_person":
+                org_cap = org_fine.get("cap")
+                if org_cap is None:
+                    errors.append(f"{rid}: per-person organization fine missing cap")
+                elif org_fine.get("max") is not None and org_cap < org_fine["max"]:
+                    errors.append(f"{rid}: organization cap {org_cap} is below max")
+            elif "cap" in org_fine:
+                errors.append(f"{rid}: organization cap requires a per-person fine")
+
+        # 1c. Licence-point tiers (e.g. 32.5/32.6: 50–100% vs over 100%).
+        tiers = rec.get("license_point_tiers") or []
+        if tiers:
+            points = {tier.get("points") for tier in tiers}
+            if len(points) < 2:
+                errors.append(f"{rid}: licence-point tiers need at least two point values")
+            if rec.get("license_points") != max(points):
+                errors.append(f"{rid}: license_points does not match the highest tier")
+            if rec.get("license_points_condition") is not None:
+                errors.append(f"{rid}: tiered points must not also set license_points_condition")
+            for tier in tiers:
+                if tier.get("points") not in VALID_LICENSE_POINTS:
+                    errors.append(f"{rid}: invalid tier points {tier.get('points')!r}")
+                if not (tier.get("condition") or "").strip():
+                    errors.append(f"{rid}: licence-point tier missing condition")
+
         # 2. Citation path
         expected_path = f"{lb['article']}.{lb['clause']}" + (
             f".{lb['point']}" if lb.get("point") else ""
@@ -273,6 +323,40 @@ def main() -> int:
             "fine_min": 28_000_000,
             "fine_max": 30_000_000,
             "vehicle_type": "o_to",
+        },
+        "nd168-d32-k5": {
+            "fine_min": 800_000,
+            "fine_max": 1_200_000,
+            "fine_unit": "per_person",
+            "fine_cap": 75_000_000,
+            "vehicle_type": "o_to",
+            "subject": "chu_phuong_tien",
+        },
+        "nd168-d32-k6": {
+            "fine_min": 2_000_000,
+            "fine_max": 4_000_000,
+            "fine_unit": "per_person",
+            "fine_cap": 75_000_000,
+            "vehicle_type": "o_to",
+            "subject": "chu_phuong_tien",
+        },
+        "nd168-d32-k9a-a": {
+            "fine_min": 5_000_000,
+            "fine_max": 6_000_000,
+            "vehicle_type": "o_to",
+            "subject": "chu_phuong_tien",
+        },
+        "nd168-d32-k11-e": {
+            "fine_min": 10_000_000,
+            "fine_max": 12_000_000,
+            "vehicle_type": "o_to",
+            "subject": "chu_phuong_tien",
+        },
+        "nd168-d32-k13-e": {
+            "fine_min": 20_000_000,
+            "fine_max": 26_000_000,
+            "vehicle_type": "o_to",
+            "subject": "chu_phuong_tien",
         },
     }
     for rid, expected in spot_checks.items():
