@@ -7,6 +7,8 @@ script enforces that rule mechanically:
 
 * both CSV files must cover exactly the same record IDs as the catalog;
 * the reviewer names must be present and different;
+* the catalog columns in each worksheet must still match the current catalog,
+  so a reviewer can only fill the review columns;
 * every required check must be ``OK`` in both files;
 * the amounts typed by both reviewers must match the catalog.
 
@@ -31,9 +33,29 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from catalog_common import format_penalty, legal_path
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "data/catalog/consolidated/violations.jsonl"
 VALID_CHECKS = {"OK", "SAI", "NA"}
+CATALOG_COLUMNS = (
+    "record_kind",
+    "vehicle_type",
+    "article",
+    "clause",
+    "point",
+    "legal_path",
+    "behavior_text",
+    "fine_text",
+    "fine_min",
+    "fine_max",
+    "license_points",
+    "additional_penalties",
+    "remedial_measures",
+    "source_quote",
+    "verification_status",
+)
+NUMERIC_COLUMNS = {"article", "fine_min", "fine_max", "license_points"}
 
 
 def load_catalog(path: Path) -> list[dict[str, Any]]:
@@ -87,6 +109,80 @@ def parse_date(value: str, rid: str, path: Path) -> date:
         raise ValueError(f"{path}: {rid}: invalid reviewed_at {value!r}") from error
 
 
+def expected_cell(record: dict[str, Any], field: str) -> Any:
+    basis = record.get("legal_basis") or {}
+    if field == "record_kind":
+        return record.get("record_kind")
+    if field == "vehicle_type":
+        return record.get("vehicle_type")
+    if field == "article":
+        return basis.get("article", record.get("article"))
+    if field == "clause":
+        return basis.get("clause", record.get("clause"))
+    if field == "point":
+        return basis.get("point") or ""
+    if field == "legal_path":
+        return legal_path(record)
+    if field == "behavior_text":
+        return record.get("behavior_text")
+    if field == "fine_text":
+        return record.get("fine_text") or ""
+    if field == "fine_min":
+        return record.get("fine_min")
+    if field == "fine_max":
+        return record.get("fine_max")
+    if field == "license_points":
+        return record.get("license_points", 0)
+    if field == "additional_penalties":
+        return "; ".join(format_penalty(p) for p in record.get("additional_penalties", []))
+    if field == "remedial_measures":
+        return "; ".join(format_penalty(p) for p in record.get("remedial_measures", []))
+    if field == "source_quote":
+        return record.get("source_quote", "")
+    if field == "verification_status":
+        return record.get("verification", {}).get("status", "")
+    raise KeyError(field)
+
+
+def same_cell(field: str, actual: str, expected: Any) -> bool:
+    actual_text = (actual or "").replace("\r\n", "\n").strip()
+    expected_text = ("" if expected is None else str(expected)).replace("\r\n", "\n").strip()
+    if field in NUMERIC_COLUMNS:
+        def number(text: str) -> int | None:
+            cleaned = text.replace(".", "").replace(",", "").strip()
+            try:
+                return int(cleaned)
+            except ValueError:
+                return None
+
+        actual_number, expected_number = number(actual_text), number(expected_text)
+        if actual_number is not None and expected_number is not None:
+            return actual_number == expected_number
+    return actual_text == expected_text
+
+
+def check_catalog_columns(
+    record: dict[str, Any],
+    row: dict[str, str],
+    path: Path,
+    errors: list[str],
+) -> None:
+    """Reject a worksheet that edited catalog cells instead of only reviewing them."""
+    rid = record["id"]
+    for field in CATALOG_COLUMNS:
+        if field not in row:
+            continue
+        expected = expected_cell(record, field)
+        if expected is None:
+            continue
+        actual = row.get(field, "")
+        if not same_cell(field, actual, expected):
+            errors.append(
+                f"{path}: {rid}: catalog column {field} was modified; "
+                "re-export the worksheet instead of editing catalog cells"
+            )
+
+
 def check_row(
     record: dict[str, Any],
     row: dict[str, str],
@@ -95,6 +191,7 @@ def check_row(
     errors: list[str],
 ) -> str | None:
     rid = record["id"]
+    check_catalog_columns(record, row, path, errors)
     reviewer = (row.get("reviewer") or "").strip()
     if not reviewer:
         errors.append(f"{path}: {rid}: missing reviewer")

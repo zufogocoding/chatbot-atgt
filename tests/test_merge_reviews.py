@@ -66,6 +66,28 @@ def test_merge_rejects_a_failed_check(tmp_path: Path):
     assert any("fine_ok is SAI" in error for error in errors)
 
 
+def test_merge_rejects_modified_catalog_text(tmp_path: Path):
+    records = catalog()
+    records[0]["behavior_text"] = "Hành vi gốc"
+    review_a = reviews("An")
+    review_a["fine-1"]["behavior_text"] = "Hành vi bị sửa"
+    _, errors, _, _ = merge(
+        records, review_a, reviews("Binh"), tmp_path / "a.csv", tmp_path / "b.csv"
+    )
+    assert any("catalog column behavior_text was modified" in error for error in errors)
+
+
+def test_merge_accepts_untouched_catalog_columns(tmp_path: Path):
+    records = catalog()
+    records[0]["behavior_text"] = "Hành vi gốc"
+    review_a = reviews("An")
+    review_a["fine-1"]["behavior_text"] = "Hành vi gốc"
+    _, errors, _, _ = merge(
+        records, review_a, reviews("Binh"), tmp_path / "a.csv", tmp_path / "b.csv"
+    )
+    assert errors == []
+
+
 def test_merge_rejects_wrong_amount(tmp_path: Path):
     review_b = reviews("Binh")
     review_b["fine-1"]["expected_fine_max"] = "300000"

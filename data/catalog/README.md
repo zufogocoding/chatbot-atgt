@@ -269,7 +269,7 @@ python3 scripts/merge_reviews.py --fine-only \
   --out data/catalog/verified/violations-2026-11-09.jsonl
 ```
 
-Script từ chối ghi snapshot nếu thiếu bản ghi, hai phiếu cùng một người, có mục `SAI`/bỏ trống, hoặc số tiền hai người nhập khác catalog. Với `--fine-only`, 259 bản ghi có phạt tiền được chuyển `verified`; 12 bản ghi cảnh cáo/tịch thu không có mức tiền giữ nguyên `draft`. Báo cáo gộp được ghi cạnh snapshot (`.report.json`).
+Script từ chối ghi snapshot nếu thiếu bản ghi, hai phiếu cùng một người, có mục `SAI`/bỏ trống, số tiền hai người nhập khác catalog, hoặc phiếu bị sửa các cột dữ liệu catalog. Với `--fine-only`, 259 bản ghi có phạt tiền được chuyển `verified`; 12 bản ghi cảnh cáo/tịch thu không có mức tiền giữ nguyên `draft`. Báo cáo gộp được ghi cạnh snapshot (`.report.json`). Xem thêm quy tắc điền phiếu và ghi chú về bản AI precheck tại [`review/README.md`](review/README.md).
 
 Dùng snapshot đã xác nhận để build bản phát hành:
 
