@@ -84,7 +84,7 @@ function SourceList({ sources }: { sources: Source[] }) {
   );
 }
 
-function PenaltyDetails({ penalty }: { penalty: Penalty }) {
+function PenaltyDetails({ penalty, sources }: { penalty: Penalty; sources: Source[] }) {
   const fine = penalty.record_kind === "warning" ? "Cảnh cáo" : fineLabel(penalty.fine);
   return (
     <>
@@ -117,6 +117,19 @@ function PenaltyDetails({ penalty }: { penalty: Penalty }) {
           <ul>{values.map((value, index) => <li key={index}>{value}</li>)}</ul>
         </section>
       ))}
+      {penalty.guidance.length > 0 && (
+        <section className="penalty-guidance">
+          <h3>Nộp phạt và khiếu nại</h3>
+          <ul>
+            {penalty.guidance.map((item) => (
+              <li key={item.title}>
+                <strong>{item.title}</strong>
+                <p><CitedText text={item.text} sources={sources} /></p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {penalty.source_quote && (
         <details className="legal-quote">
           <summary><BookOpen size={15} aria-hidden="true" /> Đoạn luật áp dụng</summary>
@@ -151,7 +164,7 @@ export default function Answer({
   return (
     <article className={"answer-card answer-" + reply.answer_type}>
       <header className="answer-title"><Icon size={19} aria-hidden="true" /><h2>{label}</h2></header>
-      {reply.penalty ? <PenaltyDetails penalty={reply.penalty} /> : (
+      {reply.penalty ? <PenaltyDetails penalty={reply.penalty} sources={reply.sources} /> : (
         <div className="answer-prose">
           {reply.answer.split(/\n{2,}/).map((paragraph, index) => {
             const newline = paragraph.indexOf("\n");

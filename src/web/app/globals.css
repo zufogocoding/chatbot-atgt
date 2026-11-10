@@ -336,6 +336,11 @@ svg { flex: none; }
 .penalty-list { margin-top: 14px; font-size: 12px; }
 .penalty-list h3 { font-size: 12px; }
 .penalty-list ul { margin: 6px 0 0; padding-left: 19px; color: #4a5973; line-height: 1.7; }
+.penalty-guidance { margin-top: 15px; padding-top: 13px; border-top: 1px solid #edf1f8; }
+.penalty-guidance h3 { margin-bottom: 7px; font-size: 12px; }
+.penalty-guidance ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.penalty-guidance strong { display: block; color: #294c9f; font-size: 11px; line-height: 1.5; }
+.penalty-guidance p { margin-top: 2px; color: #4a5973; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
 .legal-quote { margin-top: 14px; padding: 10px 12px; background: #fbfcff; border: 1px solid #e7edf7; border-radius: 8px; font-size: 12px; }
 .legal-quote summary { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #294c9f; font-weight: 600; }
 .legal-quote summary svg { color: #355ec7; }

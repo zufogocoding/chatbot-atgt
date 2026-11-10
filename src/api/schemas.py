@@ -30,6 +30,11 @@ class Fine(BaseModel):
     max: int | None
 
 
+class Guidance(BaseModel):
+    title: str
+    text: str
+
+
 class Penalty(BaseModel):
     record_id: str
     vehicle_type: Literal["xe_may", "o_to", "both"]
@@ -43,6 +48,7 @@ class Penalty(BaseModel):
     license_points_condition: str | None = None
     additional_penalties: list[str]
     remedial_measures: list[str]
+    guidance: list[Guidance] = Field(default_factory=list)
     verification_status: str
     source_quote: str
 

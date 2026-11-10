@@ -14,7 +14,9 @@ from .routing import (
     HISTORICAL, LICENSE, OUTSIDE_REQUEST, OUTSIDE_VEHICLE, PROCEDURE,
     Clarification, direct_path, includes, mentioned_vehicles, normalize_question,
 )
-from .schemas import ChatRequest, ChatResponse, Choice, Fine, HealthResponse, Intent, Penalty, Source, Vehicle
+from .schemas import (
+    ChatRequest, ChatResponse, Choice, Fine, Guidance, HealthResponse, Intent, Penalty, Source, Vehicle,
+)
 
 REQUIRED_TABLES = {
     "catalog_meta", "violations", "violations_fts", "alias_phrases", "alias_groups",
@@ -103,27 +105,68 @@ def related_choices(con: sqlite3.Connection, record: dict) -> list[Choice]:
         # A broad alias group (for example vehicle equipment) can contain
         # several different behaviors. Do not guess which one the user means.
         return []
-    choices: list[Choice] = []
-    seen: set[str] = set()
-    for row in rows:
-        if row["record_id"] in seen:
+    row = rows[0]
+    label = f"Xem mức phạt cho {VEHICLE_LABELS[row['vehicle_type']]}"
+    if row["qualifier"]:
+        label += f" — {row['qualifier']}"
+    return [Choice(record_id=row["record_id"], label=label)]
+
+
+def penalty_guidance(
+    con: sqlite3.Connection, as_of: str, sources: list[Source], include_payment: bool,
+) -> list[Guidance]:
+    """Append the standard payment/complaint steps and their citations.
+
+    The catalog stores fines, but a citizen also needs to know what to do after
+    receiving the decision. These chunks come from the same procedure corpus
+    used by the procedure branch, so every sentence stays traceable. Records
+    without a fine still get the complaint deadline.
+    """
+    indices = {
+        (source.document, source.locator, source.url, tuple(source.pages)): index
+        for index, source in enumerate(sources, 1)
+    }
+    chunk_ids = ("nop-thoi-han", "nop-dia-diem") if include_payment else ()
+    items: list[Guidance] = []
+    for chunk_id in (*chunk_ids, "kn-thoi-hieu"):
+        chunk = con.execute(
+            "SELECT * FROM procedures WHERE id = ? AND as_of = ?", (chunk_id, as_of),
+        ).fetchone()
+        if chunk is None:
             continue
-        seen.add(row["record_id"])
-        label = f"Xem mức phạt cho {VEHICLE_LABELS[row['vehicle_type']]}"
-        if row["qualifier"]:
-            label += f" — {row['qualifier']}"
-        choices.append(Choice(record_id=row["record_id"], label=label))
-        if len(choices) == 3:
-            break
-    return choices
+        refs = con.execute(
+            """
+            SELECT s.number, s.url, c.locator, c.pages
+            FROM procedure_citations c JOIN procedure_sources s ON s.id = c.source_id
+            WHERE c.procedure_id = ? ORDER BY c.position
+            """,
+            (chunk["id"],),
+        ).fetchall()
+        if not refs or any(not row["url"].startswith("https://") for row in refs):
+            continue
+        marks: list[str] = []
+        for row in refs:
+            pages = json.loads(row["pages"]) if row["pages"] else []
+            key = (row["number"], row["locator"], row["url"], tuple(pages))
+            if key not in indices:
+                sources.append(Source(document=row["number"], locator=row["locator"], url=row["url"], pages=pages))
+                indices[key] = len(sources)
+            marks.append(f"[{indices[key]}]")
+        items.append(Guidance(title=chunk["title"], text=f"{chunk['text']} {' '.join(marks)}"))
+    return items
 
 
 def penalty_response(
-    record: dict, as_of: str, text: str, related: list[Choice] | None = None,
+    con: sqlite3.Connection, record: dict, as_of: str, text: str,
+    related: list[Choice] | None = None,
 ) -> ChatResponse:
     sources = penalty_sources(record)
     if not sources:
         return refuse(as_of, "insufficient_source", "Mình chưa có căn cứ nguồn cho trường hợp này.", "penalty_lookup")
+    amendment = sources[1] if len(sources) > 1 else None
+    guidance = penalty_guidance(
+        con, as_of, sources, include_payment=record["record_kind"] == "fine",
+    )
     fine = Fine(min=record["fine_min"], max=record["fine_max"])
     organization_fine = (
         Fine(min=record["fine_org_min"], max=record["fine_org_max"])
@@ -136,6 +179,7 @@ def penalty_response(
         license_points_condition=record["license_points_condition"],
         additional_penalties=[format_penalty(value) for value in record["additional_penalties"]],
         remedial_measures=[format_penalty(value) for value in record["remedial_measures"]],
+        guidance=guidance,
         verification_status=record["verification_status"],
         source_quote=record["source_quote"],
     )
@@ -157,8 +201,11 @@ def penalty_response(
     if penalty.remedial_measures:
         lines.append("Biện pháp khắc phục: " + "; ".join(penalty.remedial_measures) + ".")
     lines.append(f"Căn cứ: {legal_path(record)} Nghị định {record['document']} [1].")
-    if len(sources) > 1:
-        lines.append(f"Văn bản sửa đổi: {sources[1].document} [2].")
+    if amendment:
+        lines.append(f"Văn bản sửa đổi: {amendment.document} [2].")
+    if guidance:
+        lines.append("Nộp phạt và khiếu nại:")
+        lines.extend(f"{item.title}: {item.text}" for item in guidance)
     return ChatResponse(
         intent="penalty_lookup", answer_type="penalty", answer="\n".join(lines),
         as_of=as_of, penalty=penalty, related=related or [], sources=sources,
@@ -291,7 +338,7 @@ def lookup_penalty(
         ).fetchone()
         record = get_record(con, row["id"]) if row else None
         if record:
-            return penalty_response(record, as_of, text, related_choices(con, record))
+            return penalty_response(con, record, as_of, text, related_choices(con, record))
         return refuse(as_of, "insufficient_source", "Mình chưa có khung phạt phù hợp trong catalog.", "penalty_lookup")
 
     for alias in find_aliases(con, text):
@@ -308,7 +355,7 @@ def lookup_penalty(
         if len(matches) == 1 and not alias["requires_qualifier"]:
             record = get_record(con, matches[0]["record_id"])
             if record:
-                return penalty_response(record, as_of, text, related_choices(con, record))
+                return penalty_response(con, record, as_of, text, related_choices(con, record))
         options = [Choice(record_id=row["record_id"], label=row["qualifier"])
                    for row in matches[:3] if row["qualifier"]]
         return clarify(as_of, Clarification("conduct", "Bạn mô tả rõ hơn trường hợp vi phạm để mình chọn đúng khung phạt?"), options)
@@ -336,7 +383,7 @@ def chat(con: sqlite3.Connection, request: ChatRequest) -> ChatResponse:
                 as_of,
                 Clarification("vehicle_type", "Bản ghi này thuộc loại xe khác. Bạn muốn tra cho xe máy hay ô tô?"),
             )
-        return penalty_response(record, as_of, text, related_choices(con, record))
+        return penalty_response(con, record, as_of, text, related_choices(con, record))
     mentioned = mentioned_vehicles(text)
     if includes(OUTSIDE_REQUEST, text):
         return refuse(as_of, "out_of_scope", "Mình hỗ trợ tra mức phạt xe máy, ô tô và hướng dẫn nộp phạt, khiếu nại giao thông.")

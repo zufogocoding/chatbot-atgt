@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path
+import re
 from tempfile import TemporaryDirectory
 
 import httpx
@@ -71,6 +72,26 @@ def test_penalty_includes_legal_quote():
     assert reply["penalty"]["record_id"] == "nd168-d7-k7-c"
     assert "Không chấp hành hiệu lệnh" in reply["penalty"]["source_quote"]
     assert "4.000.000" in reply["penalty"]["source_quote"]
+
+
+def test_penalty_includes_payment_and_complaint_guidance():
+    reply = ask("Xe máy vượt đèn đỏ")
+    guidance = reply["penalty"]["guidance"]
+    assert len(guidance) == 3
+    body = " ".join(item["text"] for item in guidance)
+    assert "10 ngày" in body
+    assert "Kho bạc" in body
+    assert "90 ngày" in body
+    markers = {int(value) for value in re.findall(r"\[(\d+)\]", body)}
+    assert markers and max(markers) <= len(reply["sources"])
+
+    # Records without a fine have nothing to pay, but still carry the
+    # complaint deadline.
+    warning = call("POST", "/chat", {
+        "question": "Xem", "record_id": "nd168-d18-k1",
+    }).json()
+    assert warning["penalty"]["record_kind"] == "warning"
+    assert [item["title"] for item in warning["penalty"]["guidance"]] == ["Thời hiệu khiếu nại lần đầu"]
 
 
 def test_related_vehicle_and_option_selection():

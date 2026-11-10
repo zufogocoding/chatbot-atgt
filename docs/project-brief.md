@@ -376,8 +376,8 @@ chatbot-atgt/
 - Đối chiếu khung tiền, loại xử phạt và căn cứ của 271 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
 - Thu thập 23 đoạn thủ tục và chạy golden set 254 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
 - Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
-- API trả `penalty.source_quote` (đoạn luật áp dụng), `options` (phương án hỏi lại) và `related` (bản ghi tương ứng cho loại xe còn lại khi xác định duy nhất). Client có thể gửi `record_id` để tra thẳng phương án đã chọn.
-- Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn luật áp dụng, đoạn thủ tục, nguồn, nút chọn phương án hỏi lại và nút so sánh loại xe còn lại.
+- API trả `penalty.source_quote` (đoạn luật áp dụng), `penalty.guidance` (hạn nộp, nơi nộp, thời hiệu khiếu nại kèm trích dẫn), `options` (phương án hỏi lại) và `related` (bản ghi tương ứng cho loại xe còn lại khi xác định duy nhất). Client có thể gửi `record_id` để tra thẳng phương án đã chọn.
+- Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn luật áp dụng, hướng dẫn nộp phạt/khiếu nại, đoạn thủ tục, nguồn, nút chọn phương án hỏi lại và nút so sánh loại xe còn lại.
 
 **Việc tiếp theo:**
 

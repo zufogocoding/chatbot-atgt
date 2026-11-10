@@ -8,6 +8,8 @@ export type ChatRequest = {
 
 export type Fine = { min: number | null; max: number | null };
 
+export type Guidance = { title: string; text: string };
+
 export type Penalty = {
   record_id: string;
   vehicle_type: Vehicle | "both";
@@ -21,6 +23,7 @@ export type Penalty = {
   license_points_condition: string | null;
   additional_penalties: string[];
   remedial_measures: string[];
+  guidance: Guidance[];
   verification_status: string;
   source_quote: string;
 };

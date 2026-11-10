@@ -107,7 +107,7 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/chat `
   -Body (@{ question = 'Nộp phạt ở đâu, thời hạn bao lâu?' } | ConvertTo-Json -Compress)
 ```
 
-`answer_type` cho biết kết quả là `penalty`, `procedure`, `clarify` hoặc `refuse`. Kết quả tra mức phạt có `penalty` để hiển thị số tiền và căn cứ; `penalty.source_quote` là đoạn luật áp dụng để người dùng đối chiếu, và `related` gợi ý mức phạt tương ứng cho loại xe còn lại khi alias xác định duy nhất một bản ghi. Kết quả thủ tục có `procedure_ids` và `sources`. Các số `[1]`, `[2]` trong câu trả lời trỏ đến thứ tự trong `sources`. Khi API hỏi lại, gửi câu hỏi đầy đủ kèm chi tiết bổ sung; nếu chọn từ `options` hoặc `related`, gửi `record_id` tương ứng để API trả thẳng bản ghi đó. API kiểm tra lại loại xe và trả `clarify` nếu bản ghi không thuộc loại xe đã chọn.
+`answer_type` cho biết kết quả là `penalty`, `procedure`, `clarify` hoặc `refuse`. Kết quả tra mức phạt có `penalty` để hiển thị số tiền và căn cứ; `penalty.source_quote` là đoạn luật áp dụng để người dùng đối chiếu, `penalty.guidance` gồm các bước nộp phạt và khiếu nại kèm trích dẫn, và `related` gợi ý mức phạt tương ứng cho loại xe còn lại khi alias xác định duy nhất một bản ghi. Kết quả thủ tục có `procedure_ids` và `sources`. Các số `[1]`, `[2]` trong câu trả lời trỏ đến thứ tự trong `sources`. Khi API hỏi lại, gửi câu hỏi đầy đủ kèm chi tiết bổ sung; nếu chọn từ `options` hoặc `related`, gửi `record_id` tương ứng để API trả thẳng bản ghi đó. API kiểm tra lại loại xe và trả `clarify` nếu bản ghi không thuộc loại xe đã chọn.
 
 Backend đọc `data/build/catalog.db` ở chế độ chỉ đọc. Có thể đặt biến môi trường `CATALOG_DB_PATH` để trỏ đến một bản catalog khác. Nhánh mức phạt dùng quy tắc chọn bản ghi và alias, nhánh thủ tục dùng các đoạn nguồn trong SQLite với truy xuất BM25 khi cần. API trả ngày snapshot qua `as_of`.
 
@@ -119,7 +119,7 @@ Backend đọc `data/build/catalog.db` ở chế độ chỉ đọc. Có thể �
 
 ## Giao diện Next.js
 
-Các câu hỏi mẫu gửi yêu cầu đến FastAPI. Thẻ trả lời hiển thị khung tiền, điểm GPLX và nguồn; phần “Đoạn luật áp dụng” mở ra nguyên văn căn cứ để đối chiếu. Câu trả lời thủ tục có số tham chiếu mở thẳng đến nguồn tương ứng. Khi API hỏi loại xe, chọn **Xe máy** hoặc **Ô tô** để gửi lại câu hỏi với thông tin đó. Khi API đưa ra các phương án hoặc gợi ý loại xe còn lại, bấm vào phương án để tra thẳng bản ghi đó.
+Các câu hỏi mẫu gửi yêu cầu đến FastAPI. Thẻ trả lời hiển thị khung tiền, điểm GPLX, nguồn và mục **Nộp phạt và khiếu nại** với hạn nộp, nơi nộp và thời hiệu khiếu nại; phần “Đoạn luật áp dụng” mở ra nguyên văn căn cứ để đối chiếu. Câu trả lời thủ tục có số tham chiếu mở thẳng đến nguồn tương ứng. Khi API hỏi loại xe, chọn **Xe máy** hoặc **Ô tô** để gửi lại câu hỏi với thông tin đó. Khi API đưa ra các phương án hoặc gợi ý loại xe còn lại, bấm vào phương án để tra thẳng bản ghi đó.
 
 Next.js chuyển tiếp `/api/chat` và `/api/health` sang `http://127.0.0.1:8000`. Đặt biến môi trường `ATGT_API_URL` trong terminal chạy Next.js nếu backend dùng địa chỉ khác.
 
