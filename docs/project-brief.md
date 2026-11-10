@@ -380,7 +380,7 @@ chatbot-atgt/
 
 **Việc tiếp theo:**
 
-1. Hai người đối chiếu độc lập 259 bản ghi có phạt tiền trước khi chuyển `verified` và lưu vào `data/catalog/verified/`.
+1. Hai người điền phiếu rà soát độc lập cho 259 bản ghi có phạt tiền, rồi chạy `scripts/merge_reviews.py --fine-only` để chuyển `verified` và lưu snapshot vào `data/catalog/verified/`. Script đã chặn thiếu bản ghi, trùng người và lệch số tiền.
 2. Bổ sung phần còn thiếu của Điều 32 (khoản 5–6 phạt theo số người vượt quá có trần; điểm 238/2026 thêm mới 9a/11.e/13.e), sau đó cân nhắc Điều 17 và 20–24.
 3. Cải thiện baseline CLI: recall@5 hiện 73/171, trả lời được 30/171; API đã đạt 171/171 trên golden set. Mở rộng định tuyến cho cách nói tự nhiên và câu hỏi phức tạp.
 4. Đánh giá chất lượng câu trả lời thủ tục có trích dẫn (không chỉ recall@5) và bổ sung corpus nếu thiếu.

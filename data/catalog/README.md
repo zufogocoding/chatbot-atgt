@@ -258,6 +258,26 @@ File CSV dùng UTF-8 (mở trực tiếp bằng Excel/LibreOffice):
 
 Hai người đối chiếu độc lập với Công báo 168 và 238 theo đề cương. Mỗi người dùng một bản phiếu riêng. Chỉ chuyển bản ghi sang `verified` sau khi hai lượt đều xác nhận số tiền, căn cứ và nội dung. Tạo phiếu mới bằng `--out` để giữ kết quả đã điền.
 
+Sau khi cả hai phiếu đã điền, gộp thành snapshot `verified`:
+
+```bash
+python3 scripts/merge_reviews.py --fine-only \
+  --reviewer-a data/catalog/review/nguoi-ra-soat-1.csv \
+  --reviewer-b data/catalog/review/nguoi-ra-soat-2.csv \
+  --out data/catalog/verified/violations-2026-11-09.jsonl
+```
+
+Script từ chối ghi snapshot nếu thiếu bản ghi, hai phiếu cùng một người, có mục `SAI`/bỏ trống, hoặc số tiền hai người nhập khác catalog. Với `--fine-only`, 259 bản ghi có phạt tiền được chuyển `verified`; 12 bản ghi cảnh cáo/tịch thu không có mức tiền giữ nguyên `draft`. Báo cáo gộp được ghi cạnh snapshot (`.report.json`).
+
+Dùng snapshot đã xác nhận để build bản phát hành:
+
+```bash
+python3 scripts/build_db.py \
+  --violations data/catalog/verified/violations-2026-11-09.jsonl
+python3 scripts/evaluate_dataset.py \
+  --violations data/catalog/verified/violations-2026-11-09.jsonl
+```
+
 [`fine-audit-2026-11-10.csv`](review/fine-audit-2026-11-10.csv) lưu kết quả đối chiếu tự động riêng cho 271 bản ghi, gồm mức tiền cá nhân, tổ chức và đoạn luật dùng để đối chiếu. Chạy lại với `python3 scripts/audit_fines.py`. Dùng `--out` để xuất CSV mới.
 
 ### Khi có văn bản mới

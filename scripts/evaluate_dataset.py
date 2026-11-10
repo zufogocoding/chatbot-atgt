@@ -224,6 +224,12 @@ def evaluate_api(url: str, cases: list[dict], failures: bool) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=lookup.DEFAULT_DB)
+    parser.add_argument(
+        "--violations",
+        type=Path,
+        default=DATA / "catalog/consolidated/violations.jsonl",
+        help="violation JSONL the SQLite database was built from",
+    )
     parser.add_argument("--failures", action="store_true", help="show mismatched cases")
     parser.add_argument("--api-url", help="score a running /chat endpoint instead of the CLI baseline")
     args = parser.parse_args()
@@ -240,8 +246,9 @@ def main() -> int:
             raise SystemExit(f"Không gọi được API tại {args.api_url}: {error}") from error
         return 0
     with closing(lookup.open_db(args.db)) as con:
+        db_records = unique_index(load_jsonl(args.violations))
         stored = {row[0]: json.loads(row[1]) for row in con.execute("SELECT id, raw_json FROM violations")}
-        if stored != records or not con.execute(
+        if stored != db_records or not con.execute(
             "SELECT 1 FROM sqlite_master WHERE name = 'procedures_fts'"
         ).fetchone():
             raise SystemExit("SQLite does not match catalog. Run scripts/build_db.py.")

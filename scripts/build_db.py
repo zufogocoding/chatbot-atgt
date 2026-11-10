@@ -4,7 +4,7 @@
 The JSONL files remain the source of truth. This script is a deterministic
 projection: delete the database, rebuild it, verify counts and foreign keys.
 
-Input : data/catalog/consolidated/violations.jsonl
+Input : data/catalog/consolidated/violations.jsonl (or --violations snapshot)
         data/catalog/consolidated/penalty-rules.jsonl
         data/catalog/aliases.json
         data/procedures/procedures.jsonl
@@ -12,6 +12,7 @@ Input : data/catalog/consolidated/violations.jsonl
 Output: data/build/catalog.db
 
 Run: python3 scripts/build_db.py
+     python3 scripts/build_db.py --violations data/catalog/verified/violations-2026-11-09.jsonl
 """
 from __future__ import annotations
 
@@ -416,8 +417,8 @@ def verify(con: sqlite3.Connection, expected_counts: dict[str, int]) -> list[str
     return problems
 
 
-def build(out: Path) -> int:
-    records = load_jsonl(VIOLATIONS)
+def build(out: Path, violations: Path = VIOLATIONS) -> int:
+    records = load_jsonl(violations)
     rules = load_jsonl(RULES)
     aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
     procedures = load_jsonl(PROCEDURES)
@@ -470,10 +471,14 @@ def build(out: Path) -> int:
                 ),
             }
             for key, path in {
-                "violations": VIOLATIONS, "rules": RULES, "aliases": ALIASES,
+                "violations": violations, "rules": RULES, "aliases": ALIASES,
                 "procedures": PROCEDURES, "procedure_sources": PROCEDURE_SOURCES,
             }.items():
-                meta[f"source_{key}"] = str(path.relative_to(ROOT))
+                try:
+                    display_path = str(path.relative_to(ROOT))
+                except ValueError:
+                    display_path = str(path)
+                meta[f"source_{key}"] = display_path
                 meta[f"source_{key}_sha256"] = sha256(path)
             con.executemany(
                 "INSERT INTO catalog_meta (key, value) VALUES (?, ?)",
@@ -496,8 +501,14 @@ def build(out: Path) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument(
+        "--violations",
+        type=Path,
+        default=VIOLATIONS,
+        help="violation JSONL to project (use the verified snapshot when available)",
+    )
     args = parser.parse_args()
-    return build(args.out)
+    return build(args.out, args.violations)
 
 
 if __name__ == "__main__":
