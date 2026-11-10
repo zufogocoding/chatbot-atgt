@@ -1239,6 +1239,123 @@
           }
         ]
       }
+    },
+    {
+      "id": "khong-nhuong-duong-xe-uu-tien",
+      "canonical": "Không nhường đường hoặc gây cản trở xe được quyền ưu tiên",
+      "citizen_phrases": [
+        "không nhường đường cho xe ưu tiên",
+        "cản trở xe ưu tiên",
+        "không nhường xe cứu hỏa",
+        "không nhường xe cấp cứu",
+        "chặn xe ưu tiên",
+        "khong nhuong duong cho xe uu tien",
+        "can tro xe uu tien"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k6-b"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k7-đ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "su-dung-coi-ban-dem",
+      "canonical": "Sử dụng còi trong thời gian từ 22 giờ đến 05 giờ",
+      "citizen_phrases": [
+        "bấm còi ban đêm",
+        "thổi còi ban đêm",
+        "sử dụng còi ban đêm",
+        "bấm còi sau 22 giờ",
+        "bấm còi trước 5 giờ sáng",
+        "còi ban đêm trong khu dân cư",
+        "bam coi ban dem",
+        "thoi coi ban dem"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k1-đ"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k1-i"
+          }
+        ]
+      }
+    },
+    {
+      "id": "khong-chap-hanh-bien-bao-vach-ke",
+      "canonical": "Không chấp hành hiệu lệnh, chỉ dẫn của biển báo hiệu, vạch kẻ đường",
+      "citizen_phrases": [
+        "không chấp hành biển báo",
+        "không tuân thủ biển báo",
+        "đi sai vạch kẻ đường",
+        "vượt vạch kẻ đường",
+        "không theo vạch kẻ đường",
+        "không chấp hành vạch kẻ đường",
+        "khong chap hanh bien bao",
+        "di sai vach ke duong"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k1-a"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k1-a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "o-to-di-tren-via-he",
+      "canonical": "Điều khiển ô tô đi trên vỉa hè",
+      "citizen_phrases": [
+        "ô tô đi lên vỉa hè",
+        "ô tô đi trên vỉa hè",
+        "xe hơi chạy trên vỉa hè",
+        "ôtô leo vỉa hè",
+        "o to di len via he"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k6-d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chay-duoi-toc-do-toi-thieu",
+      "canonical": "Điều khiển xe chạy dưới tốc độ tối thiểu",
+      "citizen_phrases": [
+        "chạy dưới tốc độ tối thiểu",
+        "chạy chậm hơn tốc độ tối thiểu",
+        "không đạt tốc độ tối thiểu",
+        "chay duoi toc do toi thieu"
+      ],
+      "records": {
+        "o_to": [
+          {
+            "record_id": "nd168-d6-k3-o"
+          }
+        ],
+        "xe_may": [
+          {
+            "record_id": "nd168-d7-k1-k"
+          }
+        ]
+      }
     }
   ]
 }

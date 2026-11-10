@@ -167,12 +167,26 @@ def test_passenger_is_a_separate_subject():
         ("Xe máy không có bộ giảm thanh", "nd168-d14-k2-d"),
         ("Ô tô dán logo cơ quan nhà nước", "nd168-d13-k4-c"),
         ("Xe máy lắp đèn chiếu sáng phía sau", "nd168-d14-k1-đ"),
+        ("Xe máy bấm còi ban đêm", "nd168-d7-k1-i"),
+        ("Ô tô bấm còi sau 22 giờ", "nd168-d6-k1-đ"),
+        ("Xe máy không chấp hành biển báo", "nd168-d7-k1-a"),
+        ("Ô tô đi sai vạch kẻ đường", "nd168-d6-k1-a"),
+        ("Ô tô đi lên vỉa hè", "nd168-d6-k6-d"),
+        ("Xe máy chạy dưới tốc độ tối thiểu", "nd168-d7-k1-k"),
+        ("Ô tô không nhường xe cứu hỏa", "nd168-d6-k6-b"),
+        ("Xe máy cản trở xe ưu tiên", "nd168-d7-k7-đ"),
     ],
 )
 def test_common_phrasings(question, record_id):
     reply = ask(question)
     assert reply["answer_type"] == "penalty"
     assert reply["penalty"]["record_id"] == record_id
+
+
+def test_right_of_way_without_vehicle_asks_for_vehicle():
+    reply = ask("Không nhường đường cho xe ưu tiên")
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == "vehicle_type"
 
 
 @pytest.mark.parametrize(

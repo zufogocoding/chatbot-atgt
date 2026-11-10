@@ -131,7 +131,7 @@ Nguồn sự thật là các file JSONL/JSON trong `data/`; SQLite chỉ là b�
 | `data/amendments/238-2026.json` | 20 bản vá nội dung, 1 bản ghi mới và 7 bản vá quy tắc |
 | `data/catalog/consolidated/violations.jsonl` | **271 bản ghi vi phạm** đã hợp nhất 168 + 238 |
 | `data/catalog/consolidated/penalty-rules.jsonl` | 57 quy tắc hình phạt bổ sung/trừ điểm |
-| `data/catalog/aliases.json` | 44 nhóm alias, 285 cách nói của người dân (229 biến thể sau chuẩn hóa) |
+| `data/catalog/aliases.json` | 49 nhóm alias, 317 cách nói của người dân (253 biến thể sau chuẩn hóa) |
 | `data/overrides/penalty-conditions.json` | Điều kiện áp dụng cho hình phạt có điều kiện |
 | `data/build/catalog.db` | SQLite sinh tự động: violations, penalty_rules, alias_*, FTS5 |
 | `data/procedures/` | 23 đoạn thủ tục và danh mục nguồn |
@@ -371,7 +371,7 @@ chatbot-atgt/
 - Thu thập 168/2024, 238/2026, Luật 36/2024 hợp nhất.
 - Parse 1.242 điều/khoản/điểm; trích xuất 271 bản ghi cho Điều 6, 7, 12 (người được chở), 13, 14, 18, 32.
 - Hợp nhất 238/2026; validation 0 lỗi, còn cảnh báo các record chưa có alias.
-- 44 nhóm alias / 285 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn, bốn nhóm cho người được chở và chín nhóm thiết bị/điều kiện xe.
+- 49 nhóm alias / 317 cách nói, gồm nhóm vượt đèn đỏ gây tai nạn, bốn nhóm cho người được chở, chín nhóm thiết bị/điều kiện xe, nhường đường cho xe ưu tiên, còi ban đêm, biển báo/vạch kẻ đường, ô tô đi trên vỉa hè và chạy dưới tốc độ tối thiểu.
 - Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển và mức phạt tổ chức.
 - Đối chiếu khung tiền, loại xử phạt và căn cứ của 271 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
 - Thu thập 23 đoạn thủ tục và chạy golden set 254 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).

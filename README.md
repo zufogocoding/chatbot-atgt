@@ -49,7 +49,7 @@ Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vư
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
 | Bản ghi vi phạm | 271 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
-| Alias tiếng dân | 44 nhóm, 285 cách nói (229 biến thể sau chuẩn hóa) |
+| Alias tiếng dân | 49 nhóm, 317 cách nói (253 biến thể sau chuẩn hóa) |
 | Kiểm chứng | 271/271 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
 | Bộ đánh giá | 254 câu có nhãn kỳ vọng, có script chấm baseline |
