@@ -2,8 +2,45 @@
 
 Chatbot tiếng Việt giúp người dân tra cứu mức phạt vi phạm giao thông cho **xe máy** và **ô tô**: số tiền, hình phạt bổ sung, trừ điểm GPLX, căn cứ pháp lý và thủ tục nộp phạt/khiếu nại.
 
-- Phạm vi, kiến trúc, kế hoạch đánh giá: [`docs/project-brief.md`](docs/project-brief.md)
-- Schema catalog, quy trình rebuild, giới hạn: [`data/catalog/README.md`](data/catalog/README.md)
+- [Phạm vi, kiến trúc và kế hoạch đánh giá](docs/project-brief.md)
+- [Schema catalog, quy trình dựng lại và giới hạn](data/catalog/README.md)
+
+## Cách chạy trên Windows
+
+Cài **Git**, **Python 3.11+** và **Node.js 20.9+**. Branch `Test` có sẵn file `data/build/catalog.db`, nên có thể chạy chatbot ngay sau khi cài thư viện.
+
+### 1. Tải branch Test
+
+```powershell
+git clone --branch Test --single-branch https://github.com/zufogocoding/chatbot-atgt.git
+cd chatbot-atgt
+```
+
+Nếu đã clone repo, chạy `git fetch origin`, `git switch Test` rồi `git pull --ff-only` từ thư mục dự án.
+
+### 2. Chạy FastAPI trong terminal thứ nhất
+
+Chạy từ thư mục gốc của repo và giữ terminal này mở.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
+```
+
+Kiểm tra backend tại [trang trạng thái API](http://127.0.0.1:8000/health) hoặc thử câu hỏi trong [Swagger UI](http://127.0.0.1:8000/docs).
+
+### 3. Chạy Next.js trong terminal thứ hai
+
+Mở terminal mới từ thư mục gốc của repo.
+
+```powershell
+cd src/web
+npm.cmd ci
+npm.cmd run dev
+```
+
+Mở [giao diện chatbot](http://127.0.0.1:3000) và thử hỏi “Xe máy vượt đèn đỏ bị phạt bao nhiêu?” hoặc “Nộp phạt ở đâu, thời hạn bao lâu?”. Nếu giao diện báo **Mất kết nối**, kiểm tra lại terminal FastAPI và trang `/health` ở cổng 8000.
 
 ## Trạng thái hiện tại
 
@@ -22,7 +59,7 @@ Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương t
 
 Dữ liệu thủ tục nằm trong [`data/procedures/`](data/procedures/) và được lập chỉ mục BM25 trong [`data/build/catalog.db`](data/build/catalog.db). SQLite chứa bảng `procedures`, `procedure_sources` và `procedure_citations` để tra đoạn thủ tục và căn cứ. Kết quả và cách chạy golden set nằm trong [`data/eval/README.md`](data/eval/README.md).
 
-## Chạy nhanh
+## Dựng lại catalog và tra cứu bằng CLI
 
 Yêu cầu: Python 3.11+ (không cần thư viện ngoài cho phần catalog).
 
@@ -61,15 +98,7 @@ python3 scripts/query_catalog.py stats
 
 ## Backend FastAPI
 
-Dùng Python 3.11+ và chạy từ thư mục gốc dự án.
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
-```
-
-Mở [Swagger UI](http://127.0.0.1:8000/docs) để thử API. `GET /health` kiểm tra catalog. `POST /chat` nhận JSON có `question` và có thể nhận `vehicle_type` là `xe_may` hoặc `o_to`.
+`GET /health` kiểm tra catalog. `POST /chat` nhận JSON có `question` và có thể nhận `vehicle_type` là `xe_may` hoặc `o_to`.
 
 ```powershell
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/chat `
@@ -89,15 +118,7 @@ Backend đọc `data/build/catalog.db` ở chế độ chỉ đọc. Có thể �
 
 ## Giao diện Next.js
 
-Sau khi chạy FastAPI, mở một terminal khác từ thư mục gốc. Dùng Node.js 20.9 trở lên.
-
-```powershell
-cd src/web
-npm.cmd ci
-npm.cmd run dev
-```
-
-Mở [giao diện chat](http://127.0.0.1:3000). Các câu hỏi mẫu gửi yêu cầu thật đến FastAPI. Thẻ trả lời hiển thị khung tiền, điểm GPLX và nguồn. Câu trả lời thủ tục có số tham chiếu mở thẳng đến nguồn tương ứng. Khi API hỏi loại xe, chọn **Xe máy** hoặc **Ô tô** để gửi lại câu hỏi với thông tin đó.
+Các câu hỏi mẫu gửi yêu cầu đến FastAPI. Thẻ trả lời hiển thị khung tiền, điểm GPLX và nguồn. Câu trả lời thủ tục có số tham chiếu mở thẳng đến nguồn tương ứng. Khi API hỏi loại xe, chọn **Xe máy** hoặc **Ô tô** để gửi lại câu hỏi với thông tin đó.
 
 Next.js chuyển tiếp `/api/chat` và `/api/health` sang `http://127.0.0.1:8000`. Đặt biến môi trường `ATGT_API_URL` trong terminal chạy Next.js nếu backend dùng địa chỉ khác.
 
