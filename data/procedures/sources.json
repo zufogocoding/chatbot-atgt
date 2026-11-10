@@ -1,0 +1,65 @@
+[
+  {
+    "id": "luat-xlvphc",
+    "number": "90/VBHN-VPQH",
+    "title": "Luật Xử lý vi phạm hành chính",
+    "publisher": "Văn phòng Quốc hội",
+    "issued_on": "2026-03-30",
+    "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/3/90-vbhn-vpqh.pdf",
+    "checked_on": "2026-11-10",
+    "local_path": "data/raw/90-vbhn-vpqh-xu-ly-vphc.pdf",
+    "sha256": "f60237d37fe965d4b15654747f53cfce60fb3c82cd76c597215882345bd6e20c"
+  },
+  {
+    "id": "luat-khieu-nai",
+    "number": "28/VBHN-VPQH",
+    "title": "Luật Khiếu nại (bao gồm sửa đổi theo Luật 136/2025/QH15)",
+    "publisher": "Văn phòng Quốc hội",
+    "issued_on": "2026-03-13",
+    "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/3/28-vbhn-vpqh.pdf",
+    "checked_on": "2026-11-10",
+    "local_path": "data/raw/28-vbhn-vpqh-khieu-nai.pdf",
+    "sha256": "018ce4301f150bf093959f14168b2a433ee5557bd357959a6d79032fdd69c1d3"
+  },
+  {
+    "id": "nd-thu-nop",
+    "number": "4749/VBHN-BTP",
+    "title": "Nghị định 118/2021/NĐ-CP, hợp nhất với 68/2025/NĐ-CP và 190/2025/NĐ-CP",
+    "publisher": "Bộ Tư pháp",
+    "issued_on": "2025-08-05",
+    "url": "https://vbpl.moj.gov.vn/botuphap/Pages/vbpq-toanvan-hopnhat.aspx?ItemID=180154&dvid=41",
+    "related_urls": [
+      "https://datafiles.chinhphu.vn/cpp/files/vbpq/2021/12/118.signed.pdf",
+      "https://vanban.chinhphu.vn/?classid=0&docid=213182&pageid=27160",
+      "https://vanban.chinhphu.vn/?classid=1&docid=214521&pageid=27160&typegroupid=4"
+    ],
+    "checked_on": "2026-11-10"
+  },
+  {
+    "id": "bca-nop-phat",
+    "number": "C08_XPHCDB",
+    "title": "Nộp tiền xử phạt vi phạm hành chính",
+    "publisher": "Bộ Công an",
+    "issued_on": null,
+    "url": "https://dichvucong.bocongan.gov.vn/bocongan/bothutuc/tthc?matt=26612",
+    "checked_on": "2026-11-10"
+  },
+  {
+    "id": "dvc-kho-bac",
+    "number": "Thủ tục 1.004652",
+    "title": "Thủ tục nộp tiền phạt vi phạm hành chính qua Kho bạc Nhà nước",
+    "publisher": "Cổng Dịch vụ công quốc gia",
+    "issued_on": null,
+    "url": "https://vpcp.dichvucong.gov.vn/p/home/dvc-chi-tiet-thu-tuc-hanh-chinh.html?ma_thu_tuc=1.004652",
+    "checked_on": "2026-11-10"
+  },
+  {
+    "id": "dvc-thanh-toan",
+    "number": "Dịch vụ trực tuyến",
+    "title": "Tra cứu, thanh toán vi phạm giao thông",
+    "publisher": "Cổng Dịch vụ công quốc gia",
+    "issued_on": null,
+    "url": "https://dichvucong.gov.vn/p/home/dvc-thanh-toan-vi-pham-giao-thong.html",
+    "checked_on": "2026-11-10"
+  }
+]

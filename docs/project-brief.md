@@ -1,7 +1,9 @@
 # Chatbot tra cứu xử phạt vi phạm giao thông
 
-**Trạng thái:** Đã chốt phạm vi/kiến trúc; đã có catalog hợp nhất 200 bản ghi + SQLite tra thử  
-**Cập nhật:** 09/11/2026  
+**Trạng thái:** Có catalog hợp nhất 267 bản ghi, corpus thủ tục, golden set 236 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
+
+**Cập nhật:** 10/11/2026
+
 **Bối cảnh:** Đồ án môn học — chi phí triển khai không phải ràng buộc chính; ưu tiên khả năng thí nghiệm, tái lập và demo.
 
 ---
@@ -96,7 +98,8 @@ LLM chỉ làm 3 việc:
 | Luật 118/2025/QH15 | Sửa đổi 10 luật, có 36/2024/QH15 | Hiệu lực 01/07/2026 |
 | Nghị định 168/2024/NĐ-CP | Mức phạt, hình phạt bổ sung, trừ điểm | Hiệu lực 01/01/2025 |
 | **Nghị định 238/2026/NĐ-CP** | **Sửa đổi, bổ sung 168/2024** | **Hiệu lực 15/08/2026** |
-| Luật Xử lý vi phạm hành chính 15/2012/QH13 (hợp nhất các lần sửa đổi, gồm 56/2025/QH15, 88/2025/QH15, 116/2025/QH15, 120/2025/QH15) | Thủ tục, thời hạn, khiếu nại | Dùng bản hợp nhất mới nhất |
+| Luật Xử lý vi phạm hành chính, 90/VBHN-VPQH | Thi hành quyết định, nộp phạt và quyền khiếu nại | Bản hợp nhất ngày 30/03/2026 |
+| Luật Khiếu nại, 28/VBHN-VPQH | Trình tự, hồ sơ, thời hiệu và thời hạn giải quyết khiếu nại | Gồm sửa đổi theo Luật 136/2025/QH15 có hiệu lực từ 01/07/2026 |
 | Nghị định 189/2025/NĐ-CP | Thẩm quyền xử phạt | Chỉ cần nếu trả lời "ai có quyền phạt" |
 
 **Lưu ý sống còn:** Nghị định 168/2024 đã bị sửa đổi bởi **Nghị định 238/2026/NĐ-CP** từ 15/08/2026. Dataset phải dùng **văn bản hợp nhất** hoặc đọc cả 168 + 238, không được chỉ lấy toàn văn 168/2024.
@@ -125,13 +128,14 @@ Nguồn sự thật là các file JSONL/JSON trong `data/`; SQLite chỉ là b�
 |---|---|
 | `data/parsed/168-provisions.jsonl` | 1.242 điều/khoản/điểm đã parse từ Công báo 168/2024 |
 | `data/parsed/238-2026-nd-cp.txt` | Toàn văn Nghị định 238/2026 |
-| `data/amendments/238-2026.json` | 15 text patch, 1 record mới, 1 rule patch |
-| `data/catalog/consolidated/violations.jsonl` | **200 bản ghi vi phạm** đã hợp nhất 168 + 238 |
-| `data/catalog/consolidated/penalty-rules.jsonl` | 32 quy tắc hình phạt bổ sung/trừ điểm |
-| `data/catalog/aliases.json` | 24 nhóm alias, 151 cách nói của người dân |
+| `data/amendments/238-2026.json` | 20 bản vá nội dung, 1 bản ghi mới và 7 bản vá quy tắc |
+| `data/catalog/consolidated/violations.jsonl` | **267 bản ghi vi phạm** đã hợp nhất 168 + 238 |
+| `data/catalog/consolidated/penalty-rules.jsonl` | 57 quy tắc hình phạt bổ sung/trừ điểm |
+| `data/catalog/aliases.json` | 31 nhóm alias, 205 cách nói của người dân |
 | `data/overrides/penalty-conditions.json` | Điều kiện áp dụng cho hình phạt có điều kiện |
 | `data/build/catalog.db` | SQLite sinh tự động: violations, penalty_rules, alias_*, FTS5 |
-| `data/eval/` | Golden set (chưa làm) |
+| `data/procedures/` | 23 đoạn thủ tục và danh mục nguồn |
+| `data/eval/golden.jsonl` | 236 câu có nhãn và căn cứ kỳ vọng |
 
 ### 6.2. Schema một bản ghi vi phạm
 
@@ -360,20 +364,23 @@ chatbot-atgt/
 - [ ] Thủ tục nộp phạt/khiếu nại làm ngay trong MVP hay để giai đoạn 2.
 - [ ] Định dạng báo cáo/slide của môn học.
 
-### Trạng thái và việc tiếp theo (09/11/2026)
+### Trạng thái và việc tiếp theo (10/11/2026)
 
 **Đã xong:**
 
 - Thu thập 168/2024, 238/2026, Luật 36/2024 hợp nhất.
 - Parse 1.242 điều/khoản/điểm; trích xuất 267 bản ghi cho Điều 6, 7, 13, 14, 18, 32.
 - Hợp nhất 238/2026; validation 0 lỗi, còn cảnh báo các record chưa có alias.
-- 30 nhóm alias / 201 cách nói, phủ 92 record (gồm các câu hỏi "không chính chủ/không sang tên", giao xe cho người không đủ điều kiện).
+- 31 nhóm alias / 205 cách nói, phủ 94 bản ghi, gồm nhóm vượt đèn đỏ gây tai nạn.
 - Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển và mức phạt tổ chức.
+- Đối chiếu khung tiền, loại xử phạt và căn cứ của 267 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-10.csv`.
+- Thu thập 23 đoạn thủ tục và chạy golden set 236 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
+- Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
+- Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn thủ tục, nguồn và lựa chọn bổ sung loại xe.
 
 **Việc tiếp theo:**
 
-1. Review thủ công 255 bản ghi có phạt tiền, chuyển `verified`, snapshot vào `data/catalog/verified/`.
+1. Hai người đối chiếu độc lập 255 bản ghi có phạt tiền trước khi chuyển `verified` và lưu vào `data/catalog/verified/`.
 2. Bổ sung phần còn thiếu của Điều 32 (khoản 5–6 phạt theo số người vượt quá có trần; điểm 238/2026 thêm mới 9a/11.e/13.e), sau đó cân nhắc Điều 12, 17, 20–24.
-3. Làm golden set 200–300 case trong `data/eval/` và đo baseline.
-4. Thu thập thủ tục nộp phạt/khiếu nại cho nhánh RAG.
-5. Dựng FastAPI + giao diện chat (Next.js hoặc Streamlit dự phòng).
+3. Cải thiện chọn khung phạt, định tuyến và từ chối ngoài phạm vi. Chạy lại golden set khi thay đổi hệ thống.
+4. Tích hợp corpus thủ tục vào RAG và đánh giá chất lượng câu trả lời có trích dẫn.

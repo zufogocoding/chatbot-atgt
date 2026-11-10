@@ -7,6 +7,7 @@ Examples:
     python3 scripts/query_catalog.py record nd168-d7-k7-c
     python3 scripts/query_catalog.py answer "xe máy vượt đèn đỏ"
     python3 scripts/query_catalog.py answer "ô tô quá tốc độ"
+    python3 scripts/query_catalog.py procedure "hạn khiếu nại quyết định xử phạt"
     python3 scripts/query_catalog.py stats
 
 This is a development/inspection tool. The FastAPI service will reuse the same
@@ -206,6 +207,49 @@ def short(text: str, limit: int = 150) -> str:
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
+def search_procedures(con: sqlite3.Connection, question: str, limit: int) -> list[sqlite3.Row]:
+    terms = dict.fromkeys(term for term in tokens(question) if term not in STOPWORDS)
+    if not terms:
+        return []
+    return con.execute(
+        """
+        SELECT p.id, p.topic, p.title, p.text, p.as_of
+        FROM procedures_fts
+        JOIN procedures p ON p.id = procedures_fts.id
+        WHERE procedures_fts MATCH ?
+        ORDER BY bm25(procedures_fts, 0, 4, 3, 1), p.id
+        LIMIT ?
+        """,
+        (" OR ".join(terms), limit),
+    ).fetchall()
+
+
+def cmd_procedure(con: sqlite3.Connection, args: argparse.Namespace) -> int:
+    if args.limit < 1:
+        raise SystemExit("--limit phải từ 1 trở lên")
+    if not con.execute("SELECT 1 FROM sqlite_master WHERE name = 'procedures_fts'").fetchone():
+        raise SystemExit("Cần dựng lại SQLite bằng scripts/build_db.py để tra thủ tục.")
+    results = search_procedures(con, args.query, args.limit)
+    if not results:
+        print("Không tìm thấy đoạn thủ tục phù hợp.")
+        return 0
+    for result in results:
+        print(f"## {result['title']} ({result['id']})")
+        print(result["text"])
+        citations = con.execute(
+            """
+            SELECT s.number, c.locator, s.url
+            FROM procedure_citations c JOIN procedure_sources s ON s.id = c.source_id
+            WHERE c.procedure_id = ? ORDER BY c.position
+            """,
+            (result["id"],),
+        )
+        for citation in citations:
+            print(f"- {citation['number']} · {citation['locator']} · {citation['url']}")
+        print()
+    return 0
+
+
 def format_date(value: str | None) -> str:
     if not value:
         return ""
@@ -293,13 +337,10 @@ def print_answer(rec: dict[str, Any], full_quote: bool = False, title: str | Non
         print("- Mức phạt tiền: Không có")
     else:
         fine = format_range(rec["fine_min"], rec["fine_max"])
-        fine_by_subject = rec.get("fine_by_subject")
-        if isinstance(fine_by_subject, str):
-            fine_by_subject = json.loads(fine_by_subject)
-        org = (fine_by_subject or {}).get("to_chuc", {})
-        if org.get("min") is not None and org.get("max") is not None:
+        org_min, org_max = rec.get("fine_org_min"), rec.get("fine_org_max")
+        if org_min is not None and org_max is not None:
             print(f"- Mức phạt (cá nhân): {fine}")
-            print(f"- Mức phạt (tổ chức): {format_range(org['min'], org['max'])}")
+            print(f"- Mức phạt (tổ chức): {format_range(org_min, org_max)}")
         else:
             print(f"- Mức phạt: {fine}")
 
@@ -344,7 +385,7 @@ def print_answer(rec: dict[str, Any], full_quote: bool = False, title: str | Non
     print()
     print(
         "Lưu ý: Thông tin tham khảo, không thay thế tư vấn pháp lý. "
-        "Phần thủ tục nộp phạt/khiếu nại chưa được tích hợp trong catalog hiện tại."
+        "Lệnh này chỉ tra cứu mức phạt."
     )
 
 
@@ -482,6 +523,9 @@ def cmd_stats(con: sqlite3.Connection, _args: argparse.Namespace) -> int:
     print()
     for key in ("violations", "penalty_rules", "alias_groups", "alias_phrases"):
         print(f"{key}: {meta.get(key)}")
+    if "procedures" in meta:
+        for key in ("procedures", "procedure_sources", "procedure_citations"):
+            print(f"{key}: {meta[key]}")
     print()
     print("Theo Điều:")
     for row in con.execute(
@@ -527,6 +571,11 @@ def main() -> int:
     search.add_argument("--limit", type=int, default=10)
     search.add_argument("--show-score", action="store_true")
     search.set_defaults(func=cmd_search)
+
+    procedure = sub.add_parser("procedure", help="tìm đoạn thủ tục và trích dẫn nguồn")
+    procedure.add_argument("query")
+    procedure.add_argument("--limit", type=int, default=3)
+    procedure.set_defaults(func=cmd_procedure)
 
     answer = sub.add_parser("answer", help="soạn câu trả lời từ alias/record")
     answer.add_argument("query", nargs="?")

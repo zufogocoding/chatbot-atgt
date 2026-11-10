@@ -7,6 +7,8 @@ projection: delete the database, rebuild it, verify counts and foreign keys.
 Input : data/catalog/consolidated/violations.jsonl
         data/catalog/consolidated/penalty-rules.jsonl
         data/catalog/aliases.json
+        data/procedures/procedures.jsonl
+        data/procedures/sources.json
 Output: data/build/catalog.db
 
 Run: python3 scripts/build_db.py
@@ -19,6 +21,8 @@ import json
 import os
 import sqlite3
 import sys
+import tempfile
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -30,6 +34,8 @@ ROOT = Path(__file__).resolve().parents[1]
 VIOLATIONS = ROOT / "data/catalog/consolidated/violations.jsonl"
 RULES = ROOT / "data/catalog/consolidated/penalty-rules.jsonl"
 ALIASES = ROOT / "data/catalog/aliases.json"
+PROCEDURES = ROOT / "data/procedures/procedures.jsonl"
+PROCEDURE_SOURCES = ROOT / "data/procedures/sources.json"
 DEFAULT_OUT = ROOT / "data/build/catalog.db"
 
 
@@ -130,6 +136,49 @@ CREATE TABLE alias_records (
 );
 
 CREATE INDEX idx_alias_records_record ON alias_records(record_id);
+
+CREATE TABLE procedures (
+    id       TEXT PRIMARY KEY,
+    topic    TEXT NOT NULL CHECK (topic IN ('nop_phat', 'khieu_nai')),
+    title    TEXT NOT NULL,
+    text     TEXT NOT NULL,
+    keywords TEXT NOT NULL,
+    as_of    TEXT NOT NULL
+);
+
+CREATE INDEX idx_procedures_topic ON procedures(topic);
+
+CREATE TABLE procedure_sources (
+    id           TEXT PRIMARY KEY,
+    number       TEXT NOT NULL,
+    title        TEXT NOT NULL,
+    publisher    TEXT NOT NULL,
+    issued_on    TEXT,
+    url          TEXT NOT NULL,
+    checked_on   TEXT NOT NULL,
+    local_path   TEXT,
+    sha256       TEXT,
+    related_urls TEXT NOT NULL
+);
+
+CREATE TABLE procedure_citations (
+    procedure_id TEXT NOT NULL REFERENCES procedures(id) ON DELETE CASCADE,
+    position     INTEGER NOT NULL,
+    source_id    TEXT NOT NULL REFERENCES procedure_sources(id),
+    locator      TEXT NOT NULL CHECK (length(trim(locator)) > 0),
+    pages        TEXT,
+    PRIMARY KEY (procedure_id, position)
+);
+
+CREATE INDEX idx_procedure_citations_source ON procedure_citations(source_id);
+
+CREATE VIRTUAL TABLE procedures_fts USING fts5(
+    id UNINDEXED,
+    title_ascii,
+    keywords_ascii,
+    text_ascii,
+    tokenize = 'unicode61'
+);
 """
 
 
@@ -284,20 +333,45 @@ def insert_aliases(con: sqlite3.Connection, aliases: dict[str, Any]) -> tuple[in
     return len(aliases.get("aliases", [])), phrase_count
 
 
-def verify(con: sqlite3.Connection, records: list, rules: list) -> list[str]:
+def insert_procedures(con: sqlite3.Connection, procedures: list[dict], sources: list[dict]) -> None:
+    con.executemany(
+        "INSERT INTO procedures (id, topic, title, text, keywords, as_of) VALUES (?, ?, ?, ?, ?, ?)",
+        [(p["id"], p["topic"], p["title"], p["text"], json_text(p["keywords"]), p["as_of"])
+         for p in procedures],
+    )
+    con.executemany(
+        """
+        INSERT INTO procedure_sources (id, number, title, publisher, issued_on,
+                                       url, checked_on, local_path, sha256, related_urls)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        [(s["id"], s["number"], s["title"], s["publisher"], s.get("issued_on"),
+          s["url"], s["checked_on"], s.get("local_path"), s.get("sha256"),
+          json_text(s.get("related_urls", []))) for s in sources],
+    )
+    con.executemany(
+        """
+        INSERT INTO procedure_citations (procedure_id, position, source_id, locator, pages)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        [(p["id"], position, ref["source_id"], ref["locator"],
+          json_text(ref["pages"]) if "pages" in ref else None)
+         for p in procedures for position, ref in enumerate(p["sources"])],
+    )
+    con.executemany(
+        "INSERT INTO procedures_fts (id, title_ascii, keywords_ascii, text_ascii) VALUES (?, ?, ?, ?)",
+        [(p["id"], normalize_text(p["title"]), normalize_text(" ".join(p["keywords"])),
+          normalize_text(p["text"])) for p in procedures],
+    )
+
+
+def verify(con: sqlite3.Connection, expected_counts: dict[str, int]) -> list[str]:
     problems: list[str] = []
 
-    counts = {
-        "violations": con.execute("SELECT COUNT(*) FROM violations").fetchone()[0],
-        "violations_fts": con.execute("SELECT COUNT(*) FROM violations_fts").fetchone()[0],
-        "penalty_rules": con.execute("SELECT COUNT(*) FROM penalty_rules").fetchone()[0],
-    }
-    if counts["violations"] != len(records):
-        problems.append(f"violations count {counts['violations']} != {len(records)}")
-    if counts["violations_fts"] != len(records):
-        problems.append(f"FTS count {counts['violations_fts']} != {len(records)}")
-    if counts["penalty_rules"] != len(rules):
-        problems.append(f"penalty_rules count {counts['penalty_rules']} != {len(rules)}")
+    for table, expected in expected_counts.items():
+        actual = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        if actual != expected:
+            problems.append(f"{table} count {actual} != {expected}")
 
     fk_errors = con.execute("PRAGMA foreign_key_check").fetchall()
     if fk_errors:
@@ -324,6 +398,15 @@ def verify(con: sqlite3.Connection, records: list, rules: list) -> list[str]:
     if missing_fts:
         problems.append(f"records missing from FTS: {[r[0] for r in missing_fts]}")
 
+    missing_citations = con.execute(
+        """
+        SELECT p.id FROM procedures p
+        WHERE NOT EXISTS (SELECT 1 FROM procedure_citations c WHERE c.procedure_id = p.id)
+        """
+    ).fetchall()
+    if missing_citations:
+        problems.append(f"procedures missing citations: {[row[0] for row in missing_citations]}")
+
     empty_phrases = con.execute(
         "SELECT COUNT(*) FROM alias_phrases WHERE phrase_ascii = ''"
     ).fetchone()[0]
@@ -337,62 +420,76 @@ def build(out: Path) -> int:
     records = load_jsonl(VIOLATIONS)
     rules = load_jsonl(RULES)
     aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
+    procedures = load_jsonl(PROCEDURES)
+    sources = json.loads(PROCEDURE_SOURCES.read_text(encoding="utf-8"))
 
     ids = [r["id"] for r in records]
     if len(ids) != len(set(ids)):
         raise SystemExit("duplicate violation ids in consolidated catalog")
+    snapshots = {r["version"]["consolidated_as_of"] for r in records}
+    if len(snapshots) != 1 or any(p["as_of"] not in snapshots for p in procedures):
+        raise SystemExit("violations and procedures must use the same snapshot")
+    citation_count = sum(len(p["sources"]) for p in procedures)
 
+    out = out.resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
-    tmp = out.with_name(out.name + ".tmp")
-    if tmp.exists():
-        tmp.unlink()
-
-    con = sqlite3.connect(tmp)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{out.name}.", suffix=".tmp", dir=out.parent)
+    os.close(fd)
+    tmp = Path(tmp_name)
     try:
-        con.executescript(SCHEMA)
-        insert_violations(con, records)
-        insert_rules(con, rules)
-        alias_groups, alias_phrases = insert_aliases(con, aliases)
+        with closing(sqlite3.connect(tmp)) as con:
+            con.executescript(SCHEMA)
+            insert_violations(con, records)
+            insert_rules(con, rules)
+            alias_groups, alias_phrases = insert_aliases(con, aliases)
+            insert_procedures(con, procedures, sources)
 
-        problems = verify(con, records, rules)
+            counts = {
+                "violations": len(records),
+                "violations_fts": len(records),
+                "penalty_rules": len(rules),
+                "alias_groups": alias_groups,
+                "alias_phrases": alias_phrases,
+                "procedures": len(procedures),
+                "procedures_fts": len(procedures),
+                "procedure_sources": len(sources),
+                "procedure_citations": citation_count,
+            }
+            problems = verify(con, counts)
+            if problems:
+                for problem in problems:
+                    print(f"ERROR {problem}", file=sys.stderr)
+                return 1
 
-        meta = {
-            "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "source_violations": str(VIOLATIONS.relative_to(ROOT)),
-            "source_violations_sha256": sha256(VIOLATIONS),
-            "source_rules": str(RULES.relative_to(ROOT)),
-            "source_rules_sha256": sha256(RULES),
-            "source_aliases": str(ALIASES.relative_to(ROOT)),
-            "source_aliases_sha256": sha256(ALIASES),
-            "consolidated_as_of": records[0]["version"]["consolidated_as_of"],
-            "violations": len(records),
-            "penalty_rules": len(rules),
-            "alias_groups": alias_groups,
-            "alias_phrases": alias_phrases,
-            "alias_phrases_raw": sum(
-                len(entry.get("citizen_phrases", []))
-                for entry in aliases.get("aliases", [])
-            ),
-        }
-        con.executemany(
-            "INSERT INTO catalog_meta (key, value) VALUES (?, ?)",
-            [(k, str(v)) for k, v in meta.items()],
-        )
-        con.commit()
+            meta = {
+                **counts,
+                "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "consolidated_as_of": records[0]["version"]["consolidated_as_of"],
+                "alias_phrases_raw": sum(
+                    len(entry.get("citizen_phrases", [])) for entry in aliases.get("aliases", [])
+                ),
+            }
+            for key, path in {
+                "violations": VIOLATIONS, "rules": RULES, "aliases": ALIASES,
+                "procedures": PROCEDURES, "procedure_sources": PROCEDURE_SOURCES,
+            }.items():
+                meta[f"source_{key}"] = str(path.relative_to(ROOT))
+                meta[f"source_{key}_sha256"] = sha256(path)
+            con.executemany(
+                "INSERT INTO catalog_meta (key, value) VALUES (?, ?)",
+                [(k, str(v)) for k, v in meta.items()],
+            )
+            con.commit()
+        os.replace(tmp, out)
     finally:
-        con.close()
-
-    if problems:
         tmp.unlink(missing_ok=True)
-        for problem in problems:
-            print(f"ERROR {problem}", file=sys.stderr)
-        return 1
 
-    os.replace(tmp, out)
-    print(f"built {out.relative_to(ROOT)}")
+    display_path = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
+    print(f"built {display_path}")
     print(f"  violations: {len(records)}")
     print(f"  penalty rules: {len(rules)}")
     print(f"  alias groups: {alias_groups} ({alias_phrases} phrases)")
+    print(f"  procedures: {len(procedures)} ({len(sources)} sources, {citation_count} citations)")
     return 0
 
 

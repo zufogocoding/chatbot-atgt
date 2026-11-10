@@ -7,6 +7,20 @@
   ],
   "aliases": [
     {
+      "id": "vuot-den-do-gay-tai-nan",
+      "canonical": "Không chấp hành đèn tín hiệu giao thông và gây tai nạn",
+      "citizen_phrases": [
+        "vượt đèn đỏ gây tai nạn",
+        "vượt đèn đỏ làm xảy ra tai nạn",
+        "vượt đèn đỏ dẫn đến tai nạn",
+        "chạy đèn đỏ gây tai nạn"
+      ],
+      "records": {
+        "o_to": [{"record_id": "nd168-d6-k10-b"}],
+        "xe_may": [{"record_id": "nd168-d7-k10-b"}]
+      }
+    },
+    {
       "id": "vuot-den-do",
       "canonical": "Không chấp hành hiệu lệnh của đèn tín hiệu giao thông",
       "citizen_phrases": [

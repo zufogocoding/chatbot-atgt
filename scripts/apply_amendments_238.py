@@ -39,7 +39,6 @@ DOC_TITLE = (
     "an toàn giao thông trong lĩnh vực giao thông đường bộ; trừ điểm, phục hồi "
     "điểm giấy phép lái xe (hợp nhất với Nghị định 238/2026/NĐ-CP)"
 )
-SOURCE_URL = "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/01/168-nd-cp.signed.pdf"
 SOURCE_URL_AMENDMENT = "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/7/238-ndcp.signed.pdf"
 
 TEXT_FIELDS = ("behavior_text", "clause_text", "source_quote")
@@ -64,6 +63,19 @@ def rebuild_source_quote(rec: dict[str, Any]) -> str:
     if lb.get("point") and clause and behavior and clause != behavior:
         return f"{clause} || {behavior}"
     return behavior or clause
+
+
+def mark_amended(rec: dict[str, Any]) -> None:
+    version = rec["version"]
+    if AMENDMENT_DOC not in version["amended_by"]:
+        version["amended_by"].append(AMENDMENT_DOC)
+    version["effective_from"] = AMENDMENT_EFFECTIVE
+    version["last_amended"] = AMENDMENT_EFFECTIVE
+    rec["source_url_amendment"] = SOURCE_URL_AMENDMENT
+    rec["verification"]["status"] = "draft"
+    rec["verification"]["notes"] = (
+        "Consolidated text after 238/2026/NĐ-CP; verify against both gazettes."
+    )
 
 
 def apply_patch(records: dict[str, dict[str, Any]], patch: dict[str, Any]) -> None:
@@ -99,15 +111,7 @@ def apply_patch(records: dict[str, dict[str, Any]], patch: dict[str, Any]) -> No
         raise SystemExit(f"patch {rid}: unsupported op {op!r}")
 
     rec["source_quote"] = rebuild_source_quote(rec)
-    version = rec.setdefault("version", {})
-    amended_by = version.setdefault("amended_by", [])
-    if AMENDMENT_DOC not in amended_by:
-        amended_by.append(AMENDMENT_DOC)
-    version["last_amended"] = AMENDMENT_EFFECTIVE
-    rec["verification"]["status"] = "draft"
-    rec["verification"]["notes"] = (
-        "Consolidated text after 238/2026/NĐ-CP; verify against both gazettes."
-    )
+    mark_amended(rec)
 
 
 def add_record(records: dict[str, dict[str, Any]], added: dict[str, Any]) -> None:
@@ -139,7 +143,7 @@ def add_record(records: dict[str, dict[str, Any]], added: dict[str, Any]) -> Non
         "license_points_condition": None,
         "penalty_rule_ids": [],
         "legal_basis": {**added["legal_basis"], "document": DOC},
-        "source_url": SOURCE_URL,
+        "source_url": SOURCE_URL_AMENDMENT,
         "source_url_amendment": SOURCE_URL_AMENDMENT,
         "source_quote": added["source_quote"],
         "verification": {
@@ -170,6 +174,8 @@ def patch_rules(rules: dict[str, dict[str, Any]], patch: dict[str, Any]) -> None
         if old not in rule["text"]:
             raise SystemExit(f"rule patch {rid}: old text not found")
         rule["text"] = rule["text"].replace(old, new)
+        if "description" in rule["penalty"]:
+            rule["penalty"]["description"] = rule["penalty"]["description"].replace(old, new)
     elif "text" in patch:
         rule["text"] = patch["text"]
     elif op not in ("replace", "set_text"):
@@ -187,6 +193,9 @@ def patch_rules(rules: dict[str, dict[str, Any]], patch: dict[str, Any]) -> None
             rule["refs"].append({"clause": ref["clause"], "point": ref.get("point")})
             existing.add(key)
     rule["amended_by"] = AMENDMENT_DOC
+    rule["effective_from"] = AMENDMENT_EFFECTIVE
+    rule["amendment_basis"] = patch["source"]
+    rule["source_url_amendment"] = SOURCE_URL_AMENDMENT
     rule["source_quote_amendment"] = patch.get("source_quote", "")
 
 
@@ -282,6 +291,8 @@ def main() -> None:
     records = sorted(violations.values(), key=sort_key)
     rule_list = sorted(rules.values(), key=lambda r: (r["article"], clause_sort_key(r["clause"]), r.get("point") or ""))
 
+    amended_rules = {rule["id"] for rule in rule_list if rule.get("amended_by")}
+    previously_affected = {rec["id"] for rec in records if amended_rules.intersection(rec["penalty_rule_ids"])}
     attach_penalties(records, rule_list)
 
     for rec in records:
@@ -289,8 +300,8 @@ def main() -> None:
         version.setdefault("amended_by", [])
         version["consolidated_as_of"] = CONSOLIDATED_AS_OF
         rec["document_title"] = DOC_TITLE
-        if rec["id"] == "nd168-d6-k1a":
-            rec["source_url_amendment"] = SOURCE_URL_AMENDMENT
+        if rec["id"] in previously_affected or amended_rules.intersection(rec["penalty_rule_ids"]):
+            mark_amended(rec)
 
     dump_jsonl(OUT_VIOLATIONS, records)
     dump_jsonl(OUT_RULES, rule_list)

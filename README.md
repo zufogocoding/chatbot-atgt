@@ -12,13 +12,15 @@ Chatbot tiếng Việt giúp người dân tra cứu mức phạt vi phạm giao
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
 | Bản ghi vi phạm | 267 (Điều 6, 7, 13, 14, 18, 32) — gồm vi phạm người điều khiển và chủ phương tiện |
-| Alias tiếng dân | 30 nhóm, 201 cách nói |
-| Kiểm chứng | `draft` — validation 0 lỗi, chưa review thủ công 100% |
+| Alias tiếng dân | 31 nhóm, 205 cách nói |
+| Kiểm chứng | 267/267 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
+| Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
+| Bộ đánh giá | 236 câu có nhãn kỳ vọng, có script chấm baseline |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
 Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe. Chưa gồm: Điều 32 khoản 5–6 (phạt trên mỗi người vượt quá, có trần), các điểm 238/2026 thêm mới 9a/11.e/13.e, Điều 12, 17.
 
-Phần **thủ tục nộp phạt/khiếu nại** chưa được thu thập; CLI hiện nói rõ điều này thay vì bịa.
+Dữ liệu thủ tục nằm trong [`data/procedures/`](data/procedures/) và được lập chỉ mục BM25 trong [`data/build/catalog.db`](data/build/catalog.db). SQLite chứa bảng `procedures`, `procedure_sources` và `procedure_citations` để tra đoạn thủ tục và căn cứ. Kết quả và cách chạy golden set nằm trong [`data/eval/README.md`](data/eval/README.md).
 
 ## Chạy nhanh
 
@@ -39,6 +41,10 @@ python3 scripts/validate_catalog.py
 
 # 5. Build SQLite + FTS5
 python3 scripts/build_db.py
+
+# 6. Đối chiếu khung tiền và chạy golden set
+python3 scripts/audit_fines.py
+python3 scripts/evaluate_dataset.py
 ```
 
 Tra thử:
@@ -49,7 +55,55 @@ python3 scripts/query_catalog.py answer "ô tô quá tốc độ"
 python3 scripts/query_catalog.py answer "vượt đèn đỏ"          # hỏi lại loại xe
 python3 scripts/query_catalog.py answer "xe máy không chính chủ" # chủ phương tiện (Điều 32)
 python3 scripts/query_catalog.py record nd168-d7-k7-c
+python3 scripts/query_catalog.py procedure "thời hiệu khiếu nại quyết định xử phạt" --limit 1
 python3 scripts/query_catalog.py stats
+```
+
+## Backend FastAPI
+
+Dùng Python 3.11+ và chạy từ thư mục gốc dự án.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
+```
+
+Mở [Swagger UI](http://127.0.0.1:8000/docs) để thử API. `GET /health` kiểm tra catalog. `POST /chat` nhận JSON có `question` và có thể nhận `vehicle_type` là `xe_may` hoặc `o_to`.
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/chat `
+  -ContentType 'application/json; charset=utf-8' `
+  -Body (@{ question = 'Nộp phạt ở đâu, thời hạn bao lâu?' } | ConvertTo-Json -Compress)
+```
+
+`answer_type` cho biết kết quả là `penalty`, `procedure`, `clarify` hoặc `refuse`. Kết quả tra mức phạt có `penalty` để hiển thị số tiền và căn cứ. Kết quả thủ tục có `procedure_ids` và `sources`. Các số `[1]`, `[2]` trong câu trả lời trỏ đến thứ tự trong `sources`. Khi API hỏi lại, gửi câu hỏi đầy đủ kèm chi tiết bổ sung.
+
+Backend đọc `data/build/catalog.db` ở chế độ chỉ đọc. Có thể đặt biến môi trường `CATALOG_DB_PATH` để trỏ đến một bản catalog khác. Nhánh mức phạt dùng quy tắc chọn bản ghi và alias, nhánh thủ tục dùng các đoạn nguồn trong SQLite với truy xuất BM25 khi cần. API trả ngày snapshot qua `as_of`.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/evaluate_dataset.py --api-url http://127.0.0.1:8000/chat
+```
+
+## Giao diện Next.js
+
+Sau khi chạy FastAPI, mở một terminal khác từ thư mục gốc. Dùng Node.js 20.9 trở lên.
+
+```powershell
+cd src/web
+npm.cmd ci
+npm.cmd run dev
+```
+
+Mở [giao diện chat](http://127.0.0.1:3000). Các câu hỏi mẫu gửi yêu cầu thật đến FastAPI. Thẻ trả lời hiển thị khung tiền, điểm GPLX và nguồn. Câu trả lời thủ tục có số tham chiếu mở thẳng đến nguồn tương ứng. Khi API hỏi loại xe, chọn **Xe máy** hoặc **Ô tô** để gửi lại câu hỏi với thông tin đó.
+
+Next.js chuyển tiếp `/api/chat` và `/api/health` sang `http://127.0.0.1:8000`. Đặt biến môi trường `ATGT_API_URL` trong terminal chạy Next.js nếu backend dùng địa chỉ khác.
+
+```powershell
+npm.cmd run typecheck
+npm.cmd run build
 ```
 
 ## Cấu trúc
@@ -59,9 +113,13 @@ data/raw/          PDF/DOCX gốc từ nguồn chính thức
 data/parsed/       Text + cấu trúc điều/khoản/điểm
 data/amendments/   Patch sửa đổi (238/2026)
 data/catalog/      violations.jsonl, penalty-rules.jsonl, aliases.json
+data/procedures/   Các đoạn hướng dẫn thủ tục và danh mục nguồn chính thức
+data/eval/         Golden set và kết quả baseline
 data/overrides/    Điều kiện hình phạt thủ công
 data/build/        SQLite sinh tự động (không sửa tay)
 scripts/           Parse, extract, consolidate, validate, build, query
+src/api/           FastAPI, định tuyến, tra cứu và soạn câu trả lời
+src/web/           Next.js, giao diện chat và chuyển tiếp API
 docs/              Project brief
 ```
 

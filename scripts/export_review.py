@@ -75,7 +75,7 @@ def main() -> int:
     if args.fine_only:
         records = [r for r in records if r["record_kind"] == "fine"]
 
-    out = args.out
+    out = args.out.resolve()
     if args.fine_only and out == DEFAULT_OUT:
         out = out.with_name(out.stem + "-fine.csv")
 
@@ -126,7 +126,8 @@ def main() -> int:
                 }
             )
 
-    print(f"wrote {out.relative_to(ROOT)} ({len(records)} rows)")
+    display_path = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
+    print(f"wrote {display_path} ({len(records)} rows)")
     print("review columns: expected_fine_min, expected_fine_max, fine_ok, citation_ok, text_ok, reviewer, reviewed_at, note")
     return 0
 

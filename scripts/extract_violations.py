@@ -417,8 +417,9 @@ def extract_violations(
                 "document": DOC,
                 "document_title": DOC_TITLE,
                 "article_title": base["article_title"],
-                "vehicle_type": infer_vehicle_type(
-                    article, clause, f"{text} {behavior}"
+                "vehicle_type": (
+                    "o_to" if path == "32.17.b"
+                    else infer_vehicle_type(article, clause, f"{text} {behavior}")
                 ),
                 "subject": "chu_phuong_tien" if article == 32 else "nguoi_dieu_khien",
                 "behavior_group": ARTICLE_META[article]["behavior_group"],
@@ -449,7 +450,7 @@ def extract_violations(
                     "notes": "Auto-extracted; verify amount and citation against the gazette.",
                 },
                 "version": {
-                    "effective_from": "2025-01-01",
+                    "effective_from": "2026-01-01" if path == "6.3.m" else "2025-01-01",
                     "effective_to": None,
                     "amended_by": [],
                 },
