@@ -136,7 +136,7 @@ Một số hình phạt chỉ áp dụng trong một trường hợp cụ thể.
 ```json
 {
   "type": "tich_thu_phuong_tien",
-  "condition": "không chứng minh được nguồn gốc xuất xứ của phương tiện"
+  "condition": "không có chứng nhận đăng ký xe hoặc sử dụng chứng nhận đăng ký xe không do cơ quan có thẩm quyền cấp, không đúng số khung, số động cơ (số máy) hoặc bị tẩy xóa mà không chứng minh được nguồn gốc xuất xứ của phương tiện"
 }
 ```
 
@@ -149,10 +149,13 @@ hoặc:
 }
 ```
 
-**Quy tắc hiển thị:** không được viết "bị tịch thu xe" như hình phạt chắc chắn. Phải viết "có thể bị tịch thu nếu...". Các điều kiện này nằm trong `data/overrides/penalty-conditions.json` và được áp dụng tự động khi trích xuất.
+**Quy tắc hiển thị:** khi đủ `condition`, hiển thị "Bị tịch thu phương tiện nếu ..." vì luật quy định "thì bị tịch thu phương tiện", không phải hình phạt tùy nghi. Khi điều luật quy định tịch thu trực tiếp (không có điều kiện), hiển thị "Bị tịch thu phương tiện". Các điều kiện này nằm trong `data/overrides/penalty-conditions.json` và được áp dụng tự động khi trích xuất.
+
+Với `thu_hoi_dang_ky_xe`, trường `description` giữ nguyên đoạn sau "bị thu hồi" trong điều luật, để hiển thị đúng cả trường hợp thu hồi chứng nhận đăng ký xe và giấy chứng nhận/tem kiểm định.
 
 **Điều kiện bổ sung đã áp dụng (rá soát 10/11/2026):**
 
+- `13.10.b`, `14.5.b`, `32.18.b`: tịch thu phương tiện chỉ áp dụng khi không có chứng nhận đăng ký xe hoặc chứng nhận không do cơ quan có thẩm quyền cấp, không đúng số khung/số máy, bị tẩy xóa, mà không chứng minh được nguồn gốc.
 - `32.18.c` và `32.19.đ`: chỉ áp dụng khi phương tiện có thùng xe, khối lượng hàng hóa cho phép chuyên chở không đúng quy định hiện hành.
 - `32.18.đ`: tước quyền sử dụng phù hiệu chỉ áp dụng nếu xe có phù hiệu.
 - `32.19.e`: biện pháp khôi phục tình trạng ban đầu chỉ áp dụng nếu hành vi gây hư hại cầu, đường.

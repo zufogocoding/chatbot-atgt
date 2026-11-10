@@ -306,7 +306,7 @@
           }
         ]
       },
-      "notes": "Có thể bị tịch thu phương tiện nếu không chứng minh được nguồn gốc xuất xứ."
+      "notes": "Bị tịch thu phương tiện nếu không có chứng nhận đăng ký xe hoặc chứng nhận không do cơ quan có thẩm quyền cấp, không đúng số khung/số máy, bị tẩy xóa mà không chứng minh được nguồn gốc."
     },
     {
       "id": "khong-xi-nhan",
@@ -487,7 +487,7 @@
           }
         ]
       },
-      "notes": "Tái phạm có thể bị tịch thu phương tiện và tước giấy phép lái xe 22–24 tháng."
+      "notes": "Tái phạm bị tịch thu phương tiện và tước giấy phép lái xe 22–24 tháng."
     },
     {
       "id": "su-dung-dien-thoai",
@@ -939,7 +939,7 @@
           }
         ]
       },
-      "notes": "Ngoài phạt tiền, có thể bị tịch thu biển số và thiết bị thay đổi biển số."
+      "notes": "Ngoài phạt tiền, bị tịch thu biển số theo Điều 32 khoản 18 điểm a."
     },
     {
       "id": "xe-qua-nien-han-su-dung-chu-xe",

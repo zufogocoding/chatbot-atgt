@@ -61,9 +61,9 @@ def format_penalty(penalty: dict[str, Any]) -> str:
             penalty.get("min_months"), penalty.get("max_months")
         )
     elif kind == "tich_thu_phuong_tien":
-        text = "Tịch thu phương tiện"
+        text = "Bị tịch thu phương tiện"
         if condition_text:
-            return f"Có thể bị tịch thu phương tiện nếu {condition_text}"
+            return f"Bị tịch thu phương tiện nếu {condition_text}"
     elif kind == "tich_thu_thiet_bi":
         text = "Tịch thu thiết bị"
     elif kind == "tich_thu_bien_so":
@@ -82,6 +82,8 @@ def format_penalty(penalty: dict[str, Any]) -> str:
             return f"Thu hồi GPLX nếu {condition_text}"
     elif kind == "thu_hoi_dang_ky_xe":
         text = "Thu hồi chứng nhận đăng ký xe"
+        if penalty.get("description"):
+            text = f"Thu hồi {penalty['description']}"
     elif kind == "thu_hoi_ho_so":
         text = "Thu hồi hồ sơ/giấy tờ không hợp lệ"
         if penalty.get("description"):

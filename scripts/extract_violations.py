@@ -333,7 +333,10 @@ def parse_penalty(text: str) -> dict[str, Any] | None:
             "description": extract_description(text, "bị thu hồi "),
         }
     if "thu hồi chứng nhận đăng ký xe" in text:
-        return {"type": "thu_hoi_dang_ky_xe"}
+        return {
+            "type": "thu_hoi_dang_ky_xe",
+            "description": extract_description(text, "bị thu hồi "),
+        }
     return None
 
 
