@@ -250,6 +250,8 @@ python3 scripts/export_review.py --fine-only --out data/catalog/review/nguoi-ra-
 python3 scripts/export_review.py --fine-only --out data/catalog/review/nguoi-ra-soat-2.csv
 ```
 
+Repo có sẵn hai phiếu trống `nguoi-ra-soat-1.csv` và `nguoi-ra-soat-2.csv` cho 259 bản ghi có phạt tiền; hai người có thể mở trực tiếp và điền, hoặc tạo lại bằng lệnh trên.
+
 File CSV dùng UTF-8 (mở trực tiếp bằng Excel/LibreOffice):
 
 - Các cột đầu là dữ liệu catalog: `id`, `behavior_text`, `fine_min/max`, `legal_path`, `source_quote`...
