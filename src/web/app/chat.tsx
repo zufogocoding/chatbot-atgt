@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ArrowRight, ArrowUp, BookOpenCheck, CheckCircle2, ChevronDown, CircleAlert, FileText,
+  ArrowRight, ArrowUp, BookOpenCheck, ChevronDown, CircleAlert, FileText,
   Gavel, MessageSquareText, Plus, Scale, ShieldCheck,
 } from "lucide-react";
 import { type FormEvent, type KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -235,6 +235,11 @@ export default function Chat() {
           </div>
         </header>
 
+        <div className="ai-warning" role="note">
+          <CircleAlert size={16} aria-hidden="true" />
+          <span><strong>Cảnh báo:</strong> Thông tin do AI tạo ra chỉ mang tính tham khảo, không thay thế văn bản pháp luật hoặc tư vấn pháp lý.</span>
+        </div>
+
         <div className="chat-body">
           <div className="chat-scroll" ref={scrollArea}>
             {turns.length === 0 ? (
@@ -331,7 +336,6 @@ export default function Chat() {
                   </button>
                 </div>
               </form>
-              <p className="composer-note"><CheckCircle2 size={14} aria-hidden="true" /> Thông tin tham khảo, không thay thế tư vấn pháp lý.</p>
             </div>
           </div>
         </div>
