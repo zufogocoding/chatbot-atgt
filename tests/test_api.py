@@ -222,6 +222,35 @@ def test_common_vehicle_unspecified_questions_show_amounts():
     assert [option["record_id"] for option in seatbelt["options"]] == ["nd168-d6-k3-k"]
 
 
+def test_passenger_count_question_offers_both_bands():
+    reply = ask("Xe máy chở quá số người bị phạt bao nhiêu?")
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == "passenger_count"
+    assert {option["record_id"] for option in reply["options"]} == {
+        "nd168-d7-k2-g", "nd168-d7-k3-b",
+    }
+
+
+def test_owner_change_questions_answer_directly():
+    assert ask("Xe máy không sang tên bị phạt bao nhiêu?")["penalty"]["record_id"] == "nd168-d32-k3-a"
+    assert ask("Ô tô không sang tên bị phạt bao nhiêu?")["penalty"]["record_id"] == "nd168-d32-k7-h"
+    generic = ask("Không sang tên xe bị phạt bao nhiêu?")
+    assert generic["answer_type"] == "clarify"
+    assert generic["reason"] == "vehicle_type"
+    assert {option["record_id"] for option in generic["options"]} == {
+        "nd168-d32-k3-a", "nd168-d32-k7-h",
+    }
+
+
+def test_motorcycle_class_clarification_offers_engine_choices():
+    reply = ask("Xe gắn máy 50cc không có bằng lái")
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == "motorcycle_class"
+    assert {option["record_id"] for option in reply["options"]} == {
+        "nd168-d18-k5-a", "nd168-d18-k7-b",
+    }
+
+
 def test_passenger_is_a_separate_subject():
     passenger = ask("Người ngồi sau xe máy không đội mũ bảo hiểm")
     assert passenger["penalty"]["subject"] == "nguoi_duoc_cho"

@@ -122,8 +122,20 @@ CLARIFY_PATHS: dict[str, dict[Vehicle, tuple[tuple[str, str], ...]]] = {
     },
     "engine_size": {
         "xe_may": (
-            ("18.5.a", "Xe đến 125 cm³ (xe gắn máy, mô tô nhỏ)"),
-            ("18.7.b", "Mô tô trên 125 cm³"),
+            ("18.5.a", "Xe mô tô đến 125 cm³"),
+            ("18.7.b", "Xe mô tô trên 125 cm³"),
+        ),
+    },
+    "motorcycle_class": {
+        "xe_may": (
+            ("18.5.a", "Xe mô tô đến 125 cm³"),
+            ("18.7.b", "Xe mô tô trên 125 cm³"),
+        ),
+    },
+    "passenger_count": {
+        "xe_may": (
+            ("7.2.g", "Chở 2 người (trừ trường hợp được miễn)"),
+            ("7.3.b", "Chở từ 3 người trở lên"),
         ),
     },
     "road_type": {
@@ -550,8 +562,6 @@ def lookup_penalty(
             continue
         if alias_id == "vuot-den-do":
             return clarify(as_of, Clarification("conduct", "Bạn mô tả cụ thể đã đi qua đèn đỏ hay vi phạm tín hiệu khác?"))
-        if alias_id == "khong-sang-ten-chu-xe":
-            return clarify(as_of, Clarification("ownership", "Xe đã đổi chủ mà chưa làm thủ tục sang tên, hay bạn đang mượn xe?"))
         if len(matches) == 1 and not alias["requires_qualifier"]:
             record = get_record(con, matches[0]["record_id"])
             if record:

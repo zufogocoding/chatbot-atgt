@@ -137,10 +137,16 @@ def license_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificati
         return Clarification("license_status", "Bạn chưa được cấp bằng, hay có bằng nhưng không mang theo?")
     expired = includes(r"\b(?:het han|qua han)\b", text)
     if vehicle == "xe_may":
+        # 18.5.a chỉ áp dụng cho xe mô tô đến 125 cm³, không phải xe gắn máy
+        # (đến 50 cm³), nên phải hỏi lại thay vì gán bừa khung phạt.
         if "xe gan may" in text or any(
             decimal(value) <= (4 if unit == "kw" else 50) for value, unit in ENGINE.findall(surface)
         ):
-            return Clarification("motorcycle_class", "Xe được đăng ký là xe gắn máy hay xe mô tô?")
+            return Clarification(
+                "motorcycle_class",
+                "Xe bạn dùng là xe mô tô (trên 50 cm³) hay xe gắn máy (đến 50 cm³)? "
+                "Nếu là xe mô tô, chọn dung tích bên dưới.",
+            )
         tier = motorcycle_class(surface)
         if tier is None:
             return Clarification("engine_size", "Xe mô tô có dung tích bao nhiêu cm³, hoặc công suất bao nhiêu kW nếu chạy điện?")
@@ -279,6 +285,8 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
             text,
         ):
             return "12.5.a"
+        if includes(r"\bqua so nguoi\b|\bcho qua so nguoi\b", text):
+            return Clarification("passenger_count", "Xe chở 2 người hay từ 3 người trở lên?")
         if includes(r"\b(?:khong doi|khong cai|quen doi|quen cai|doi mu)\b.{0,30}\b(?:mu bao hiem|quai mu|quai)\b", text):
             passenger = includes(PASSENGER_CUE, text)
             driver_responsibility = includes(DRIVER_CUE, text)
