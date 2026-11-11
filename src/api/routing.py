@@ -351,6 +351,7 @@ HELMET = (
 
 def _part_violation_paths(surface: str, text: str, vehicle: Vehicle) -> list[str]:
     paths: list[str] = []
+    path = direct_path(surface, text, vehicle)
     if vehicle == "xe_may":
         total_three = includes(r"\btong (?:3|ba)\b", text)
         all_three = includes(r"\bca (?:3|ba) nguoi\b", text)
@@ -365,8 +366,10 @@ def _part_violation_paths(surface: str, text: str, vehicle: Vehicle) -> list[str
         elif helmet and not includes(PASSENGER_CUE, text) and not includes(DRIVER_CUE, text):
             # Trong câu nhiều hành vi, "không đội mũ" không nói rõ ai thì
             # mặc định là người lái; không tự quy kết thêm cho người được chở.
-            paths.append("7.2.h")
-    path = direct_path(surface, text, vehicle)
+            # Nếu direct_path đã xác định đây là câu hỏi về người được chở
+            # (7.2.i/12.5.b) thì giữ nguyên, không thêm mặc định người lái.
+            if not (isinstance(path, str) and path in {"7.2.i", "12.5.b"}):
+                paths.append("7.2.h")
     if isinstance(path, str) and path and path not in paths:
         paths.append(path)
     return paths

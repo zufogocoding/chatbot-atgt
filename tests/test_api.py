@@ -260,6 +260,17 @@ def test_passenger_is_a_separate_subject():
     assert driver["penalty"]["subject"] == "nguoi_dieu_khien"
 
 
+def test_passenger_helmet_question_about_driver_returns_one_violation():
+    reply = ask(
+        "Người lớn ngồi sau xe máy không cài quai mũ "
+        "thì người chở bị phạt mức nào?"
+    )
+    assert reply["answer_type"] == "penalty"
+    assert reply["penalty"]["record_id"] == "nd168-d7-k2-i"
+    assert reply["violations"] == []
+    assert "2 hành vi vi phạm độc lập" not in reply["answer"]
+
+
 @pytest.mark.parametrize(
     "question, record_id",
     [
