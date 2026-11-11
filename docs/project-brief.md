@@ -1,6 +1,6 @@
 # Chatbot tra cứu xử phạt vi phạm giao thông
 
-**Trạng thái:** Có catalog hợp nhất 276 bản ghi, corpus thủ tục, golden set 261 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
+**Trạng thái:** Có catalog hợp nhất 276 bản ghi, corpus thủ tục, golden set 265 câu và API FastAPI. Catalog đang ở trạng thái `draft`.
 
 **Cập nhật:** 10/11/2026
 
@@ -28,14 +28,15 @@ Xây chatbot tiếng Việt cho người dân tra cứu: **hành vi vi phạm �
 | Trong phạm vi | Ngoài phạm vi |
 |---|---|
 | Người dân tra cứu | Cán bộ/CSGT tra cứu nghiệp vụ |
-| Xe máy (mô tô, xe gắn máy) | Xe tải, xe khách, xe đạp, xe thô sơ, người đi bộ |
+| Xe máy (mô tô, xe gắn máy); ô tô trong đó có xe khách, xe tải, xe đầu kéo | Xe buýt, xe đạp, xe thô sơ, xe máy chuyên dùng, người đi bộ |
 | Mức phạt tiền | Tra phạt nguội theo biển số |
 | Hình phạt bổ sung: tước GPLX, tạm giữ phương tiện... | Tư vấn tranh tụng/luật sư |
 | Trừ điểm GPLX (12 điểm) | Tích hợp thanh toán/nộp phạt trực tuyến |
 | Căn cứ pháp lý: nghị định, điều/khoản/điểm | Đa ngôn ngữ (chỉ tiếng Việt) |
 | Thủ tục nộp phạt, khiếu nại | Dự đoán kết quả xử lý thực tế |
+| Hành vi chung của người lái/chủ xe ô tô (đèn đỏ, tốc độ, nồng độ cồn...) | Quy định riêng cho kinh doanh vận tải (Điều 20–24, cước phí, hợp đồng vận tải) |
 
-**Nguyên tắc phạm vi:** thà trả lời hẹp mà đúng, còn hơn mở rộng sang xe tải/xe khách khi chưa kiểm chứng dữ liệu.
+**Nguyên tắc phạm vi:** thà trả lời hẹp mà đúng, còn hơn mở rộng sang quy định mới khi chưa kiểm chứng dữ liệu. Xe khách, xe tải, xe đầu kéo được coi là ô tô cho các hành vi đã có trong catalog; các câu hỏi thuần về nghiệp vụ vận tải vẫn được từ chối.
 
 ## 4. Quyết định kiến trúc
 
@@ -135,7 +136,7 @@ Nguồn sự thật là các file JSONL/JSON trong `data/`; SQLite chỉ là b�
 | `data/overrides/penalty-conditions.json` | Điều kiện áp dụng cho hình phạt có điều kiện |
 | `data/build/catalog.db` | SQLite sinh tự động: violations, penalty_rules, alias_*, FTS5 |
 | `data/procedures/` | 23 đoạn thủ tục và danh mục nguồn |
-| `data/eval/golden.jsonl` | 261 câu có nhãn và căn cứ kỳ vọng |
+| `data/eval/golden.jsonl` | 265 câu có nhãn và căn cứ kỳ vọng |
 
 ### 6.2. Schema một bản ghi vi phạm
 
@@ -375,7 +376,7 @@ chatbot-atgt/
 - Build SQLite + FTS5 và CLI tra thử (`scripts/query_catalog.py`), có phân biệt chủ phương tiện/người điều khiển, mức phạt tổ chức, phạt theo người và nhiều mức trừ điểm GPLX.
 - Đối chiếu khung tiền, mức trần, loại xử phạt và căn cứ của 276 bản ghi bằng `scripts/audit_fines.py`. Kết quả chi tiết lưu trong `data/catalog/review/fine-audit-2026-11-11.csv`.
 - Xuất mẫu spot-check 30 bản ghi rủi ro cao (người được chở, sửa đổi 238/2026, phạt tổ chức, điều kiện trừ điểm, hình phạt bổ sung, khắc phục hậu quả) bằng `scripts/export_spotcheck.py`; phiếu mới nằm trong `data/catalog/review/spotcheck-2026-11-11.csv`. Đây là mẫu một người, không thay thế quy trình hai người.
-- Thu thập 23 đoạn thủ tục và chạy golden set 261 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
+- Thu thập 23 đoạn thủ tục và chạy golden set 265 câu. Cách chạy và số đo ở [`data/eval/README.md`](../data/eval/README.md).
 - Có `GET /health` và `POST /chat` cho hai nhánh mức phạt và thủ tục. Backend hiện dùng truy xuất SQLite/FTS5 và soạn câu trả lời từ bản ghi có nguồn.
 - API trả `penalty.source_quote` (đoạn luật áp dụng), `penalty.guidance` (hạn nộp, nơi nộp, thời hiệu khiếu nại kèm trích dẫn), `options` (phương án hỏi lại) và `related` (bản ghi tương ứng cho loại xe còn lại khi xác định duy nhất). Client có thể gửi `record_id` để tra thẳng phương án đã chọn.
 - Có giao diện Next.js tại `src/web`, hiển thị thẻ mức phạt, đoạn luật áp dụng, hướng dẫn nộp phạt/khiếu nại, đoạn thủ tục, nguồn, nút chọn phương án hỏi lại và nút so sánh loại xe còn lại.
@@ -384,5 +385,5 @@ chatbot-atgt/
 
 1. Hai người điền phiếu rà soát độc lập cho 264 bản ghi có phạt tiền, rồi chạy `scripts/merge_reviews.py --fine-only` để chuyển `verified` và lưu snapshot vào `data/catalog/verified/`. Script đã chặn thiếu bản ghi, trùng người, lệch số tiền/mức trần và thiếu kiểm tra khung tổ chức.
 2. Cân nhắc mở rộng sang Điều 17 và các điều vận tải 20–24; điểm b khoản 9a Điều 32 chỉ áp dụng từ 01/01/2028.
-3. Cải thiện baseline CLI: recall@5 hiện 91/187, trả lời được 42/187; API đã đạt 187/187 trên golden set. Mở rộng định tuyến cho cách nói tự nhiên và câu hỏi phức tạp.
+3. Cải thiện baseline CLI: recall@5 hiện 96/192, trả lời được 47/192; API đã đạt 192/192 trên golden set. Định tuyến đã coi xe khách/xe tải/xe đầu kéo như ô tô; tiếp tục mở rộng cho cách nói tự nhiên.
 4. Đánh giá chất lượng câu trả lời thủ tục có trích dẫn (không chỉ recall@5) và bổ sung corpus nếu thiếu.

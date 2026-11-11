@@ -1504,7 +1504,13 @@
         "xe ô tô đầu kéo không lắp thiết bị giám sát hành trình",
         "xe vận tải nội bộ không lắp thiết bị giám sát hành trình",
         "đầu kéo làm sai lệch dữ liệu giám sát hành trình",
-        "o to dau keo khong lap thiet bi giam sat hanh trinh"
+        "o to dau keo khong lap thiet bi giam sat hanh trinh",
+        "chủ xe đầu kéo không lắp thiết bị giám sát hành trình",
+        "xe đầu kéo không lắp thiết bị giám sát hành trình",
+        "đầu kéo không lắp thiết bị giám sát hành trình",
+        "chu xe dau keo khong lap thiet bi giam sat hanh trinh",
+        "xe dau keo khong lap thiet bi giam sat hanh trinh",
+        "dau keo khong lap thiet bi giam sat hanh trinh"
       ],
       "records": {
         "o_to": [

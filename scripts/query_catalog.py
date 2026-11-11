@@ -72,6 +72,9 @@ STOPWORDS = {
 
 CAR_RE = re.compile(r"\b(?:o to|oto|xe hoi|bon banh|4 banh)\b")
 BIKE_RE = re.compile(r"\b(?:xe may|xemay|mo to|xe gan may|hai banh|2 banh)\b")
+# Xe khách, xe tải, xe đầu kéo là ô tô: hành vi của người lái/chủ xe trong
+# catalog áp dụng như ô tô thông thường.
+COMMERCIAL_RE = re.compile(r"\b(?:xe|o to) (?:khach|tai|dau keo)\b|\bxe (?:o to )?dau keo\b")
 
 
 def open_db(path: Path) -> sqlite3.Connection:
@@ -83,7 +86,7 @@ def open_db(path: Path) -> sqlite3.Connection:
 
 
 def detect_vehicle(query_ascii: str) -> str | None:
-    car = bool(CAR_RE.search(query_ascii))
+    car = bool(CAR_RE.search(query_ascii)) or bool(COMMERCIAL_RE.search(query_ascii))
     bike = bool(BIKE_RE.search(query_ascii))
     if car and not bike:
         return "o_to"

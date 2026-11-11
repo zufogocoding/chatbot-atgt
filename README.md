@@ -75,7 +75,7 @@ Khi đặt `ATGT_QUESTION_LOG_PATH`, API ghi mỗi lượt chat có kết quả 
 | Alias tiếng dân | 56 nhóm, 363 cách nói (290 biến thể sau chuẩn hóa) |
 | Kiểm chứng | 276/276 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
-| Bộ đánh giá | 261 câu có nhãn kỳ vọng, có script chấm baseline |
+| Bộ đánh giá | 265 câu có nhãn kỳ vọng, có script chấm baseline |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
 Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe, khoản 5–6 (phạt trên mỗi người vượt quá, có trần) và các điểm 238/2026 thêm mới 9a.a/11.e/13.e. Chưa gồm: điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe, hiệu lực 01/01/2028), Điều 17 và các điều vận tải 20–24.

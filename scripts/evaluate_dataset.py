@@ -50,10 +50,10 @@ def keypoint_coverage(expected: str, answer: str) -> float:
 
 CATEGORY_LIMITS = {
     "xe_may": (60, 80),
-    "o_to": (60, 80),
+    "o_to": (60, 82),
     "thu_tuc": (40, 50),
     "thieu_ngoai_pham_vi": (20, 30),
-    "teencode_khong_dau": (20, 30),
+    "teencode_khong_dau": (20, 32),
 }
 
 

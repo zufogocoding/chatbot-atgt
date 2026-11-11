@@ -1,14 +1,14 @@
 # Golden set và baseline
 
-[golden.jsonl](golden.jsonl) chứa 261 câu hỏi biên soạn cho snapshot 09/11/2026. Các nhãn được lưu cố định để phát hiện thay đổi khi chạy lại, với khung tiền lấy từ kết quả đối chiếu theo điều, khoản, điểm.
+[golden.jsonl](golden.jsonl) chứa 265 câu hỏi biên soạn cho snapshot 09/11/2026. Các nhãn được lưu cố định để phát hiện thay đổi khi chạy lại, với khung tiền lấy từ kết quả đối chiếu theo điều, khoản, điểm.
 
 | Nhóm | Số câu |
 |---|---:|
 | Tra mức phạt xe máy | 79 |
-| Tra mức phạt ô tô | 80 |
+| Tra mức phạt ô tô | 82 |
 | Thủ tục nộp phạt và khiếu nại | 46 |
-| Thiếu thông tin và ngoài phạm vi | 28 |
-| Không dấu và teencode | 28 |
+| Thiếu thông tin và ngoài phạm vi | 27 |
+| Không dấu và teencode | 31 |
 
 - `expected_answer_type` nhận `penalty`, `procedure`, `clarify` hoặc `refuse`.
 - Ca mức phạt có `expected_violation_id`, `expected_legal_basis`, `expected_fine` và đối tượng áp dụng khung tiền. Cảnh cáo có cặp 0/0. Bản ghi chỉ có hình thức xử phạt khác có cặp null/null.
@@ -26,16 +26,16 @@ python3 scripts/evaluate_dataset.py
 python3 scripts/evaluate_dataset.py --failures
 ```
 
-## Kết quả baseline ngày 10/11/2026
+## Kết quả baseline ngày 11/11/2026
 
 | Chỉ số | Kết quả |
 |---|---:|
-| Tra mức phạt, tìm đúng bản ghi trong 5 ứng viên đầu | 91/187 |
-| Tra mức phạt, trả đúng bản ghi | 42/187 |
-| Tra mức phạt, đúng cả min/max | 42/187 |
-| Tra mức phạt, đúng căn cứ | 42/187 |
-| Hỏi lại khi thiếu thông tin | 18/18 |
-| Từ chối ngoài phạm vi hoặc thiếu nguồn | 0/10 |
+| Tra mức phạt, tìm đúng bản ghi trong 5 ứng viên đầu | 96/192 |
+| Tra mức phạt, trả đúng bản ghi | 47/192 |
+| Tra mức phạt, đúng cả min/max | 47/192 |
+| Tra mức phạt, đúng căn cứ | 47/192 |
+| Hỏi lại khi thiếu thông tin | 19/19 |
+| Từ chối ngoài phạm vi hoặc thiếu nguồn | 0/8 |
 | Thủ tục, tìm đúng đoạn trong 5 kết quả BM25 đầu | 46/46 |
 | Thủ tục, số liệu trong key point xuất hiện trong câu trả lời | 46/46 |
 | Thủ tục, độ phủ từ khóa trung bình | 87,4% |
@@ -56,16 +56,18 @@ Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, 
 
 | Chỉ số qua HTTP cục bộ | Kết quả |
 |---|---:|
-| Đúng bản ghi, khung tiền, mức trần và căn cứ mức phạt | 187/187 |
+| Đúng bản ghi, khung tiền, mức trần và căn cứ mức phạt | 192/192 |
 | Đúng đoạn và căn cứ thủ tục | 46/46 |
 | Thủ tục, số liệu trong key point xuất hiện trong câu trả lời | 46/46 |
 | Thủ tục, độ phủ từ khóa trung bình | 87,4% |
 | Thủ tục, ca dưới 60% từ khóa | 0/46 |
 | Thủ tục, trích dẫn hợp lệ | 46/46 |
-| Hỏi lại đúng loại phản hồi | 18/18 |
-| Từ chối đúng loại phản hồi | 10/10 |
+| Hỏi lại đúng loại phản hồi | 19/19 |
+| Từ chối đúng loại phản hồi | 8/8 |
 | Câu trả lời thiếu nguồn | 0 |
-| Độ trễ HTTP p95 trong lần chạy kiểm thử | 1,8 ms |
+| Độ trễ HTTP p95 trong lần chạy kiểm thử | 2,0 ms |
+
+Định tuyến mới coi xe khách, xe tải, xe đầu kéo như ô tô cho các hành vi có trong catalog: hai ca trước đây nhãn `refuse` ("Xe tải vượt đèn đỏ", "Xe khách 45 chỗ vượt đèn đỏ") được đổi thành Điều 6 khoản 9 điểm b, cùng bốn ca mới cho xe khách/xe tải/đầu kéo và một ca hỏi lại chọn khung chủ xe chở quá số người. Xe buýt, xe máy chuyên dùng vẫn ngoài phạm vi.
 
 Ba câu về dùng tay cầm điện thoại khi lái ô tô được sửa nhãn thành Điều 6 khoản 5 điểm h theo catalog và Công báo. Bảy ca bổ sung phủ Điều 12 (người được chở), cách nói số lượng hành khách và trường hợp thiếu loại đường khi hỏi ngược chiều. Mười một ca tiếp theo phủ nhóm thiết bị/điều kiện xe: kính chắn gió, đèn lắp thêm, lốp, phanh, còi, giảm thanh, logo cơ quan và đèn sau.
 

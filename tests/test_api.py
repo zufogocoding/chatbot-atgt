@@ -277,8 +277,8 @@ def test_payment_where_and_deadline():
         ("Ô tô có nồng độ cồn 0,3 thì phạt bao nhiêu?", "clarify", "alcohol_unit"),
         ("Xe gắn máy 50cc không có bằng lái", "clarify", "motorcycle_class"),
         ("Xe máy vượt đèn đỏ và đi ngược chiều trên đường một chiều", "clarify", "multiple_violations"),
-        ("Xe tải vượt đèn đỏ", "refuse", "vehicle_out_of_scope"),
-        ("Tôi lái ô tô tải vượt đèn đỏ", "refuse", "vehicle_out_of_scope"),
+        ("Xe buýt vượt đèn đỏ", "refuse", "vehicle_out_of_scope"),
+        ("Xe máy chuyên dùng đi trên đường", "refuse", "vehicle_out_of_scope"),
         ("Ô tô đang đỗ mà cầm điện thoại có bị phạt không?", "refuse", "insufficient_source"),
         ("Tôi chạy xe máy không vượt đèn đỏ thì phạt bao nhiêu?", "refuse", "insufficient_source"),
         ("Tháng 6 năm 2024 xe máy vượt đèn đỏ phạt bao nhiêu?", "refuse", "historical_lookup_unsupported"),
@@ -290,6 +290,33 @@ def test_guardrails_do_not_return_amount(question, answer_type, reason):
     assert reply["reason"] == reason
     assert reply["penalty"] is None
     assert reply["sources"] == []
+
+
+@pytest.mark.parametrize(
+    "question, record_id",
+    [
+        ("Xe khách vượt đèn đỏ bị phạt bao nhiêu?", "nd168-d6-k9-b"),
+        ("Xe tải vượt đèn đỏ", "nd168-d6-k9-b"),
+        ("Tôi lái ô tô tải vượt đèn đỏ", "nd168-d6-k9-b"),
+        ("Lái xe tải vượt đèn đỏ bị phạt bao nhiêu?", "nd168-d6-k9-b"),
+        ("xe khach vuot den do bi phat bn?", "nd168-d6-k9-b"),
+        ("Chủ xe đầu kéo không lắp thiết bị giám sát hành trình bị phạt bao nhiêu?", "nd168-d32-k9a-a"),
+        ("Xe đầu kéo làm sai lệch dữ liệu giám sát hành trình bị phạt thế nào?", "nd168-d32-k9a-a"),
+    ],
+)
+def test_commercial_vehicle_questions_route_like_cars(question, record_id):
+    reply = ask(question)
+    assert reply["answer_type"] == "penalty"
+    assert reply["penalty"]["record_id"] == record_id
+
+
+def test_owner_overload_question_offers_both_owner_frameworks():
+    reply = ask("Xe khách chở quá số người quy định bị phạt bao nhiêu?")
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == "conduct"
+    assert {option["record_id"] for option in reply["options"]} == {
+        "nd168-d32-k5", "nd168-d32-k6",
+    }
 
 
 def test_followup_vehicle_and_validation():

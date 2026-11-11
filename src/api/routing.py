@@ -6,7 +6,7 @@ from decimal import Decimal
 import re
 
 from scripts.catalog_common import normalize_text, strip_accents
-from scripts.query_catalog import BIKE_RE, CAR_RE
+from scripts.query_catalog import BIKE_RE, CAR_RE, COMMERCIAL_RE
 
 from .schemas import Vehicle
 
@@ -16,8 +16,7 @@ SHORT_FORMS = {
 }
 SHORT_FORM_RE = re.compile(r"\b(" + "|".join(SHORT_FORMS) + r")\b")
 OUTSIDE_VEHICLE = (
-    r"\b(?:xe tai|o to tai|xe khach|o to khach|xe buyt|xe dap(?: may)?"
-    r"|xe tho so|xe dau keo|xe may chuyen dung|nguoi di bo)\b"
+    r"\b(?:xe buyt|xe dap(?: may)?|xe tho so|xe may chuyen dung|nguoi di bo)\b"
 )
 OUTSIDE_REQUEST = (
     r"\b(?:tra (?:cuu )?phat nguoi|tra cuu theo bien so|(?:thanh toan|nop phat).{0,35}(?:ho toi|giup toi luon)"
@@ -75,7 +74,7 @@ def mentioned_vehicles(text: str) -> set[Vehicle]:
     vehicles: set[Vehicle] = set()
     if BIKE_RE.search(text):
         vehicles.add("xe_may")
-    if CAR_RE.search(text) or includes(r"\bxe con\b", text):
+    if CAR_RE.search(text) or includes(r"\bxe con\b", text) or COMMERCIAL_RE.search(text):
         vehicles.add("o_to")
     return vehicles
 

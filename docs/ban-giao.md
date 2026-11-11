@@ -12,7 +12,7 @@ Tài liệu này dành cho người nhận bàn giao: hai người rà soát đ�
 | Trạng thái | `draft` — chưa có snapshot `verified` |
 | Validation | 0 lỗi; audit 276/276 khớp |
 | Test | 94/94 pass |
-| Golden set | 261 câu; API đạt 187/187 ca mức phạt, 46/46 ca thủ tục |
+| Golden set | 265 câu; API đạt 192/192 ca mức phạt, 46/46 ca thủ tục |
 | Phạm vi | Điều 6, 7, 12, 13, 14, 18, 32 |
 
 Điểm b khoản 9a Điều 32 (thiết bị ghi nhận hình ảnh người lái xe) hoãn đến 01/01/2028, không nằm trong phạm vi rà soát.
@@ -132,7 +132,7 @@ Chỉ coi là bàn giao xong khi:
 ## 7. Giới hạn đã biết
 
 - Runtime hiện chạy deterministic; chưa cấu hình API key cho LLM.
-- Baseline CLI còn thấp so với API (recall@5 91/187, trả lời đúng 42/187); đây là baseline của CLI, không phải kết quả API.
-- Câu hỏi chỉ dùng từ “xe khách”, “xe tải”, “xe đầu kéo” có thể bị từ chối là ngoài phạm vi; thêm “ô tô” sẽ định tuyến đúng. Đây là việc cải thiện định tuyến sau, không chặn bàn giao.
+- Baseline CLI còn thấp so với API (recall@5 96/192, trả lời đúng 47/192); đây là baseline của CLI, không phải kết quả API.
+- Định tuyến đã coi xe khách, xe tải, xe đầu kéo như ô tô cho các hành vi có trong catalog; câu thuần vận tải kinh doanh vẫn bị từ chối. Xe buýt, xe máy chuyên dùng vẫn ngoài phạm vi.
 - 12 bản ghi cảnh cáo/tịch thu không có mức tiền vẫn `draft` sau khi gộp `--fine-only`.
 - Điểm b khoản 9a Điều 32 chưa có trong catalog đến 01/01/2028.
