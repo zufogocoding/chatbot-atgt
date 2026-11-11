@@ -22,6 +22,7 @@ export type Penalty = {
   record_kind: "fine" | "warning" | "additional_only";
   behavior: string;
   legal_path: string;
+  legal_basis: string | null;
   fine: Fine;
   organization_fine: Fine | null;
   license_points: number;
@@ -48,6 +49,7 @@ export type ChatReply = {
   disclaimer: string;
   reason: string | null;
   penalty: Penalty | null;
+  violations: Penalty[];
   options: { record_id: string; label: string }[];
   related: { record_id: string; label: string }[];
   sources: Source[];

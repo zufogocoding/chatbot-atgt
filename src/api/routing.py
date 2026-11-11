@@ -40,7 +40,8 @@ EXCESS_SPEED = re.compile(
     r"|vuot (?:toc do(?: cho phep)?|gioi han(?: toc do)?))"
     r"\s+(?:dung\s+)?(\d+(?:[,.]\d+)?)\s*(?:km\s*/\s*h|kmh)\b"
 )
-ALCOHOL = r"\b(?:nong do con|do con|co con|thoi (?:nong do )?con|kiem tra con|say xin|uong ruou bia)\b"
+# "dong thoi con ..." (đồng thời còn ...) must not be read as "thổi cồn".
+ALCOHOL = r"\b(?:(?<!dong )thoi (?:nong do )?con|nong do con|do con|co con|kiem tra con|say xin|uong ruou bia)\b"
 ALCOHOL_MEASUREMENT = re.compile(
     r"\b(\d+(?:[,.]\d+)?)\s*mg(?:\s+con)?\s*(?:/|tren)\s*"
     r"(?:(?:1\s*)?(l(?:it)?)(?![a-z])|100\s*(ml)(?![a-z]))"
@@ -338,3 +339,50 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
         if includes(r"\b(?:ban dem|sang|toi|suong mu|mua|(?:1[89]|2[0-3]|0?[0-5]) gio)\b", text):
             return vehicle_path(vehicle, "7.1.g", "6.3.g")
     return None
+
+
+# Do not split decimals ("20,5 km/h") or the collision words "va chạm"/"va quẹt".
+MULTI_SPLIT = re.compile(r"\bdong thoi\b|\bva\b(?!\s+(?:cham|quet)\b)|[,;](?!\d)")
+HELMET = (
+    r"\b(?:khong doi|khong cai|quen doi|quen cai|doi mu)\b.{0,30}"
+    r"\b(?:mu bao hiem|quai mu|quai)\b"
+)
+
+
+def _part_violation_paths(surface: str, text: str, vehicle: Vehicle) -> list[str]:
+    paths: list[str] = []
+    if vehicle == "xe_may":
+        total_three = includes(r"\btong (?:3|ba)\b", text)
+        all_three = includes(r"\bca (?:3|ba) nguoi\b", text)
+        helmet = includes(HELMET, text)
+        if total_three:
+            # "Tống 3" thường được hiểu là tổng cộng 3 người trên xe
+            # (tài xế + 2 người), tức khung chở 02 người.
+            paths.append("7.2.g")
+        if helmet and all_three:
+            # Cả 3 người không đội mũ: tài xế (7.2.h) và người được chở (7.2.i).
+            paths.extend(["7.2.h", "7.2.i"])
+    path = direct_path(surface, text, vehicle)
+    if isinstance(path, str) and path and path not in paths:
+        paths.append(path)
+    return paths
+
+
+def violation_paths(surface: str, text: str, vehicle: Vehicle) -> list[str]:
+    """Return every distinct catalog path mentioned in a compound question.
+
+    The detector is deliberately conservative: accident questions stay with
+    ``accident_path`` as one aggravated violation, because splitting them would
+    count the base behaviour and the accident separately.
+    """
+    if includes(r"\btai nan\b", text):
+        return []
+    paths: list[str] = []
+    for part in MULTI_SPLIT.split(surface):
+        part = part.strip()
+        if not part:
+            continue
+        for path in _part_violation_paths(part, normalize_text(part), vehicle):
+            if path not in paths:
+                paths.append(path)
+    return paths

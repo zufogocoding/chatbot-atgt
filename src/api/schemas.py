@@ -49,6 +49,7 @@ class Penalty(BaseModel):
     record_kind: str
     behavior: str
     legal_path: str
+    legal_basis: str | None = None
     fine: Fine
     organization_fine: Fine | None = None
     license_points: int
@@ -74,6 +75,9 @@ class ChatResponse(BaseModel):
     disclaimer: str = "Thông tin tham khảo, không thay thế tư vấn pháp lý."
     reason: str | None = None
     penalty: Penalty | None = None
+    # Multiple independent violations found in one question. ``penalty`` stays
+    # as the first item for clients that only read the single-penalty field.
+    violations: list[Penalty] = Field(default_factory=list)
     options: list[Choice] = Field(default_factory=list)
     related: list[Choice] = Field(default_factory=list)
     sources: list[Source] = Field(default_factory=list)

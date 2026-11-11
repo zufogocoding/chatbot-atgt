@@ -13,6 +13,7 @@ from scripts.query_catalog import alias_record_ids, find_aliases, fts_search, ge
 from .routing import (
     HISTORICAL, LICENSE, OUTSIDE_REQUEST, OUTSIDE_VEHICLE, PROCEDURE,
     Clarification, direct_path, includes, mentioned_vehicles, normalize_question,
+    violation_paths,
 )
 from .schemas import (
     ChatRequest, ChatResponse, Choice, Fine, Guidance, HealthResponse, Intent,
@@ -330,6 +331,46 @@ def penalty_guidance(
     return items
 
 
+def fine_with_unit(value: Fine) -> str:
+    text = format_range(value.min, value.max)
+    if value.unit == "per_person":
+        text += " cho mỗi người vượt quá quy định"
+    if value.cap is not None:
+        text += f", tổng mức phạt tối đa {format_money(value.cap)}"
+    return text
+
+
+def make_penalty(record: dict, guidance: list[Guidance] | None = None) -> Penalty:
+    """Build the API penalty object from one catalog record."""
+    organization_fine = (
+        Fine(
+            min=record["fine_org_min"], max=record["fine_org_max"],
+            unit=record.get("fine_unit"), cap=record.get("fine_org_cap"),
+        )
+        if record["fine_org_min"] is not None else None
+    )
+    return Penalty(
+        record_id=record["id"], vehicle_type=record["vehicle_type"], subject=record["subject"],
+        record_kind=record["record_kind"], behavior=record["behavior_text"], legal_path=record["legal_path"],
+        legal_basis=f"{legal_path(record)} Nghị định {record['document']}",
+        fine=Fine(
+            min=record["fine_min"], max=record["fine_max"],
+            unit=record.get("fine_unit"), cap=record.get("fine_cap"),
+        ),
+        organization_fine=organization_fine, license_points=record["license_points"],
+        license_points_condition=record["license_points_condition"],
+        license_point_tiers=[
+            LicensePointTier(points=value["points"], condition=value["condition"])
+            for value in (record.get("license_point_tiers") or [])
+        ],
+        additional_penalties=[format_penalty(value) for value in record["additional_penalties"]],
+        remedial_measures=[format_penalty(value) for value in record["remedial_measures"]],
+        guidance=guidance or [],
+        verification_status=record["verification_status"],
+        source_quote=record["source_quote"],
+    )
+
+
 def penalty_response(
     con: sqlite3.Connection, record: dict, as_of: str, text: str,
     related: list[Choice] | None = None,
@@ -341,51 +382,18 @@ def penalty_response(
     guidance = penalty_guidance(
         con, as_of, sources, include_payment=record["record_kind"] == "fine",
     )
-    fine = Fine(
-        min=record["fine_min"], max=record["fine_max"],
-        unit=record.get("fine_unit"), cap=record.get("fine_cap"),
-    )
-    organization_fine = (
-        Fine(
-            min=record["fine_org_min"], max=record["fine_org_max"],
-            unit=record.get("fine_unit"), cap=record.get("fine_org_cap"),
-        )
-        if record["fine_org_min"] is not None else None
-    )
-    penalty = Penalty(
-        record_id=record["id"], vehicle_type=record["vehicle_type"], subject=record["subject"],
-        record_kind=record["record_kind"], behavior=record["behavior_text"], legal_path=record["legal_path"],
-        fine=fine, organization_fine=organization_fine, license_points=record["license_points"],
-        license_points_condition=record["license_points_condition"],
-        license_point_tiers=[
-            LicensePointTier(points=value["points"], condition=value["condition"])
-            for value in (record.get("license_point_tiers") or [])
-        ],
-        additional_penalties=[format_penalty(value) for value in record["additional_penalties"]],
-        remedial_measures=[format_penalty(value) for value in record["remedial_measures"]],
-        guidance=guidance,
-        verification_status=record["verification_status"],
-        source_quote=record["source_quote"],
-    )
-
-    def fine_with_unit(value: Fine) -> str:
-        text = format_range(value.min, value.max)
-        if value.unit == "per_person":
-            text += " cho mỗi người vượt quá quy định"
-        if value.cap is not None:
-            text += f", tổng mức phạt tối đa {format_money(value.cap)}"
-        return text
+    penalty = make_penalty(record, guidance)
 
     if penalty.record_kind == "warning":
         lines = ["Hình thức xử phạt: cảnh cáo."]
     elif penalty.record_kind == "additional_only":
         lines = ["Mức phạt tiền: không áp dụng cho bản ghi này."]
-    elif organization_fine is not None:
-        individual = f"Mức phạt cá nhân: {fine_with_unit(fine)}."
-        organization = f"Mức phạt tổ chức: {fine_with_unit(organization_fine)}."
+    elif penalty.organization_fine is not None:
+        individual = f"Mức phạt cá nhân: {fine_with_unit(penalty.fine)}."
+        organization = f"Mức phạt tổ chức: {fine_with_unit(penalty.organization_fine)}."
         lines = [organization, individual] if includes(r"\b(?:cong ty|to chuc|doanh nghiep)\b", text) else [individual, organization]
     else:
-        lines = [f"Mức phạt tiền: {fine_with_unit(fine)}."]
+        lines = [f"Mức phạt tiền: {fine_with_unit(penalty.fine)}."]
     if penalty.license_point_tiers:
         tiers = "; ".join(
             f"trừ {tier.points} điểm nếu {tier.condition}"
@@ -409,6 +417,109 @@ def penalty_response(
     return ChatResponse(
         intent="penalty_lookup", answer_type="penalty", answer="\n".join(lines),
         as_of=as_of, penalty=penalty, related=related or [], sources=sources,
+    )
+
+
+def _source_key(source: Source) -> tuple[str, str, str, tuple[int, ...]]:
+    return (source.document, source.locator, source.url, tuple(source.pages))
+
+
+def multi_penalty_response(
+    con: sqlite3.Connection, records: list[dict], as_of: str,
+) -> ChatResponse | None:
+    """Answer a compound question with one penalty per independent violation.
+
+    Fine amounts, points and citations still come only from catalog records.
+    The total is a plain sum of the individual ranges, so it is shown only when
+    every fine is a fixed range without a per-person unit or a cap.
+    """
+    sources: list[Source] = []
+    source_indices: dict[tuple, int] = {}
+    resolved: list[tuple[dict, list[int]]] = []
+    for record in records:
+        record_sources = penalty_sources(record)
+        if not record_sources:
+            continue
+        marks: list[int] = []
+        for source in record_sources:
+            key = _source_key(source)
+            if key not in source_indices:
+                sources.append(source)
+                source_indices[key] = len(sources)
+            marks.append(source_indices[key])
+        resolved.append((record, marks))
+    if len(resolved) < 2:
+        return None
+
+    guidance = penalty_guidance(
+        con, as_of, sources,
+        include_payment=any(record["record_kind"] == "fine" for record, _ in resolved),
+    )
+    penalties = [make_penalty(record, guidance) for record, _ in resolved]
+    lines = [
+        f"Câu hỏi có {len(penalties)} hành vi vi phạm độc lập. "
+        "Mỗi hành vi được xử phạt riêng theo các mức dưới đây:"
+    ]
+    for order, ((record, marks), penalty) in enumerate(zip(resolved, penalties), 1):
+        if penalty.record_kind == "warning":
+            amount = "cảnh cáo"
+        elif penalty.record_kind == "additional_only":
+            amount = "không áp dụng mức phạt tiền"
+        elif penalty.organization_fine is not None:
+            amount = (
+                f"cá nhân {fine_with_unit(penalty.fine)}, "
+                f"tổ chức {fine_with_unit(penalty.organization_fine)}"
+            )
+        else:
+            amount = fine_with_unit(penalty.fine)
+        if penalty.license_point_tiers:
+            points = "trừ điểm GPLX theo mức tương ứng"
+        else:
+            points = f"trừ {penalty.license_points} điểm GPLX"
+        detail = f"{order}. {penalty.behavior.rstrip('; ')} — {amount}; {points}."
+        if penalty.additional_penalties:
+            detail += " Hình phạt bổ sung: " + "; ".join(penalty.additional_penalties) + "."
+        if penalty.remedial_measures:
+            detail += " Biện pháp khắc phục: " + "; ".join(penalty.remedial_measures) + "."
+        detail += f" Căn cứ: {penalty.legal_basis} " + " ".join(f"[{mark}]" for mark in marks) + "."
+        lines.append(detail)
+
+    fine_penalties = [penalty for penalty in penalties if penalty.record_kind == "fine"]
+    if fine_penalties:
+        if all(penalty.fine.unit is None and penalty.fine.cap is None for penalty in fine_penalties):
+            total_min = sum(penalty.fine.min or 0 for penalty in fine_penalties)
+            total_max = sum(penalty.fine.max or 0 for penalty in fine_penalties)
+            lines.append(
+                "Tổng mức phạt tiền nếu cộng các khung: "
+                f"{format_range(total_min, total_max)}."
+            )
+        else:
+            lines.append("Tổng tiền không cộng gộp vì có khung tính theo người hoặc có mức trần.")
+    if all(not penalty.license_point_tiers for penalty in penalties):
+        lines.append(f"Tổng trừ điểm GPLX: {sum(penalty.license_points for penalty in penalties)} điểm.")
+    else:
+        lines.append("Trừ điểm GPLX: áp dụng theo từng hành vi nêu trên.")
+    extras: list[str] = []
+    for penalty in penalties:
+        for value in penalty.additional_penalties:
+            entry = f"{value} ({penalty.legal_basis})"
+            if entry not in extras:
+                extras.append(entry)
+    if extras:
+        lines.append("Hình phạt bổ sung: " + "; ".join(extras) + ".")
+    remedies: list[str] = []
+    for penalty in penalties:
+        for value in penalty.remedial_measures:
+            if value not in remedies:
+                remedies.append(value)
+    if remedies:
+        lines.append("Biện pháp khắc phục: " + "; ".join(remedies) + ".")
+    if guidance:
+        lines.append("Nộp phạt và khiếu nại:")
+        lines.extend(f"{item.title}: {item.text}" for item in guidance)
+    return ChatResponse(
+        intent="penalty_lookup", answer_type="penalty", answer="\n".join(lines),
+        as_of=as_of, penalty=penalties[0], violations=penalties, sources=sources,
     )
 
 
@@ -523,6 +634,25 @@ def procedure_response(con: sqlite3.Connection, surface: str, text: str, as_of: 
 def lookup_penalty(
     con: sqlite3.Connection, surface: str, text: str, vehicle: Vehicle, as_of: str,
 ) -> ChatResponse:
+    paths = violation_paths(surface, text, vehicle)
+    if len(paths) > 1:
+        records: list[dict] = []
+        seen: set[str] = set()
+        for path in paths:
+            row = con.execute(
+                "SELECT id FROM violations WHERE legal_path = ? AND vehicle_type IN (?, 'both')",
+                (path, vehicle),
+            ).fetchone()
+            if row is None or row["id"] in seen:
+                continue
+            record = get_record(con, row["id"])
+            if record:
+                seen.add(record["id"])
+                records.append(record)
+        if len(records) > 1:
+            response = multi_penalty_response(con, records, as_of)
+            if response is not None:
+                return response
     parts = re.split(r"\b(?:va|dong thoi)\b", surface)
     if len(parts) > 1:
         part_paths = [direct_path(part, normalize_text(part), vehicle) for part in parts]

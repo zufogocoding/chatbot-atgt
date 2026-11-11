@@ -334,7 +334,6 @@ def test_payment_where_and_deadline():
         ("Ô tô chạy quá tốc độ thì phạt bao nhiêu?", "clarify", "speed_excess"),
         ("Ô tô có nồng độ cồn 0,3 thì phạt bao nhiêu?", "clarify", "alcohol_unit"),
         ("Xe gắn máy 50cc không có bằng lái", "clarify", "motorcycle_class"),
-        ("Xe máy vượt đèn đỏ và đi ngược chiều trên đường một chiều", "clarify", "multiple_violations"),
         ("Xe buýt vượt đèn đỏ", "refuse", "vehicle_out_of_scope"),
         ("Xe máy chuyên dùng đi trên đường", "refuse", "vehicle_out_of_scope"),
         ("Ô tô đang đỗ mà cầm điện thoại có bị phạt không?", "refuse", "insufficient_source"),
@@ -348,6 +347,60 @@ def test_guardrails_do_not_return_amount(question, answer_type, reason):
     assert reply["reason"] == reason
     assert reply["penalty"] is None
     assert reply["sources"] == []
+
+
+def test_two_independent_violations_return_both_penalties():
+    reply = ask("Xe máy vượt đèn đỏ và đi ngược chiều trên đường một chiều")
+    assert reply["answer_type"] == "penalty"
+    assert reply["reason"] is None
+    assert [item["record_id"] for item in reply["violations"]] == [
+        "nd168-d7-k7-c", "nd168-d7-k7-a",
+    ]
+    assert reply["penalty"]["record_id"] == "nd168-d7-k7-c"
+    assert "Tổng mức phạt tiền nếu cộng các khung: 8.000.000 đồng – 12.000.000 đồng." in reply["answer"]
+    assert "Tổng trừ điểm GPLX: 6 điểm." in reply["answer"]
+    assert len(reply["sources"]) >= 2
+
+
+def test_decimal_speed_in_compound_question_is_not_split_at_comma():
+    reply = ask("Xe máy vượt đèn đỏ và chạy quá tốc độ 20,5 km/h")
+    assert reply["answer_type"] == "penalty"
+    assert [item["record_id"] for item in reply["violations"]] == [
+        "nd168-d7-k7-c", "nd168-d7-k8-a",
+    ]
+    assert "Tổng mức phạt tiền nếu cộng các khung: 10.000.000 đồng – 14.000.000 đồng." in reply["answer"]
+
+
+def test_compound_passenger_helmet_and_weaving_question():
+    reply = ask(
+        "Nếu xe gắn máy tống 3 và không đội mũ bảo hiểm cả 3 người, "
+        "đồng thời còn lạng lách đánh võng thì phải làm như thế nào?"
+    )
+    assert reply["answer_type"] == "penalty"
+    assert reply["reason"] is None
+    assert [item["record_id"] for item in reply["violations"]] == [
+        "nd168-d7-k2-g", "nd168-d7-k2-h", "nd168-d7-k2-i", "nd168-d7-k9-a",
+    ]
+    assert "Tổng mức phạt tiền nếu cộng các khung: 9.200.000 đồng – 11.800.000 đồng." in reply["answer"]
+    assert "Tổng trừ điểm GPLX: 0 điểm." in reply["answer"]
+    assert "Tước quyền sử dụng GPLX 10–12 tháng" in reply["answer"]
+    assert all(item["legal_basis"].startswith("Điều ") for item in reply["violations"])
+
+
+def test_multi_violation_does_not_mistake_dong_thoi_con_for_alcohol():
+    reply = ask("Xe máy vượt đèn đỏ, đồng thời còn đi ngược chiều")
+    assert reply["answer_type"] == "penalty"
+    assert reply["reason"] is None
+    assert [item["record_id"] for item in reply["violations"]] == [
+        "nd168-d7-k7-c", "nd168-d7-k7-a",
+    ]
+
+
+def test_accident_question_remains_one_aggravated_violation():
+    reply = ask("Xe máy vượt đèn đỏ gây tai nạn")
+    assert reply["answer_type"] == "penalty"
+    assert reply["violations"] == []
+    assert reply["penalty"]["record_id"] == "nd168-d7-k10-b"
 
 
 @pytest.mark.parametrize(

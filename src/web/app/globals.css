@@ -342,6 +342,18 @@ svg { flex: none; }
 .answer-tags span { padding: 4px 8px; color: #3f537a; background: #eef3fb; border-radius: 6px; font-size: 10px; font-weight: 600; }
 .answer-tags .draft-tag { color: #78460f; background: #fff0d9; }
 .behavior { color: #4a5973; font-size: 12px; line-height: 1.7; }
+.multi-summary { color: #4a5973; font-size: 12px; line-height: 1.7; }
+.multi-list { display: grid; gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.multi-item { padding: 13px; background: #fbfcff; border: 1px solid #e7edf7; border-radius: 10px; }
+.multi-item-head { display: flex; align-items: flex-start; gap: 10px; }
+.multi-index { display: grid; width: 22px; height: 22px; flex: none; place-items: center; color: white; background: #3762dd; border-radius: 50%; font-size: 11px; font-weight: 700; }
+.multi-item .behavior { margin: 0; }
+.legal-basis { display: inline-block; margin-top: 5px; color: #62718a; font-size: 10px; font-weight: 600; line-height: 1.5; }
+.multi-item .penalty-facts { margin-top: 10px; }
+.multi-total { margin-top: 15px; padding: 13px; background: #f2f6ff; border: 1px solid #dce7ff; border-radius: 10px; }
+.multi-total h3 { margin-bottom: 8px; font-size: 12px; }
+.multi-total p { margin-top: 7px; color: #41516a; font-size: 12px; line-height: 1.7; }
+.multi-total .fact { margin-bottom: 8px; background: white; }
 .penalty-facts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 13px; }
 .fact { display: grid; flex: 1 1 145px; align-content: start; gap: 7px; padding: 12px; background: #f7f9fd; border: 1px solid #e9eef8; border-radius: 10px; }
 .fact-primary { flex: 1.5 1 215px; background: #eff4ff; border-color: #dce7ff; }
