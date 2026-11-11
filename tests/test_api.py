@@ -371,6 +371,14 @@ def test_decimal_speed_in_compound_question_is_not_split_at_comma():
     assert "Tổng mức phạt tiền nếu cộng các khung: 10.000.000 đồng – 14.000.000 đồng." in reply["answer"]
 
 
+def test_helmet_in_compound_question_defaults_to_driver():
+    reply = ask("Xe máy chở 3 người, không đội mũ bảo hiểm, lạng lách đánh võng")
+    assert reply["answer_type"] == "penalty"
+    assert [item["record_id"] for item in reply["violations"]] == [
+        "nd168-d7-k3-b", "nd168-d7-k2-h", "nd168-d7-k9-a",
+    ]
+
+
 def test_compound_passenger_helmet_and_weaving_question():
     reply = ask(
         "Nếu xe gắn máy tống 3 và không đội mũ bảo hiểm cả 3 người, "
