@@ -160,7 +160,7 @@ def accident_path(text: str, vehicle: Vehicle) -> str | Clarification:
         return vehicle_path(vehicle, "7.10.a", "6.10.b")
     if includes(SPEED + r"|\b(?:sai lan|khong dung (?:lan|phan) duong)\b", text):
         return vehicle_path(vehicle, "7.10.a", "6.10.a")
-    return Clarification("conduct", "Bạn mô tả hành vi gây tai nạn và nơi xảy ra để mình xác định đúng điều khoản?")
+    return Clarification("accident_cause", "Bạn mô tả hành vi gây tai nạn để mình xác định đúng điều khoản?")
 
 
 def child_passenger_path(surface: str, text: str) -> str | Clarification:
@@ -254,6 +254,9 @@ def direct_path(surface: str, text: str, vehicle: Vehicle) -> str | Clarificatio
     if not on_highway and includes(r"\bnguoc chieu\b", text):
         if includes(r"\b(?:duong mot chieu|bien cam|trong pho)\b", text):
             return vehicle_path(vehicle, "7.7.a", "6.9.d")
+        if vehicle == "xe_may":
+            # Cùng một khung phạt cho cả đường một chiều và đường khác.
+            return "7.7.a"
         return Clarification(
             "road_type",
             "Bạn đi ngược chiều trong đô thị/đường một chiều hay trên đường cao tốc?",

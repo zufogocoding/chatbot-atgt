@@ -62,6 +62,167 @@ def clarify(as_of: str, info: Clarification, options: list[Choice] | None = None
     )
 
 
+# Mỗi phương án làm rõ trỏ thẳng tới một khung phạt trong catalog. Nhờ vậy
+# người dùng chỉ cần bấm một nút, không phải gõ lại câu trả lời.
+CLARIFY_PATHS: dict[str, dict[Vehicle, tuple[tuple[str, str], ...]]] = {
+    "helmet_role": {
+        "xe_may": (
+            ("7.2.h", "Tôi là người lái, không đội mũ hoặc cài quai sai"),
+            ("7.2.i", "Tôi chở người ngồi sau không đội mũ"),
+            ("12.5.b", "Tôi là người ngồi sau, không đội mũ"),
+        ),
+    },
+    "seatbelt_role": {
+        "o_to": (
+            ("6.3.k", "Tôi là người lái, không thắt dây an toàn"),
+            ("6.3.l", "Tôi chở người không thắt dây an toàn"),
+            ("12.4", "Tôi là người được chở, không thắt dây an toàn"),
+        ),
+    },
+    "alcohol_level": {
+        "xe_may": (
+            ("7.6.a", "Chưa vượt quá 0,25 mg/l khí thở (hoặc 50 mg/100 ml máu)"),
+            ("7.8.b", "Trên 0,25 đến 0,4 mg/l (hoặc trên 50 đến 80 mg/100 ml)"),
+            ("7.9.d", "Trên 0,4 mg/l (hoặc trên 80 mg/100 ml)"),
+            ("7.9.đ", "Không chấp hành yêu cầu kiểm tra nồng độ cồn"),
+        ),
+        "o_to": (
+            ("6.6.c", "Chưa vượt quá 0,25 mg/l khí thở (hoặc 50 mg/100 ml máu)"),
+            ("6.9.a", "Trên 0,25 đến 0,4 mg/l (hoặc trên 50 đến 80 mg/100 ml)"),
+            ("6.11.a", "Trên 0,4 mg/l (hoặc trên 80 mg/100 ml)"),
+            ("6.11.b", "Không chấp hành yêu cầu kiểm tra nồng độ cồn"),
+        ),
+    },
+    "alcohol_unit": {
+        "xe_may": (
+            ("7.6.a", "Chưa vượt quá 0,25 mg/l khí thở (hoặc 50 mg/100 ml máu)"),
+            ("7.8.b", "Trên 0,25 đến 0,4 mg/l (hoặc trên 50 đến 80 mg/100 ml)"),
+            ("7.9.d", "Trên 0,4 mg/l (hoặc trên 80 mg/100 ml)"),
+            ("7.9.đ", "Không chấp hành yêu cầu kiểm tra nồng độ cồn"),
+        ),
+        "o_to": (
+            ("6.6.c", "Chưa vượt quá 0,25 mg/l khí thở (hoặc 50 mg/100 ml máu)"),
+            ("6.9.a", "Trên 0,25 đến 0,4 mg/l (hoặc trên 50 đến 80 mg/100 ml)"),
+            ("6.11.a", "Trên 0,4 mg/l (hoặc trên 80 mg/100 ml)"),
+            ("6.11.b", "Không chấp hành yêu cầu kiểm tra nồng độ cồn"),
+        ),
+    },
+    "speed_excess": {
+        "xe_may": (
+            ("7.2.b", "Vượt từ 5 đến dưới 10 km/h"),
+            ("7.4.a", "Vượt từ 10 đến 20 km/h"),
+            ("7.8.a", "Vượt trên 20 km/h"),
+        ),
+        "o_to": (
+            ("6.3.a", "Vượt từ 5 đến dưới 10 km/h"),
+            ("6.5.đ", "Vượt từ 10 đến 20 km/h"),
+            ("6.6.a", "Vượt trên 20 đến 35 km/h"),
+            ("6.7.a", "Vượt trên 35 km/h"),
+        ),
+    },
+    "engine_size": {
+        "xe_may": (
+            ("18.5.a", "Xe đến 125 cm³ (xe gắn máy, mô tô nhỏ)"),
+            ("18.7.b", "Mô tô trên 125 cm³"),
+        ),
+    },
+    "road_type": {
+        "o_to": (
+            ("6.9.d", "Trong đô thị hoặc đường một chiều"),
+            ("6.11.đ", "Trên đường cao tốc"),
+        ),
+    },
+    "license_expiry": {
+        "o_to": (
+            ("18.8.a", "Bằng lái hết hạn dưới 1 năm"),
+            ("18.9.a", "Bằng lái hết hạn từ 1 năm trở lên"),
+        ),
+    },
+    "inspection_expiry": {
+        "o_to": (
+            ("13.5.a", "Đăng kiểm hết hạn dưới 1 tháng"),
+            ("13.6.b", "Đăng kiểm hết hạn từ 1 tháng trở lên"),
+        ),
+    },
+    "accident_cause": {
+        "xe_may": (
+            ("7.10.b", "Vượt đèn đỏ gây tai nạn"),
+            ("7.10.a", "Đi ngược chiều, chạy quá tốc độ hoặc sai làn gây tai nạn"),
+        ),
+        "o_to": (
+            ("6.10.b", "Vượt đèn đỏ hoặc đi ngược chiều gây tai nạn"),
+            ("6.10.a", "Chạy quá tốc độ hoặc sai làn gây tai nạn"),
+        ),
+    },
+}
+
+
+def clarification_options(
+    con: sqlite3.Connection, info: Clarification, vehicle: Vehicle, text: str,
+) -> list[Choice]:
+    """Resolve clarification buttons to concrete catalog records."""
+    options: list[Choice] = []
+    seen: set[str] = set()
+    for path, label in CLARIFY_PATHS.get(info.reason, {}).get(vehicle, ()):
+        row = con.execute(
+            "SELECT id FROM violations WHERE legal_path = ? AND vehicle_type IN (?, 'both')",
+            (path, vehicle),
+        ).fetchone()
+        if row and row["id"] not in seen:
+            seen.add(row["id"])
+            options.append(Choice(record_id=row["id"], label=label))
+    if options:
+        return options
+    # Alias qualifiers already use citizen-facing wording (for example the
+    # alcohol tiers or speed bands), so reuse them when a direct mapping is
+    # not available.
+    for alias in find_aliases(con, text):
+        matches = alias_record_ids(con, alias["id"], vehicle)
+        if len(matches) < 2 or not all(row["qualifier"] for row in matches):
+            continue
+        for row in matches[:5]:
+            if row["record_id"] not in seen:
+                seen.add(row["record_id"])
+                options.append(Choice(record_id=row["record_id"], label=row["qualifier"]))
+        if options:
+            break
+    return options
+
+
+def vehicle_penalty_choices(
+    con: sqlite3.Connection, surface: str, text: str,
+) -> list[Choice]:
+    """Preview the same behavior for both vehicles when the user omitted it.
+
+    The first reply then already contains the amounts instead of only asking
+    "xe máy hay ô tô"; clicking a preview opens the full penalty record.
+    """
+    options: list[Choice] = []
+    seen: set[str] = set()
+    for vehicle, label in (("xe_may", "Xe máy"), ("o_to", "Ô tô")):
+        path = direct_path(surface, text, vehicle)
+        record = None
+        if isinstance(path, str) and path:
+            row = con.execute(
+                "SELECT id FROM violations WHERE legal_path = ? AND vehicle_type IN (?, 'both')",
+                (path, vehicle),
+            ).fetchone()
+            record = get_record(con, row["id"]) if row else None
+        if record is None:
+            for alias in find_aliases(con, text):
+                matches = alias_record_ids(con, alias["id"], vehicle)
+                if len(matches) == 1 and not alias["requires_qualifier"]:
+                    record = get_record(con, matches[0]["record_id"])
+                    break
+        if record and record["id"] not in seen:
+            seen.add(record["id"])
+            options.append(Choice(
+                record_id=record["id"],
+                label=f"{label}: {format_range(record['fine_min'], record['fine_max'])}",
+            ))
+    return options
+
+
 def penalty_sources(record: dict) -> list[Source]:
     url = record["source_url"]
     if not url or not url.startswith("https://") or not record["source_quote"]:
@@ -352,12 +513,26 @@ def lookup_penalty(
 ) -> ChatResponse:
     parts = re.split(r"\b(?:va|dong thoi)\b", surface)
     if len(parts) > 1:
-        paths = {direct_path(part, normalize_text(part), vehicle) for part in parts}
-        if sum(isinstance(path, str) and bool(path) for path in paths) > 1:
-            return clarify(as_of, Clarification("multiple_violations", "Bạn muốn tra hành vi nào trước?"))
+        part_paths = [direct_path(part, normalize_text(part), vehicle) for part in parts]
+        if sum(isinstance(item, str) and bool(item) for item in part_paths) > 1:
+            options: list[Choice] = []
+            for part, item in zip(parts, part_paths):
+                if not isinstance(item, str) or not item:
+                    continue
+                row = con.execute(
+                    "SELECT id, behavior_text FROM violations WHERE legal_path = ? AND vehicle_type IN (?, 'both')",
+                    (item, vehicle),
+                ).fetchone()
+                if row:
+                    options.append(Choice(record_id=row["id"], label=row["behavior_text"]))
+            return clarify(
+                as_of,
+                Clarification("multiple_violations", "Bạn muốn tra hành vi nào trước?"),
+                options,
+            )
     path = direct_path(surface, text, vehicle)
     if isinstance(path, Clarification):
-        return clarify(as_of, path)
+        return clarify(as_of, path, clarification_options(con, path, vehicle, text))
     if path is not None:
         row = con.execute(
             "SELECT id FROM violations WHERE legal_path = ? AND vehicle_type IN (?, 'both')",
@@ -375,8 +550,6 @@ def lookup_penalty(
             continue
         if alias_id == "vuot-den-do":
             return clarify(as_of, Clarification("conduct", "Bạn mô tả cụ thể đã đi qua đèn đỏ hay vi phạm tín hiệu khác?"))
-        if alias_id == "su-dung-dien-thoai":
-            return clarify(as_of, Clarification("conduct", "Người điều khiển có dùng tay cầm và sử dụng điện thoại khi xe đang chạy?"))
         if alias_id == "khong-sang-ten-chu-xe":
             return clarify(as_of, Clarification("ownership", "Xe đã đổi chủ mà chưa làm thủ tục sang tên, hay bạn đang mượn xe?"))
         if len(matches) == 1 and not alias["requires_qualifier"]:
@@ -431,5 +604,9 @@ def chat(con: sqlite3.Connection, request: ChatRequest) -> ChatResponse:
         return clarify(as_of, Clarification("vehicle_type", "Bạn muốn tra cho xe máy hay ô tô?"))
     vehicle = request.vehicle_type or next(iter(mentioned), None)
     if vehicle is None:
-        return clarify(as_of, Clarification("vehicle_type", "Bạn đi xe máy hay ô tô?"))
+        return clarify(
+            as_of,
+            Clarification("vehicle_type", "Bạn đi xe máy hay ô tô?"),
+            vehicle_penalty_choices(con, surface, text),
+        )
     return lookup_penalty(con, surface, text, vehicle, as_of)

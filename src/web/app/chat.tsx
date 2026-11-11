@@ -166,7 +166,9 @@ export default function Chat() {
     const previous = turns.at(-1);
     if (previous?.reply?.reason === "vehicle_type") {
       const shortReply = question.toLocaleLowerCase("vi-VN").replace(/[.!?]+$/, "");
-      const selected = shortReply === "xe máy" ? "xe_may" : shortReply === "ô tô" ? "o_to" : undefined;
+      const bike = ["xe máy", "xe may", "máy", "may"].includes(shortReply);
+      const car = ["ô tô", "o to", "oto", "xe hơi", "xe hoi", "xe con", "ôto"].includes(shortReply);
+      const selected = bike ? "xe_may" : car ? "o_to" : undefined;
       if (selected) {
         void ask({ ...previous.request, vehicle_type: selected });
         return;

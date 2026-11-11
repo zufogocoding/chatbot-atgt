@@ -133,6 +133,8 @@ Chỉ coi là bàn giao xong khi:
 
 - Runtime hiện chạy deterministic; chưa cấu hình API key cho LLM.
 - Baseline CLI còn thấp so với API (recall@5 96/192, trả lời đúng 47/192); đây là baseline của CLI, không phải kết quả API.
+- Câu hỏi thiếu loại xe, mức cồn, tốc độ hoặc vai trò người ngồi trên xe trả về nút chọn khung phạt; bấm nút là ra bản ghi đầy đủ. Gọi API trực tiếp có thể gửi `record_id` lấy từ `options`.
+- Một số câu phổ biến nhưng catalog chưa có hành vi tương ứng (ví dụ không mang giấy tờ xe cá nhân, chở hàng cồng kềnh) vẫn trả lời "chưa tìm thấy"; cần bổ sung dữ liệu trước khi mở rộng.
 - Định tuyến đã coi xe khách, xe tải, xe đầu kéo như ô tô cho các hành vi có trong catalog; câu thuần vận tải kinh doanh vẫn bị từ chối. Xe buýt, xe máy chuyên dùng vẫn ngoài phạm vi.
 - 12 bản ghi cảnh cáo/tịch thu không có mức tiền vẫn `draft` sau khi gộp `--fine-only`.
 - Điểm b khoản 9a Điều 32 chưa có trong catalog đến 01/01/2028.

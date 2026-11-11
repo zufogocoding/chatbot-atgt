@@ -193,6 +193,35 @@ def test_option_selection_requires_valid_record_and_vehicle():
     assert wrong_vehicle["reason"] == "vehicle_type"
 
 
+def test_vehicle_question_previews_both_fines_before_asking():
+    reply = ask("Vượt đèn đỏ phạt bao nhiêu?")
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == "vehicle_type"
+    labels = {option["record_id"]: option["label"] for option in reply["options"]}
+    assert set(labels) == {"nd168-d7-k7-c", "nd168-d6-k9-b"}
+    assert "Xe máy" in labels["nd168-d7-k7-c"]
+    assert "4.000.000" in labels["nd168-d7-k7-c"]
+    assert "Ô tô" in labels["nd168-d6-k9-b"]
+    assert "18.000.000" in labels["nd168-d6-k9-b"]
+
+    chosen = call("POST", "/chat", {
+        "question": labels["nd168-d6-k9-b"], "record_id": "nd168-d6-k9-b",
+    }).json()
+    assert chosen["answer_type"] == "penalty"
+    assert chosen["penalty"]["record_id"] == "nd168-d6-k9-b"
+
+
+def test_common_vehicle_unspecified_questions_show_amounts():
+    phone = ask("Sử dụng điện thoại khi lái xe phạt bao nhiêu?")
+    assert phone["reason"] == "vehicle_type"
+    assert {option["record_id"] for option in phone["options"]} == {
+        "nd168-d7-k4-đ", "nd168-d6-k5-h",
+    }
+    seatbelt = ask("Không thắt dây an toàn phạt bao nhiêu?")
+    assert seatbelt["reason"] == "vehicle_type"
+    assert [option["record_id"] for option in seatbelt["options"]] == ["nd168-d6-k3-k"]
+
+
 def test_passenger_is_a_separate_subject():
     passenger = ask("Người ngồi sau xe máy không đội mũ bảo hiểm")
     assert passenger["penalty"]["subject"] == "nguoi_duoc_cho"
@@ -317,6 +346,57 @@ def test_owner_overload_question_offers_both_owner_frameworks():
     assert {option["record_id"] for option in reply["options"]} == {
         "nd168-d32-k5", "nd168-d32-k6",
     }
+
+
+@pytest.mark.parametrize(
+    "question, vehicle, reason, record_ids",
+    [
+        (
+            "Không đội mũ bảo hiểm phạt bao nhiêu?", "xe_may", "helmet_role",
+            {"nd168-d7-k2-h", "nd168-d7-k2-i", "nd168-d12-k5-b"},
+        ),
+        (
+            "Nồng độ cồn phạt bao nhiêu?", "xe_may", "alcohol_level",
+            {"nd168-d7-k6-a", "nd168-d7-k8-b", "nd168-d7-k9-d", "nd168-d7-k9-đ"},
+        ),
+        (
+            "Chạy quá tốc độ phạt bao nhiêu?", "o_to", "speed_excess",
+            {"nd168-d6-k3-a", "nd168-d6-k5-đ", "nd168-d6-k6-a", "nd168-d6-k7-a"},
+        ),
+        (
+            "Không có bằng lái phạt bao nhiêu?", "xe_may", "engine_size",
+            {"nd168-d18-k5-a", "nd168-d18-k7-b"},
+        ),
+        (
+            "Không thắt dây an toàn phạt bao nhiêu?", "o_to", "seatbelt_role",
+            {"nd168-d6-k3-k", "nd168-d6-k3-l", "nd168-d12-k4"},
+        ),
+        (
+            "Đi ngược chiều phạt bao nhiêu?", "o_to", "road_type",
+            {"nd168-d6-k9-d", "nd168-d6-k11-đ"},
+        ),
+        (
+            "Gây tai nạn giao thông phạt bao nhiêu?", "xe_may", "accident_cause",
+            {"nd168-d7-k10-b", "nd168-d7-k10-a"},
+        ),
+    ],
+)
+def test_common_clarifications_offer_clickable_penalties(question, vehicle, reason, record_ids):
+    reply = ask(question, vehicle)
+    assert reply["answer_type"] == "clarify"
+    assert reply["reason"] == reason
+    assert {option["record_id"] for option in reply["options"]} == record_ids
+    for option in reply["options"]:
+        chosen = call("POST", "/chat", {"question": "chọn phương án", "record_id": option["record_id"]}).json()
+        assert chosen["answer_type"] == "penalty"
+        assert chosen["penalty"]["record_id"] == option["record_id"]
+        assert chosen["sources"]
+
+
+def test_phone_and_motorbike_wrong_way_questions_answer_without_a_dead_end():
+    assert ask("Sử dụng điện thoại khi lái xe phạt bao nhiêu?", "xe_may")["penalty"]["record_id"] == "nd168-d7-k4-đ"
+    assert ask("Sử dụng điện thoại khi lái xe phạt bao nhiêu?", "o_to")["penalty"]["record_id"] == "nd168-d6-k5-h"
+    assert ask("Xe máy đi ngược chiều phạt bao nhiêu?")["penalty"]["record_id"] == "nd168-d7-k7-a"
 
 
 def test_followup_vehicle_and_validation():

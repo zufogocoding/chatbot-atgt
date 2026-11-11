@@ -159,7 +159,7 @@ function PenaltyDetails({ penalty, sources }: { penalty: Penalty; sources: Sourc
 const answerLabels = {
   penalty: { label: "Kết quả tra mức phạt", icon: Scale },
   procedure: { label: "Hướng dẫn thủ tục", icon: FileText },
-  clarify: { label: "Cần thêm thông tin", icon: CircleHelp },
+  clarify: { label: "Chọn thông tin để tra mức phạt", icon: CircleHelp },
   refuse: { label: "Tra cứu có giới hạn", icon: ShieldAlert },
 };
 
@@ -223,7 +223,7 @@ export default function Answer({
             </ul>
           )}
           <div className="clarification-actions">
-            {reply.reason === "vehicle_type" && (
+            {reply.reason === "vehicle_type" && reply.options.length < 2 && (
               <>
                 <button type="button" disabled={pending} onClick={() => onChooseVehicle("xe_may")}>Xe máy</button>
                 <button type="button" disabled={pending} onClick={() => onChooseVehicle("o_to")}>Ô tô</button>
