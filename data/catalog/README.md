@@ -18,7 +18,7 @@ Thư mục này là **nguồn sự thật** cho phần tra cứu mức phạt c�
 | Có biện pháp khắc phục hậu quả | 69 |
 | Có trừ điểm GPLX | 112 |
 | Quy tắc hình phạt/trừ điểm | 59 |
-| Alias tiếng dân | 56 nhóm, 363 cách nói (290 biến thể sau chuẩn hóa) |
+| Alias tiếng dân | 56 nhóm, 369 cách nói (293 biến thể sau chuẩn hóa) |
 | Trạng thái kiểm chứng | `draft`. Đối chiếu tự động khớp 276/276. Hai lượt rà soát của người kiểm chứng đang chờ xác nhận. |
 
 Phân bố theo Điều:
@@ -222,7 +222,7 @@ warnings: 0 (hoặc chỉ warning về record chưa có alias)
 built data/build/catalog.db
   violations: 276
   penalty rules: 59
-  alias groups: 56 (290 phrases)
+  alias groups: 56 (293 phrases)
 ```
 
 ### Tra thử bằng CLI
@@ -346,8 +346,8 @@ Catalog giữ trạng thái **draft** đến khi hoàn tất hai lượt đối 
 
 ## 7. Giới hạn hiện tại
 
-- Thủ tục nộp phạt và khiếu nại nằm trong [`data/procedures/`](../procedures/). Nhánh trả lời bằng RAG đang chờ tích hợp.
-- **Điều 32 (chủ phương tiện) đã trích xuất phần lõi**: sang tên/thay đổi chủ xe, đăng ký/biển số, cải tạo xe, giao xe cho người không đủ điều kiện, đưa xe không biển số/đăng ký tham gia giao thông, tịch thu phương tiện (một số trường hợp). **Chưa gồm**: khoản 5, 6 (phạt theo số người vượt quá, có trần tối đa — mô hình phạt khác), các điểm 238/2026 bổ sung như 9a, 11.e, 13.e, và một số hành vi tham chiếu Điều 20/21/22/34 chưa có trong catalog.
+- Thủ tục nộp phạt và khiếu nại nằm trong [`data/procedures/`](../procedures/). Nhánh thủ tục đã tích hợp: truy xuất BM25/FTS5 trên 23 đoạn trong SQLite, trả kèm nguồn và căn cứ; không dùng dense embedding/Chroma.
+- **Điều 32 (chủ phương tiện) đã trích xuất phần lõi**: sang tên/thay đổi chủ xe, đăng ký/biển số, cải tạo xe, giao xe cho người không đủ điều kiện, đưa xe không biển số/đăng ký tham gia giao thông, tịch thu phương tiện (một số trường hợp). **Đã bổ sung** khoản 5, 6 (phạt theo số người vượt quá, có trần tối đa) và các điểm 238/2026 như 9a.a, 11.e, 13.e. **Chưa gồm**: điểm b khoản 9a (hoãn đến 01/01/2028) và một số hành vi tham chiếu Điều 20/21/22/34 chưa có trong catalog.
 - **Điều 12 mới trích xuất nhóm người được chở**: mũ bảo hiểm, dây đai an toàn, bám kéo, che ô/dù. Các hành vi công cộng khác của Điều 12 (bán hàng vỉa hè, vật cản, drone...) nằm ngoài phạm vi. **Chưa trích xuất Điều 17 và 20–24** (môi trường, vận tải hành khách/hàng hóa).
 - **Một số điểm luật gộp nhiều hành vi thay thế** (ví dụ Điều 18 khoản 5 điểm a). Record giữ nguyên văn cả điểm; hình phạt bổ sung có `condition` để tránh khẳng định sai. Khi làm UI nên tách hoặc hỏi lại hành vi cụ thể.
 - **Chưa xử lý quy định chuyển tiếp** của 238/2026 và các mức phạt thay đổi theo thời điểm. Catalog là ảnh chụp tại 09/11/2026.

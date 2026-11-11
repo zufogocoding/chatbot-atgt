@@ -1,5 +1,7 @@
 # Bàn giao kiểm chứng catalog
 
+> **Lưu ý:** số liệu trong tài liệu này là snapshot tại commit `5de91b1` (94/94 test). Trạng thái hiện tại xem [`docs/report-handoff.md`](report-handoff.md).
+
 Tài liệu này dành cho người nhận bàn giao: hai người rà soát độc lập và một người gộp/release.
 
 ## 1. Trạng thái bàn giao

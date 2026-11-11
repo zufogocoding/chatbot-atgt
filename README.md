@@ -5,6 +5,10 @@ Chatbot tiếng Việt giúp người dân tra cứu mức phạt vi phạm giao
 - [Phạm vi, kiến trúc và kế hoạch đánh giá](docs/project-brief.md)
 - [Schema catalog, quy trình dựng lại và giới hạn](data/catalog/README.md)
 - [Bàn giao kiểm chứng catalog cho hai người rà soát](docs/ban-giao.md)
+- [Bàn giao viết báo cáo](docs/report-handoff.md)
+- [Kết quả kiểm thử và đánh giá](docs/eval-results.md)
+- [Nhật ký quyết định thiết kế](docs/decision-log.md)
+- [Kịch bản demo](docs/demo-script.md)
 
 ## Cách chạy trên Windows
 
@@ -72,10 +76,11 @@ Khi đặt `ATGT_QUESTION_LOG_PATH`, API ghi mỗi lượt chat có kết quả 
 | Văn bản áp dụng | 168/2024/NĐ-CP, hợp nhất với 238/2026/NĐ-CP (hiệu lực 15/08/2026) |
 | Ngày snapshot | 09/11/2026 |
 | Bản ghi vi phạm | 276 (Điều 6, 7, 12, 13, 14, 18, 32) — gồm người điều khiển, người được chở và chủ phương tiện |
-| Alias tiếng dân | 56 nhóm, 363 cách nói (290 biến thể sau chuẩn hóa) |
+| Alias tiếng dân | 56 nhóm, 369 cách nói (293 biến thể sau chuẩn hóa) |
 | Kiểm chứng | 276/276 bản ghi khớp đối chiếu tự động. Trạng thái `draft` đến khi có hai người xác nhận khung tiền theo đề cương. |
 | Dữ liệu thủ tục | 23 đoạn có dẫn nguồn cho nộp phạt và khiếu nại |
 | Bộ đánh giá | 265 câu có nhãn kỳ vọng, có script chấm baseline |
+| Câu hỏi nhiều vi phạm | Tách deterministic, trả `violations[]` kèm căn cứ từng hành vi |
 | Tra cứu thử | SQLite + FTS5 + CLI |
 
 Phạm vi catalog hiện tại: quy tắc giao thông, điều kiện phương tiện, điều kiện người lái, **Điều 12 (người được chở)** và **Điều 32 (chủ phương tiện)** — bao gồm sang tên/không chính chủ, giao xe cho người không đủ điều kiện, biển số/đăng ký, cải tạo xe, khoản 5–6 (phạt trên mỗi người vượt quá, có trần) và các điểm 238/2026 thêm mới 9a.a/11.e/13.e. Chưa gồm: điểm b khoản 9a (thiết bị ghi nhận hình ảnh người lái xe, hiệu lực 01/01/2028), Điều 17 và các điều vận tải 20–24.

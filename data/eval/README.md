@@ -54,6 +54,8 @@ python scripts/evaluate_dataset.py --api-url http://127.0.0.1:8000/chat --failur
 
 Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, loại phản hồi hỏi lại hoặc từ chối và độ trễ HTTP p95. Golden set này được dùng trong lúc phát triển API. Các số đo phản ánh mức độ bao phủ của bộ câu hỏi hiện có.
 
+Số đo dưới đây chạy ngày 11/11/2026 tại commit `d857ca6`, snapshot dữ liệu 09/11/2026, trên API tạm không bật log câu hỏi. Kiểm thử chức năng, gồm các ca multi-violation, nằm trong `tests/test_api.py`; tài liệu này chỉ chấm golden set.
+
 | Chỉ số qua HTTP cục bộ | Kết quả |
 |---|---:|
 | Đúng bản ghi, khung tiền, mức trần và căn cứ mức phạt | 192/192 |
@@ -65,7 +67,7 @@ Bộ chấm kiểm tra bản ghi, khung tiền, căn cứ, đoạn thủ tục, 
 | Hỏi lại đúng loại phản hồi | 19/19 |
 | Từ chối đúng loại phản hồi | 8/8 |
 | Câu trả lời thiếu nguồn | 0 |
-| Độ trễ HTTP p95 trong lần chạy kiểm thử | 2,0 ms |
+| Độ trễ HTTP p95 trong lần chạy kiểm thử | 2,0 ms (không bật log câu hỏi) |
 
 Định tuyến mới coi xe khách, xe tải, xe đầu kéo như ô tô cho các hành vi có trong catalog: hai ca trước đây nhãn `refuse` ("Xe tải vượt đèn đỏ", "Xe khách 45 chỗ vượt đèn đỏ") được đổi thành Điều 6 khoản 9 điểm b, cùng bốn ca mới cho xe khách/xe tải/đầu kéo và một ca hỏi lại chọn khung chủ xe chở quá số người. Xe buýt, xe máy chuyên dùng vẫn ngoài phạm vi.
 
