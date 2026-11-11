@@ -94,6 +94,8 @@ Output:
 123 passed
 ```
 
+Trong lần rà soát tài liệu ngày 11/11/2026, golden set phát hiện ca `gs-012` (“Người lớn ngồi sau xe máy không cài quai mũ thì người chở bị phạt mức nào?”) trả 2 vi phạm thay vì 1. Nguyên nhân là mặc định “không đội mũ” cho người lái được cộng thêm dù câu hỏi đã nêu rõ người ngồi sau và hỏi về người chở. Đã sửa tại commit `d857ca6` và thêm test `test_passenger_helmet_question_about_driver_returns_one_violation`; test tăng từ 122 lên 123. Đây là ví dụ golden set bắt được regression ngoài các ca multi-violation.
+
 ### 3.4. Golden set qua API
 
 Chạy API tạm ở cổng 8100 để không ảnh hưởng demo:
